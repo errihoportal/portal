@@ -24,7 +24,7 @@ if (isset($_POST['login'])) {
     $data = json_decode($response, true);
 
     if ($data && isset($data['status']) && $data['status'] !== 'error') {
-        $_SESSION['user_data'] = $data; // I-save ang buong data sa session
+        $_SESSION['user_data'] = $data;
         header("Location: statement.php");
         exit();
     } else {
@@ -40,18 +40,18 @@ if (isset($_POST['login'])) {
     <title>ERRIHO PORTAL - LOGIN</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
-        /* Kinuha ko ang lahat ng login styles mo rito */
+        body { font-family: 'Inter', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #1a1a1a; }
+        .login-card { max-width: 400px; margin: 60px auto; padding: 45px 35px; background: #ffffff; border-radius: 28px; box-shadow: 0 15px 40px rgba(0,0,0,0.08); text-align: center; border: 1px solid #f1f1f1; }
     </style>
 </head>
 <body>
-    <div style="max-width: 400px; margin: 60px auto; padding: 45px 35px; background: #ffffff; border-radius: 28px; box-shadow: 0 15px 40px rgba(0,0,0,0.08); text-align: center; border: 1px solid #f1f1f1;">
+    <div class="login-card">
         <div style="margin-bottom: 30px;">
             <div style="background: #f0fdf4; width: 70px; height: 70px; border-radius: 20px; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px; border: 1px solid #dcfce7;">
                 <img src="images/test.png" alt="ERRIHO" style="height: 40px; width: auto;">
             </div>
-            <h2 style="color: #27ae60; margin: 0; font-size: 28px; font-weight: 800;">WELCOME TO ERRIHO PORTAL</h2>
-            <p style="font-size: 11px; color: #64748b; margin-top: 6px; font-weight: 700; text-transform: uppercase;">Provide your account credentials below</p>
+            <h2 style="color: #27ae60; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -1px;">WELCOME TO ERRIHO PORTAL</h2>
+            <p style="font-size: 11px; color: #64748b; margin-top: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;">Provide your account credentials below</p>
         </div>
 
         <?php if ($error_login): ?>
@@ -62,20 +62,19 @@ if (isset($_POST['login'])) {
 
         <form method="POST">
             <div style="margin-bottom: 15px; text-align: left;">
-                <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Username</label>
-                <input type="text" name="acc" style="width: 100%; padding: 16px; border-radius: 15px; border: 1.5px solid #e2e8f0; box-sizing: border-box;" placeholder="Enter username" required>
+                <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-left: 5px;">Username</label>
+                <input type="text" name="acc" style="width: 100%; padding: 16px; border-radius: 15px; border: 1.5px solid #e2e8f0; box-sizing: border-box; font-size: 15px; background: #f8fafc; margin-top: 5px;" placeholder="Enter username" required>
             </div>
             <div style="margin-bottom: 25px; text-align: left;">
-                <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Passcode</label>
-                <input type="password" name="pass" style="width: 100%; padding: 16px; border-radius: 15px; border: 1.5px solid #e2e8f0; box-sizing: border-box;" placeholder="Enter passcode" required>
+                <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-left: 5px;">Passcode</label>
+                <input type="password" name="pass" style="width: 100%; padding: 16px; border-radius: 15px; border: 1.5px solid #e2e8f0; box-sizing: border-box; font-size: 15px; background: #f8fafc; margin-top: 5px;" placeholder="Enter passcode" required>
             </div>
-            <button type="submit" name="login" onclick="handleLogin()" style="width:100%; padding:18px; background:#27ae60; color:white; border:none; border-radius:14px; font-weight:800; cursor:pointer;">AUTHORIZE LOGIN</button>
+            <button type="submit" name="login" onclick="handleLogin()" style="width:100%; padding:18px; background:#27ae60; color:white; border:none; border-radius:14px; font-weight:800; font-size:16px; cursor:pointer;">AUTHORIZE LOGIN</button>
         </form>
 
-        <div style="margin-top: 20px;"><a href="javascript:void(0)" onclick="showLoginHelp()" style="font-size: 13px; color: #888; text-decoration: none;">Need help?</a></div>
+        <div style="margin-top: 20px;"><a href="javascript:void(0)" onclick="showLoginHelp()" style="font-size: 13px; color: #888; text-decoration: none; font-weight: 600;">Need help with your passcode?</a></div>
         <div style="margin-top: 15px;"><a href="update.php" style="display: block; text-align: center; padding: 12px; font-size: 13px; color: #27ae60; background: #f0faf3; border: 1px solid #d1f2dc; border-radius: 12px; text-decoration: none; font-weight: 700;">Request Passcode Update</a></div>
     </div>
-
     <script>
         function handleLogin() {
             var userField = document.getElementsByName("acc")[0];
@@ -90,7 +89,7 @@ if (isset($_POST['login'])) {
             return true;
         }
         function showLoginHelp() {
-            alert("LOGIN GUIDE:\n1. USERNAME: First name lowercase.\n2. PASSCODE: Last 6 digits of mobile.");
+            alert("LOGIN GUIDE:\n\n1. USERNAME: Your first name in lowercase.\n2. PASSCODE: Last 6 digits of your mobile number.");
         }
     </script>
 </body>
