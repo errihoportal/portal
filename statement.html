@@ -147,19 +147,43 @@
 </div>
 
 <script>
-    // 1. Security Check
-    const data = JSON.parse(localStorage.getItem('erriho_user'));
+    // 1. Security Check & Initial Data
+    let data = JSON.parse(localStorage.getItem('erriho_user'));
     if (!data) { window.location.href = 'index.html'; }
 
-    // 2. Formatting Helper
+    const baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
     const fmt = (num) => "₱" + parseFloat(num).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-    window.onload = () => {
+    window.onload = async () => {
         document.getElementById('mainContent').style.display = 'block';
+        
+        populateData();
+        
         if (!localStorage.getItem('hasSeenWelcome_v2')) {
             document.getElementById('welcomePortalModal').style.display = 'flex';
         }
-        populateData();
+
+        // --- BAGONG LOGIC: Mag-sync sa Server para sa Live Updates ---
+        try {
+            console.log("Syncing with server...");
+            // Gagamitin natin ang saved credentials para mag-fetch uli
+            const response = await fetch(`${baseUrl}?acc=${encodeURIComponent(data.accRef)}&pass=${encodeURIComponent(data.passcode)}`);
+            const newData = await response.json();
+
+            if (newData && newData.status !== 'error') {
+                // I-update ang LocalStorage para sa susunod na refresh
+                localStorage.setItem('erriho_user', JSON.stringify(newData));
+                data = newData; // I-update ang variable
+                
+                // Burahin ang lumang listahan bago i-populate uli
+                document.getElementById('scheduleList').innerHTML = '<span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>';
+                
+                populateData(); // I-render ang bagong data
+                console.log("Data synced successfully!");
+            }
+        } catch (err) {
+            console.log("Offline mode: Using cached data.");
+        }
     };
 
     function populateData() {
