@@ -1,7 +1,6 @@
 <?php
 session_start();
-// Kung naka-login na, rekta na sa statement
-if (isset($_SESSION['user_data'])) {
+if (isset($_SESSION['data'])) {
     header("Location: statement.php");
     exit();
 }
@@ -10,7 +9,6 @@ $error_login = false;
 if (isset($_POST['login'])) {
     $acc = trim($_POST['acc']); 
     $pass = trim($_POST['pass']); 
-    
     $baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
     $url = $baseUrl . "?acc=" . urlencode($acc) . "&pass=" . urlencode($pass);
 
@@ -25,7 +23,7 @@ if (isset($_POST['login'])) {
     $data = json_decode($response, true);
 
     if ($data && isset($data['status']) && $data['status'] !== 'error') {
-        $_SESSION['user_data'] = $data;
+        $_SESSION['data'] = $data;
         header("Location: statement.php");
         exit();
     } else {
@@ -42,31 +40,34 @@ if (isset($_POST['login'])) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
-        .login-card { max-width: 400px; margin: 60px auto; padding: 45px 35px; background: #ffffff; border-radius: 28px; box-shadow: 0 15px 40px rgba(0,0,0,0.08); text-align: center; border: 1px solid #f1f1f1; }
-        input { width: 100%; padding: 16px; border-radius: 15px; border: 1.5px solid #e2e8f0; box-sizing: border-box; font-size: 15px; background: #f8fafc; margin-top: 5px; margin-bottom: 15px; }
-        button { width:100%; padding:18px; background:#27ae60; color:white; border:none; border-radius:14px; font-weight:800; font-size:16px; cursor:pointer; }
-        .error { background: #fff1f0; color: #e74c3c; padding: 12px; border-radius: 12px; font-size: 12px; margin-bottom: 20px; font-weight: 600; border: 1px solid #ffccc7; }
+        .login-box { max-width: 400px; margin: 60px auto; padding: 45px 35px; background: #ffffff; border-radius: 28px; box-shadow: 0 15px 40px rgba(0,0,0,0.08); text-align: center; border: 1px solid #f1f1f1; }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <img src="images/test.png" alt="ERRIHO" style="height: 50px; margin-bottom: 15px;">
-        <h2 style="color: #27ae60; margin: 0; font-size: 24px; font-weight: 800;">ERRIHO PORTAL</h2>
-        <p style="font-size: 11px; color: #64748b; margin-bottom: 25px;">Please provide your account credentials</p>
+    <div class="login-box">
+        <div style="background: #f0fdf4; width: 70px; height: 70px; border-radius: 20px; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px; border: 1px solid #dcfce7;">
+            <img src="images/test.png" alt="ERRIHO" style="height: 40px;">
+        </div>
+        <h2 style="color: #27ae60; margin: 0; font-size: 28px; font-weight: 800;">WELCOME TO ERRIHO PORTAL</h2>
+        <p style="font-size: 11px; color: #64748b; margin-top: 10px; font-weight: 700; text-transform: uppercase;">Provide your account credentials below</p>
 
         <?php if ($error_login): ?>
-            <div class="error">❌ Invalid Username or Passcode</div>
+            <div style="background: #fff1f0; color: #e74c3c; padding: 12px; border-radius: 12px; font-size: 12px; margin-bottom: 20px; font-weight: 600; border: 1px solid #ffccc7;">
+                ❌ Invalid Username or Passcode
+            </div>
         <?php endif; ?>
 
         <form method="POST">
-            <input type="text" name="acc" placeholder="Username" required>
-            <input type="password" name="pass" placeholder="Passcode" required>
-            <button type="submit" name="login">AUTHORIZE LOGIN</button>
+            <div style="text-align: left; margin-bottom: 15px;">
+                <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Username</label>
+                <input type="text" name="acc" style="width: 100%; padding: 16px; border-radius: 15px; border: 1.5px solid #e2e8f0; box-sizing: border-box; background: #f8fafc;" required>
+            </div>
+            <div style="text-align: left; margin-bottom: 25px;">
+                <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Passcode</label>
+                <input type="password" name="pass" style="width: 100%; padding: 16px; border-radius: 15px; border: 1.5px solid #e2e8f0; box-sizing: border-box; background: #f8fafc;" required>
+            </div>
+            <button type="submit" name="login" style="width:100%; padding:18px; background:#27ae60; color:white; border:none; border-radius:14px; font-weight:800; font-size:16px; cursor:pointer;">AUTHORIZE LOGIN</button>
         </form>
-        
-        <div style="margin-top: 20px;">
-            <a href="update.php" style="text-decoration:none; font-size: 13px; color: #27ae60; font-weight: 700;">Request Passcode Update</a>
-        </div>
     </div>
 </body>
 </html>
