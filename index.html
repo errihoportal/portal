@@ -128,10 +128,10 @@
 
             if (!isStandalone) {
                 if (isiOS) {
-                    pwaText.innerHTML = "Para sa mabilis na access, i-save ito sa iyong iPhone/iPad: I-tap ang <b>'Share'</b> button (yung square na may arrow up) sa baba, at piliin ang <b>'Add to Home Screen'</b>.";
+                    pwaText.innerHTML = "<b>Add to Home Screen:</b> Tap the <b>'Share'</b> icon (square with an up arrow) and select <b>'Add to Home Screen'</b> for easier access.";
                     pwaBadge.style.display = 'block';
                 } else if (isAndroid) {
-                    pwaText.innerHTML = "Para sa mabilis na access: I-tap ang <b>tatlong tuldok (⋮)</b> sa taas ng browser at piliin ang <b>'Install app'</b> o <b>'Add to Home Screen'</b>.";
+                    pwaText.innerHTML = "<b>Install App:</b> Tap the <b>three dots (⋮)</b> in your browser menu and select <b>'Install app'</b> or <b>'Add to Home Screen'</b>.";
                     pwaBadge.style.display = 'block';
                 }
             }
