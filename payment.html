@@ -273,15 +273,15 @@
     }
 
     function showSuccess() {
-        document.querySelector('.close-overlay').style.display = 'none';
         document.getElementById('overlay').style.display = 'flex';
         let seconds = 5;
         const msgElement = document.getElementById('overlayMsg');
-        const updateMsg = (s) => {
-            msgElement.innerHTML = `Thank you! Status: <b>VERIFYING</b>.<br>` +
-                                   `Checking your proof of payment.<br>` +
-                                   `<small style="color:#e67e22">Refreshing in ${s}s...</small>`;
-        }
+        const countdown = setInterval(() => {
+            seconds--;
+            msgElement.innerHTML = `Thank you! Status: <b>VERIFYING</b>.<br>Refreshing in ${seconds}s...`;
+            if (seconds <= 0) { clearInterval(countdown); window.location.reload(); }
+        }, 1000);
+    }
 
     function toggleModal(show) {
         document.getElementById('instrModal').style.display = show ? 'flex' : 'none';
