@@ -1,9 +1,79 @@
+<?php
+session_start();
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: index.php");
+    exit();
+}
+
+$data = null;
+$error_login = false;
+
+if (isset($_POST['login'])) {
+    $acc = trim($_POST['acc']); 
+    $pass = trim($_POST['pass']); 
+    
+    $baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
+    $url = $baseUrl . "?acc=" . urlencode($acc) . "&pass=" . urlencode($pass);
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); 
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    
+    $response = curl_exec($ch);
+    curl_close($ch);
+    
+    $data = json_decode($response, true);
+
+    if (!$data || (isset($data['status']) && $data['status'] == 'error')) {
+        $error_login = true;
+        $data = null; 
+    }
+}
+
+$overdueBills = [];
+$nextDueBill = null;
+$totalOverdueAmount = 0;
+
+if ($data && isset($data['schedule'])) {
+    foreach ($data['schedule'] as $index => $item) {
+        $st = strtoupper(trim($item['st'])); 
+        
+        if ($st === 'OVERDUE') {
+            $overdueBills[] = [
+                'bill_no' => $index + 1,
+                'total' => $item['total']
+            ];
+            $totalOverdueAmount += $item['total'];
+        } elseif ($st === 'DUE' && $nextDueBill === null) {
+            $nextDueBill = $item;
+        }
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ERRIHO PORTAL - STATEMENT</title>
+    <title>ERRIHO PORTAL</title>
+    
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://errihoportal.page.gd">
+    <meta property="og:title" content="CLICK HERE TO VIEW YOUR STATEMENT AND PAY">
+    <meta property="og:description" content="ERRIHO PORTAL">
+    <meta property="og:image" content="https://errihoportal.page.gd/images/logo.png">
+    
+    <meta name="theme-color" content="#27ae60">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <link rel="apple-touch-icon" href="https://errihoportal.page.gd/images/test.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://errihoportal.page.gd/images/test.png">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -38,10 +108,11 @@
         .status-overdue { background: #fff1f0; color: #e74c3c; }
 
         .btn-pay-animated { background: var(--primary-green); color: white; border: none; padding: 18px; width: 100%; border-radius: 16px; font-weight: 800; cursor: pointer; font-size: 18px; margin-top: 10px; transition: 0.3s; display: block; text-align: center; text-decoration: none; }
+        .btn-dl { display: inline-block; background: #fff; border: 1px solid #ddd; padding: 8px 12px; border-radius: 8px; font-size: 11px; text-decoration: none; color: #555; font-weight: 700; margin-top: 12px; text-align: center; }
         
-        .active .details-pane { display: block; }
-        .action-circle { background: #eee; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #888; }
+        .action-circle { background: #eee; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #888; transition: 0.3s; }
         .active .action-circle { transform: rotate(45deg); background: var(--danger-red); color: white; }
+        .active .details-pane { display: block; }
 
         /* Modal */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 9999; }
@@ -52,219 +123,229 @@
 </head>
 <body>
 
-<div id="welcomePortalModal" class="modal-overlay">
-    <div class="modal-box" style="width: 90%; max-width: 360px;">
-        <div style="font-size: 50px; margin-bottom: 15px;">👋</div>
-        <h2 style="font-size: 22px; margin: 0 0 10px 0; color: #1a1a1a;" id="modalGreeting">Hello!</h2>
-        <p style="font-size: 14px; color: #666; line-height: 1.5; margin-bottom: 20px;">Welcome to your new ERRIHO Portal! We’ve upgraded our system for a smoother experience.</p>
-        <button onclick="closeWelcomeModal()" style="width: 100%; padding: 18px; font-size: 16px; border-radius: 16px; background: #27ae60; color: white; border: none; font-weight: 800; cursor: pointer;">GOT IT, THANKS!</button>
-    </div>
-</div>
+<?php if (!$data): ?>
+    <div style="max-width: 400px; margin: 60px auto; padding: 45px 35px; background: #ffffff; border-radius: 28px; box-shadow: 0 15px 40px rgba(0,0,0,0.08); text-align: center; font-family: 'Inter', sans-serif; border: 1px solid #f1f1f1;">
+        <div style="margin-bottom: 30px;">
+            <div style="background: #f0fdf4; width: 70px; height: 70px; border-radius: 20px; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px; border: 1px solid #dcfce7;">
+                <img src="images/test.png" alt="ERRIHO" style="height: 40px; width: auto; object-fit: contain;">
+            </div>
+            <h2 style="color: #27ae60; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -1px;">WELCOME TO ERRIHO PORTAL</h2>
+            <p style="font-size: 11px; color: #64748b; margin-top: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;">ErriHo Personal Finance</p>
+        </div>
 
-<div class="card" id="mainContent" style="display:none;">
-    <div style="text-align: right; margin-bottom: 10px;">
-        <a href="logout.html" style="text-decoration: none; font-size: 11px; font-weight: 800; color: #e74c3c; background: #fff1f0; padding: 8px 15px; border-radius: 10px; border: 1px solid #ffccc7;">Log Out ➔</a>
+        <?php if ($error_login): ?>
+            <div style="background: #fff1f0; color: #e74c3c; padding: 12px; border-radius: 12px; font-size: 12px; margin-bottom: 20px; font-weight: 600; border: 1px solid #ffccc7;">
+                ❌ Invalid Username or Passcode
+            </div>
+        <?php endif; ?>
+
+        <form method="POST">
+            <div style="margin-bottom: 15px; text-align: left;">
+                <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-left: 5px; letter-spacing: 1px;">Username</label>
+                <input type="text" name="acc" style="width: 100%; padding: 16px; border-radius: 15px; border: 1.5px solid #e2e8f0; box-sizing: border-box; font-size: 15px; background: #f8fafc; margin-top: 5px;" placeholder="Enter username" required>
+            </div>
+            <div style="margin-bottom: 25px; text-align: left;">
+                <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-left: 5px; letter-spacing: 1px;">Passcode</label>
+                <input type="password" name="pass" style="width: 100%; padding: 16px; border-radius: 15px; border: 1.5px solid #e2e8f0; box-sizing: border-box; font-size: 15px; background: #f8fafc; margin-top: 5px;" placeholder="Enter passcode" required>
+            </div>
+            <button type="submit" name="login" onclick="handleLogin()" style="width:100%; padding:18px; background:#27ae60; color:white; border:none; border-radius:14px; font-weight:800; font-size:16px; cursor:pointer;">AUTHORIZE LOGIN</button>
+        </form>
+
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="javascript:void(0)" onclick="showLoginHelp()" style="font-size: 13px; color: #888; text-decoration: none; font-weight: 600;">Need help with your passcode?</a>
+        </div>
+        <div style="margin-top: 15px;">
+            <a href="update.php" style="display: block; text-align: center; padding: 12px; font-size: 13px; color: #27ae60; background: #f0faf3; border: 1px solid #d1f2dc; border-radius: 12px; text-decoration: none; font-weight: 700;">Request Passcode Update</a>
+        </div>
+        <div style="margin-top: 25px; border-top: 1px solid #eee; padding-top: 20px;">
+            <button type="button" onclick="openInstallGuide()" style="width: 100%; background: #f0fdf4; color: #27ae60; border: 1px dashed #27ae60; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;"><span>📲</span> ADD TO HOME SCREEN</button>
+        </div>
     </div>
 
-    <div style="text-align: center; margin-bottom: 30px; border-bottom: 1px solid #f0f0f0; padding-bottom: 20px;">
-        <img src="images/test.png" alt="ERRIHO Logo" style="height: 100px; width: auto; object-fit: contain;">
-        <div style="font-size: 10px; font-weight: 800; color: #aaa; letter-spacing: 2px; margin-top: 5px;">ERRIHO PORTAL</div>
+<?php else: ?>
+    <div id="welcomePortalModal" class="modal-overlay">
+        <div class="modal-box" style="width: 90%; max-width: 360px;">
+            <div style="font-size: 50px; margin-bottom: 15px;">👋</div>
+            <h2 style="font-size: 22px; margin: 0 0 10px 0; color: #1a1a1a;">Hello, <?php echo explode(' ', trim($data['name']))[0]; ?>!</h2>
+            <p style="font-size: 14px; color: #666; line-height: 1.5; margin-bottom: 20px;">Welcome to your new ERRIHO Portal! We’ve upgraded our system for a smoother experience.</p>
+            <button onclick="closeWelcomeModal()" style="width: 100%; padding: 18px; font-size: 16px; border-radius: 16px; background: #27ae60; color: white; border: none; font-weight: 800; cursor: pointer;">GOT IT, THANKS!</button>
+        </div>
     </div>
 
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; gap: 15px;">
-        <div style="flex: 1;">
-            <h2 id="dispName" style="margin: 0; font-size: 22px; font-weight: 800; color: #1a1a1a; line-height: 1.2;">---</h2>
-            <div style="margin-top: 8px; display: flex; align-items: center; gap: 5px;">
-                <span style="font-size: 10px; font-weight: 800; color: #999; text-transform: uppercase;">Account No:</span>
-                <span id="dispAccRef" style="font-family: monospace; font-size: 13px; font-weight: 700; color: var(--primary-green); background: #e8f5e9; padding: 2px 8px; border-radius: 5px;">---</span>
+    <div class="card">
+        <div style="text-align: right; margin-bottom: 10px;">
+            <a href="?logout=1" style="text-decoration: none; font-size: 11px; font-weight: 800; color: #e74c3c; background: #fff1f0; padding: 8px 15px; border-radius: 10px; border: 1px solid #ffccc7;">Log Out ➔</a>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 1px solid #f0f0f0; padding-bottom: 20px;">
+            <img src="images/test.png" alt="ERRIHO Logo" style="height: 100px; width: auto; object-fit: contain;">
+            <div style="font-size: 10px; font-weight: 800; color: #aaa; letter-spacing: 2px; margin-top: 5px;">ERRIHO PORTAL</div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; gap: 15px;">
+            <div style="flex: 1;">
+                <h2 style="margin: 0; font-size: 22px; font-weight: 800; color: #1a1a1a; line-height: 1.2;"><?php echo strtoupper($data['name']); ?></h2>
+                <div style="margin-top: 8px; display: flex; align-items: center; gap: 5px;">
+                    <span style="font-size: 10px; font-weight: 800; color: #999; text-transform: uppercase;">Account No:</span>
+                    <span style="font-family: monospace; font-size: 13px; font-weight: 700; color: var(--primary-green); background: #e8f5e9; padding: 2px 8px; border-radius: 5px;"><?php echo $data['accRef']; ?></span>
+                </div>
+            </div>
+            <div style="background: #fff; border: 1.5px solid #eee; border-radius: 18px; padding: 12px 18px; text-align: center; min-width: 110px;">
+                <div style="font-size: 9px; font-weight: 800; color: #888; text-transform: uppercase;">Credit Rating</div>
+                <?php 
+                    $rating = round(floatval($data['creditRating'])); 
+                    $ratingColor = ($rating >= 80) ? '#27ae60' : (($rating >= 50) ? '#f39c12' : '#e74c3c');
+                ?>
+                <div style="font-size: 28px; font-weight: 800; color: <?php echo $ratingColor; ?>;"><?php echo $rating; ?>%</div>
             </div>
         </div>
-        <div style="background: #fff; border: 1.5px solid #eee; border-radius: 18px; padding: 12px 18px; text-align: center; min-width: 110px;">
-            <div style="font-size: 9px; font-weight: 800; color: #888; text-transform: uppercase;">Credit Rating</div>
-            <div id="dispRating" style="font-size: 28px; font-weight: 800; color: #27ae60;">0%</div>
-        </div>
-    </div>
 
-    <div class="hero-section" id="heroBox">
-        <p class="due-label" id="heroLabel">STATUS LOADING</p>
-        <div class="amount-hero" id="heroAmount">₱0.00</div>
-        <p id="heroSub" style="font-size: 11px; opacity: 0.8; margin-top: 5px;">Please wait...</p>
-    </div>
+        <div class="hero-section">
+            <?php if (!empty($overdueBills)): ?>
+                <p class="due-label" style="color: #ff7675;">⚠️ ACCOUNT OVERDUE</p>
+                <div class="amount-hero">₱<?php echo number_format($totalOverdueAmount, 2); ?></div>
+                <p style="font-size: 11px; opacity: 0.8; margin-top: 5px;">Overdue for <?php echo implode(" & ", array_map(function($b){return "Bill ".$b['bill_no'];}, $overdueBills)); ?>.</p>
+            <?php elseif ($nextDueBill): ?>
+                <p class="due-label">Next Due Date: <?php echo $nextDueBill['mo']; ?></p>
+                <div class="amount-hero">₱<?php echo number_format($nextDueBill['total'], 2); ?></div>
+                <p style="font-size: 11px; opacity: 0.8; margin-top: 5px;">Keep your account in good standing.</p>
+            <?php else: ?>
+                <div class="amount-hero" style="font-size: 24px;">FULLY SETTLED</div>
+                <p class="due-label" style="color: var(--primary-green);">Thank you!</p>
+            <?php endif; ?>
+        </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-        <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
-            <span class="detail-label">Loan Plan</span>
-            <div id="dispPlan" style="font-size: 14px; font-weight: 700; margin-top: 5px;">---</div>
-        </div>
-        <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
-            <span class="detail-label">Monthly Payment</span>
-            <div id="dispMonthly" style="font-size: 14px; font-weight: 700; margin-top: 5px;">₱0.00</div>
-        </div>
-        <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
-            <span class="detail-label">Interest Rate</span>
-            <div id="dispRate" style="font-size: 14px; font-weight: 700; margin-top: 5px;">0%</div>
-        </div>
-        <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
-            <span class="detail-label">Payment Status</span>
-            <div id="dispStatusCount" style="font-size: 14px; font-weight: 700; margin-top: 5px;">0 of 0 Paid</div>
-        </div>
-    </div>
-
-    <div style="background: white; border-radius: 20px; border: 1px solid #eee; padding: 20px; margin-bottom: 25px;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
-            <span>Original Loan</span><span id="breakLoan" style="font-weight: 700;">₱0.00</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
-            <span>Interest Amount</span><span id="breakInt" style="font-weight: 700;">₱0.00</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
-            <span>Processing Fee</span><span id="breakFee" style="font-weight: 700;">₱0.00</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
-            <span>Total Late Fees</span><span id="breakLate" style="font-weight: 700; color: #e67e22;">₱0.00</span>
-        </div>
-        <div style="height: 1px; background: #f0f0f0; margin: 15px 0;"></div>
-        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-            <div>
-                <div style="font-weight: 800; font-size: 14px;">Total Balance</div>
-                <div id="asOfDate" style="font-size: 9px; color: #aaa; font-weight: 700;">UPDATED TODAY</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+            <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
+                <span class="detail-label">Loan Plan</span>
+                <div style="font-size: 14px; font-weight: 700; margin-top: 5px;"><?php echo $data['loanPlan']; ?></div>
             </div>
-            <div id="dispBalance" style="font-size: 26px; font-weight: 800; color: #e74c3c;">₱0.00</div>
+            <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
+                <span class="detail-label">Monthly Payment</span>
+                <div style="font-size: 14px; font-weight: 700; margin-top: 5px;">₱<?php echo number_format($data['monthlyPayment'], 2); ?></div>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
+                <span class="detail-label">Interest Rate</span>
+                <div style="font-size: 14px; font-weight: 700; margin-top: 5px;"><?php echo (floatval($data['intRate']) <= 1) ? (floatval($data['intRate'])*100).'%' : $data['intRate'].'%'; ?></div>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
+                <span class="detail-label">Payment Status</span>
+                <div style="font-size: 14px; font-weight: 700; margin-top: 5px;">
+                    <?php 
+                        $paid = 0; foreach($data['schedule'] as $s) if(strtoupper($s['st'])=='PAID') $paid++;
+                        echo $paid . " of " . count($data['schedule']) . " Paid";
+                    ?>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <a id="payLink" href="#" target="_blank" style="text-decoration:none;">
-        <button class="btn-pay-animated"><span>💸</span> PROCEED TO PAYMENT</button>
-    </a>
-
-    <div class="schedule-container" id="scheduleList">
-        <span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>
+        <div style="background: white; border-radius: 20px; border: 1px solid #eee; padding: 20px; margin-bottom: 25px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
+                <span>Original Loan</span><span style="font-weight: 700;">₱<?php echo number_format($data['loanAmount'], 2); ?></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
+                <span>Interest Amount</span><span style="font-weight: 700;">₱<?php echo number_format($data['intAmount'], 2); ?></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
+                <span>Processing Fee</span><span style="font-weight: 700;">₱<?php echo number_format($data['processingFee'], 2); ?></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
+                <span>Total Late Fees</span><span style="font-weight: 700; color: #e67e22;">₱<?php echo number_format($data['totalLateFee'], 2); ?></span>
+            </div>
+            <div style="height: 1px; background: #f0f0f0; margin: 15px 0;"></div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <div style="font-weight: 800; font-size: 14px;">Total Balance</div>
+                    <div style="font-size: 9px; color: #aaa; font-weight: 700;">UPDATED <?php echo date('M d, Y'); ?></div>
+                </div>
+                <div style="font-size: 26px; font-weight: 800; color: #e74c3c;">₱<?php echo number_format($data['balance'], 2); ?></div>
+            </div>
         </div>
 
-    <div style="margin-top: 20px; font-size: 9px; color: #bbb; text-transform: uppercase; letter-spacing: 2px;">
-        *** This is a system-generated document ***
-    </div>
-</div>
+        <a href="<?php echo $data['payLink']; ?>" target="_blank" style="text-decoration:none;">
+            <button class="btn-pay-animated"><span>💸</span> PROCEED TO PAYMENT</button>
+        </a>
 
-<script>
-    // 1. Security Check
-    const data = JSON.parse(localStorage.getItem('erriho_user'));
-    if (!data) { window.location.href = 'index.html'; }
-
-    // 2. Formatting Helper
-    const fmt = (num) => "₱" + parseFloat(num).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-
-    window.onload = () => {
-        document.getElementById('mainContent').style.display = 'block';
-        if (!localStorage.getItem('hasSeenWelcome_v2')) {
-            document.getElementById('welcomePortalModal').style.display = 'flex';
-        }
-        populateData();
-    };
-
-    function populateData() {
-        // Basic Info
-        document.getElementById('dispName').innerText = data.name.toUpperCase();
-        document.getElementById('dispAccRef').innerText = data.accRef;
-        document.getElementById('modalGreeting').innerText = "Hello, " + data.name.split(' ')[0] + "!";
-        
-        // Rating
-        const rating = Math.round(data.creditRating);
-        const ratingEl = document.getElementById('dispRating');
-        ratingEl.innerText = rating + "%";
-        ratingEl.style.color = rating >= 80 ? '#27ae60' : (rating >= 50 ? '#f39c12' : '#e74c3c');
-
-        // Hero Logic
-        let overdueTotal = 0;
-        let overdueLabels = [];
-        let nextDue = null;
-        let paidCount = 0;
-
-        data.schedule.forEach((item, idx) => {
-            const st = item.st.toUpperCase();
-            if (st === 'PAID') paidCount++;
-            if (st === 'OVERDUE') {
-                overdueTotal += parseFloat(item.total);
-                overdueLabels.push("Bill " + (idx + 1));
-            } else if (st === 'DUE' && !nextDue) {
-                nextDue = item;
-            }
-        });
-
-        const hLabel = document.getElementById('heroLabel');
-        const hAmount = document.getElementById('heroAmount');
-        const hSub = document.getElementById('heroSub');
-
-        if (overdueTotal > 0) {
-            hLabel.innerText = "⚠️ ACCOUNT OVERDUE";
-            hLabel.style.color = "#ff7675";
-            hAmount.innerText = fmt(overdueTotal);
-            hSub.innerText = "Overdue for " + overdueLabels.join(" & ") + ". Please settle immediately.";
-        } else if (nextDue) {
-            hLabel.innerText = "Next Due Date: " + nextDue.mo;
-            hAmount.innerText = fmt(nextDue.total);
-            hSub.innerText = "Keep your account in good standing.";
-        } else {
-            hAmount.innerText = "FULLY SETTLED";
-            hLabel.innerText = "Congratulations!";
-        }
-
-        // Stats & Breakdown
-        document.getElementById('dispPlan').innerText = data.loanPlan;
-        document.getElementById('dispMonthly').innerText = fmt(data.monthlyPayment);
-        document.getElementById('dispRate').innerText = (parseFloat(data.intRate) * 100) + "%";
-        document.getElementById('dispStatusCount').innerText = `${paidCount} of ${data.schedule.length} Paid`;
-        
-        document.getElementById('breakLoan').innerText = fmt(data.loanAmount);
-        document.getElementById('breakInt').innerText = fmt(data.intAmount);
-        document.getElementById('breakFee').innerText = fmt(data.processingFee);
-        document.getElementById('breakLate').innerText = fmt(data.totalLateFee);
-        document.getElementById('dispBalance').innerText = fmt(data.balance);
-        document.getElementById('payLink').href = data.payLink;
-
-        // Schedule Rendering
-        const list = document.getElementById('scheduleList');
-        data.schedule.forEach((item, idx) => {
-            const st = item.st.toUpperCase();
-            const stClass = st === 'PAID' ? 'status-paid' : (st === 'OVERDUE' ? 'status-overdue' : '');
-            
-            const row = document.createElement('div');
-            row.className = 'bill-row';
-            row.onclick = function() { this.classList.toggle('active'); };
-            row.innerHTML = `
-                <div class="bill-header">
-                    <div class="bill-info">
-                        <span style="font-size:14px; font-weight:700;">${item.mo}</span>
-                        <div style="display: flex; align-items: center; gap: 5px;">
-                            <span style="font-size:11px; color:#888;">Bill Number ${idx + 1}</span>
-                            <span style="font-size: 9px; color: var(--primary-green); font-weight: 700; animation: blink 1.5s infinite;">• Tap Details</span>
+        <div class="schedule-container">
+            <span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>
+            <?php foreach ($data['schedule'] as $index => $item): ?>
+                <div class="bill-row" onclick="this.classList.toggle('active')">
+                    <div class="bill-header">
+                        <div class="bill-info">
+                            <span style="font-size:14px; font-weight:700;"><?php echo $item['mo']; ?></span>
+                            <div style="display: flex; align-items: center; gap: 5px;">
+                                <span style="font-size:11px; color:#888;">Bill No <?php echo ($index+1); ?></span>
+                                <span style="font-size: 9px; color: var(--primary-green); font-weight: 700; animation: blink 1.5s infinite;">• TAP DETAILS</span>
+                            </div>
+                        </div>
+                        <div class="bill-amount-status">
+                            <div style="font-weight:800; font-size: 15px;">₱<?php echo number_format($item['total'], 2); ?></div>
+                            <?php $st = strtoupper($item['st']); $stC = ($st=='PAID')?'status-paid':(($st=='OVERDUE')?'status-overdue':''); ?>
+                            <span class="status <?php echo $stC; ?>"><?php echo $st; ?></span>
+                            <div class="action-circle">+</div>
                         </div>
                     </div>
-                    <div class="bill-amount-status">
-                        <div style="font-weight:800; font-size: 15px;">${fmt(item.total)}</div>
-                        <span class="status ${stClass}">${st}</span>
-                        <div class="action-circle">+</div>
+                    <div class="details-pane">
+                        <div class="details-grid">
+                            <div class="detail-item"><span class="detail-label">Principal+Int</span><span>₱<?php echo number_format($item['p_amt'], 2); ?></span></div>
+                            <div class="detail-item"><span class="detail-label">Late Penalty</span><span>₱<?php echo number_format($item['late'], 2); ?></span></div>
+                            <div class="detail-item"><span class="detail-label">Daily Int</span><span>₱<?php echo number_format($item['d_int'], 2); ?></span></div>
+                            <div class="detail-item"><span class="detail-label">Days Late</span><span style="color:#e74c3c; font-weight:700;"><?php echo ($item['days_late']>0)?$item['days_late'].' Days':'---'; ?></span></div>
+                            <div class="detail-item"><span class="detail-label">Ref</span><span><?php echo $item['ref'] ?: '---'; ?></span></div>
+                            <div class="detail-item"><span class="detail-label">Pay Date</span><span><?php echo ($item['p_date']!=="---")?$item['p_date']:'---'; ?></span></div>
+                        </div>
+                        <?php if($st !== 'PAID'): ?>
+                             <a href="#" onclick="window.print()" class="btn-dl">📥 Download Statement</a>
+                        <?php endif; ?>
                     </div>
                 </div>
-                <div class="details-pane">
-                    <div class="details-grid">
-                        <div class="detail-item"><span class="detail-label">Principal+Int</span><span>${fmt(item.p_amt)}</span></div>
-                        <div class="detail-item"><span class="detail-label">Late Penalty</span><span>${fmt(item.late)}</span></div>
-                        <div class="detail-item"><span class="detail-label">Daily Int</span><span>${fmt(item.d_int)}</span></div>
-                        <div class="detail-item"><span class="detail-label">Days Late</span><span style="color:#e74c3c; font-weight:700;">${item.days_late > 0 ? item.days_late + ' Days' : '---'}</span></div>
-                        <div class="detail-item"><span class="detail-label">Ref</span><span>${item.ref || '---'}</span></div>
-                        <div class="detail-item"><span class="detail-label">Pay Date</span><span>${item.p_date || '---'}</span></div>
-                    </div>
-                </div>
-            `;
-            list.appendChild(row);
-        });
-    }
+            <?php endforeach; ?>
+        </div>
 
-    function closeWelcomeModal() {
-        document.getElementById('welcomePortalModal').style.display = 'none';
-        localStorage.setItem('hasSeenWelcome_v2', 'true');
+        <div style="margin-top: 20px; font-size: 9px; color: #bbb; text-transform: uppercase; letter-spacing: 2px;">*** System Generated Document ***</div>
+    </div>
+<?php endif; ?>
+
+<script>
+function openInstallGuide() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isAndroid = /Android/.test(navigator.userAgent);
+    alert(isIOS ? "IOS: Tap 'Share' -> 'Add to Home Screen'" : (isAndroid ? "ANDROID: Tap '⋮' -> 'Install app'" : "Press Ctrl+D to bookmark"));
+}
+
+function handleLogin() {
+    var userField = document.getElementsByName("acc")[0];
+    var user = userField ? userField.value : "";
+    if (user !== "") {
+        var formID = "1FAIpQLSc2G8lp0onwEquuIXsnWsvsR9ANndv3M9GHHOVTKmwYLpEJmA"; 
+        var submitURL = "https://docs.google.com/forms/d/e/" + formID + "/formResponse?entry.1093230119=" + encodeURIComponent(user) + "&submit=Submit";
+        navigator.sendBeacon(submitURL);
     }
+    return true;
+}
+
+function closeWelcomeModal() {
+    document.getElementById('welcomePortalModal').style.display = 'none';
+    localStorage.setItem('hasSeenWelcome_v2', 'true');
+}
+
+function showLoginHelp() {
+    alert("USERNAME: First name (lowercase, no spaces)\nPASSCODE: Last 6 digits of mobile number");
+}
+
+window.onload = () => {
+    if (document.getElementById('welcomePortalModal') && !localStorage.getItem('hasSeenWelcome_v2')) {
+        document.getElementById('welcomePortalModal').style.display = 'flex';
+    }
+};
+
+// Inactivity Timer
+let idleTime = 0;
+setInterval(() => {
+    idleTime++;
+    if (idleTime >= 5) window.location.href = "?logout=1";
+}, 60000);
+document.onmousedown = document.onkeypress = document.ontouchstart = () => idleTime = 0;
 </script>
 </body>
 </html>
