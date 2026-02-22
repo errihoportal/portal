@@ -1,17 +1,16 @@
 <?php
 session_start();
-if (!isset($_SESSION['data'])) {
+if (!isset($_SESSION['user_data'])) {
     header("Location: index.php");
     exit();
 }
-$data = $_SESSION['data'];
 
-// Logic para sa Overdue at Next Due
+$data = $_SESSION['user_data'];
 $overdueBills = [];
 $nextDueBill = null;
 $totalOverdueAmount = 0;
 
-if (isset($data['schedule'])) {
+if ($data && isset($data['schedule'])) {
     foreach ($data['schedule'] as $index => $item) {
         $st = strtoupper(trim($item['st'])); 
         if ($st === 'OVERDUE') {
@@ -26,100 +25,53 @@ if (isset($data['schedule'])) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ERRIHO PORTAL - STATEMENT</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>ERRIHO PORTAL</title>
     <style>
         :root { --primary-green: #27ae60; --dark-black: #1a1a1a; --danger-red: #e74c3c; --soft-gray: #f8f9fa; }
-        body { font-family: 'Inter', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: var(--dark-black); line-height: 1.6; }
-        .card { background: white; border-radius: 28px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); max-width: 550px; margin: auto; border-top: 8px solid var(--primary-green); position: relative; }
+        body { font-family: 'Inter', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        .card { background: white; border-radius: 28px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); max-width: 550px; margin: auto; border-top: 8px solid var(--primary-green); }
         .hero-section { background: linear-gradient(135deg, #1a1a1a, #333); color: white; border-radius: 20px; padding: 25px; text-align: center; margin-bottom: 25px; }
-        .amount-hero { font-size: 42px; font-weight: 800; margin: 5px 0; color: #fff; }
-        .due-label { font-size: 11px; font-weight: 600; color: #aaa; text-transform: uppercase; }
-        .bill-row { border-bottom: 1px solid #f0f0f0; padding: 15px 0; cursor: pointer; }
-        .details-pane { display: none; background: var(--soft-gray); border-radius: 15px; padding: 15px; margin-top: 10px; font-size: 13px; border: 1px solid #eee; }
-        .active .details-pane { display: block; }
-        .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .status { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .status-paid { background: #e6f9ed; color: #27ae60; }
-        .status-overdue { background: #fff1f0; color: #e74c3c; }
-        .btn-pay-animated { background: var(--primary-green); color: white; border: none; padding: 18px; width: 100%; border-radius: 16px; font-weight: 800; cursor: pointer; font-size: 18px; margin-top: 10px; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-box { background: white; border-radius: 28px; padding: 25px; text-align: center; }
+        /* ... Lahat ng iba mo pang styles ... */
     </style>
 </head>
 <body>
-
-<div class="card">
-    <div style="text-align: right; margin-bottom: 10px;">
-        <a href="logout.php" style="text-decoration: none; font-size: 11px; font-weight: 800; color: #e74c3c; background: #fff1f0; padding: 8px 15px; border-radius: 10px; border: 1px solid #ffccc7;">Log Out ➔</a>
-    </div>
-
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px;">
-        <div>
-            <h2 style="margin: 0; font-size: 22px; font-weight: 800;"><?php echo strtoupper($data['name']); ?></h2>
-            <span style="font-family: monospace; font-size: 13px; color: var(--primary-green); background: #e8f5e9; padding: 2px 8px; border-radius: 5px;"><?php echo $data['accRef']; ?></span>
+    <div class="card">
+        <div style="text-align: right; margin-bottom: 10px;">
+            <a href="logout.php" style="text-decoration: none; font-size: 11px; font-weight: 800; color: #e74c3c; background: #fff1f0; padding: 8px 15px; border-radius: 10px; border: 1px solid #ffccc7;">Log Out ➔</a>
         </div>
-        <div style="background: #fff; border: 1.5px solid #eee; border-radius: 18px; padding: 12px; text-align: center; min-width: 100px;">
-            <div style="font-size: 9px; font-weight: 800; color: #888;">CREDIT RATING</div>
-            <div style="font-size: 28px; font-weight: 800; color: var(--primary-green);"><?php echo round($data['creditRating']); ?>%</div>
+        
+        <h2><?php echo strtoupper($data['name']); ?></h2>
+        <p>Account: <?php echo $data['accRef']; ?></p>
+        
+        <div class="hero-section">
+            <?php if (!empty($overdueBills)): ?>
+                <p class="due-label" style="color: #ff7675;">⚠️ ACCOUNT OVERDUE</p>
+                <div class="amount-hero">₱<?php echo number_format($totalOverdueAmount, 2); ?></div>
+            <?php elseif ($nextDueBill): ?>
+                <p class="due-label">Next Due Date: <?php echo $nextDueBill['mo']; ?></p>
+                <div class="amount-hero">₱<?php echo number_format($nextDueBill['total'], 2); ?></div>
+            <?php endif; ?>
         </div>
-    </div>
 
-    <div class="hero-section">
-        <?php if (!empty($overdueBills)): ?>
-            <p class="due-label" style="color: #ff7675;">⚠️ ACCOUNT OVERDUE</p>
-            <div class="amount-hero">₱<?php echo number_format($totalOverdueAmount, 2); ?></div>
-        <?php elseif ($nextDueBill): ?>
-            <p class="due-label">Next Due: <?php echo $nextDueBill['mo']; ?></p>
-            <div class="amount-hero">₱<?php echo number_format($nextDueBill['total'], 2); ?></div>
-        <?php else: ?>
-            <div class="amount-hero" style="font-size: 24px;">LOAN FULLY SETTLED</div>
-        <?php endif; ?>
-    </div>
-
-    <a href="<?php echo $data['payLink']; ?>" target="_blank" style="text-decoration:none;">
-        <button class="btn-pay-animated">💸 PROCEED TO PAYMENT</button>
-    </a>
-
-    <div style="margin-top: 25px;">
-        <span style="font-size: 11px; font-weight: 800; color: #999;">REPAYMENT SCHEDULE</span>
         <?php foreach ($data['schedule'] as $index => $item): ?>
-            <div class="bill-row" onclick="this.classList.toggle('active')">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <div style="font-weight: 700;"><?php echo $item['mo']; ?></div>
-                        <div style="font-size: 11px; color: #888;">Bill #<?php echo ($index + 1); ?></div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="font-weight: 800;">₱<?php echo number_format($item['total'], 2); ?></div>
-                        <span class="status <?php echo (strtoupper($item['st']) == 'PAID') ? 'status-paid' : 'status-overdue'; ?>">
-                            <?php echo $item['st']; ?>
-                        </span>
-                    </div>
-                </div>
-                <div class="details-pane">
-                    <div class="details-grid">
-                        <div><small>LATE PENALTY</small><br>₱<?php echo number_format($item['late'], 2); ?></div>
-                        <div><small>DAYS LATE</small><br><?php echo $item['days_late']; ?> Days</div>
-                        <div><small>PAYMENT DATE</small><br><?php echo $item['p_date']; ?></div>
-                        <div><small>REFERENCE</small><br><?php echo $item['ref']; ?></div>
-                    </div>
-                </div>
-            </div>
-        <?php endforeach; ?>
+            <?php endforeach; ?>
     </div>
-</div>
 
-<script>
-// Auto-logout script
-let idleTime = 0;
-document.onmousemove = document.onkeypress = () => idleTime = 0;
-setInterval(() => {
-    idleTime++;
-    if (idleTime >= 5) window.location.href = "logout.php";
-}, 60000);
-</script>
+    <script>
+        // Idle Timer (5 Minutes)
+        let idleTime = 0;
+        setInterval(() => {
+            idleTime++;
+            if (idleTime >= 5) {
+                alert("Session expired.");
+                window.location.href = "logout.php";
+            }
+        }, 60000);
+        window.onmousemove = window.onclick = () => idleTime = 0;
+        
+        function closeWelcomeModal() {
+            document.getElementById('welcomePortalModal').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
