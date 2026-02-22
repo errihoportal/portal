@@ -66,10 +66,22 @@
             <button type="submit" class="btn-login" id="loginBtn">AUTHORIZE LOGIN</button>
         </form>
 
-        <div style="margin-top: 20px;">
-            <a href="javascript:void(0)" onclick="showLoginHelp()" style="font-size: 13px; color: #888; text-decoration: none; font-weight: 600;">Need help with your passcode?</a>
-        </div>
+        <div style="margin-top: 25px; border-top: 1px solid #f1f1f1; padding-top: 20px;">
+    <a href="javascript:void(0)" onclick="showLoginHelp()" style="font-size: 13px; color: #64748b; text-decoration: none; font-weight: 600; display: block; margin-bottom: 15px;">
+        Can't sign in? View Login Guide
+    </a>
+
+    <p style="font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; margin-bottom: 12px;">Contact Support</p>
+    
+    <div style="display: flex; justify-content: center; gap: 20px;">
+        <a href="https://m.me/YOUR_PAGE_NAME" target="_blank" style="text-decoration: none; color: #0084FF; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 5px;">
+            <span>💬 Messenger</span>
+        </a>
+        <a href="mailto:support@erriho.com" style="text-decoration: none; color: #e74c3c; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 5px;">
+            <span>✉️ Email Us</span>
+        </a>
     </div>
+</div>
 
     <div id="pwa-badge" class="pwa-badge">
         <span class="close-pwa" onclick="this.parentElement.style.display='none'">×</span>
@@ -112,8 +124,8 @@
         };
 
         function showLoginHelp() {
-            alert("LOGIN GUIDE:\n\n1. USERNAME: Your first name in lowercase, no spaces.\n2. PASSCODE: The last 6 digits of your mobile number.");
-        }
+        alert("LOGIN ASSISTANCE:\n\nPlease check your Email or Messenger for your official login credentials. If you haven't received them yet, please contact us using the support links below.");
+    }
 
         // --- ADD TO HOME SCREEN LOGIC ---
         window.onload = function() {
