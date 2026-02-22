@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERRIHO PORTAL - LOGIN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #1a1a1a; }
+        .login-card { max-width: 400px; margin: 60px auto; padding: 45px 35px; background: #ffffff; border-radius: 28px; box-shadow: 0 15px 40px rgba(0,0,0,0.08); text-align: center; border: 1px solid #f1f1f1; }
+        input { width: 100%; padding: 16px; border-radius: 15px; border: 1.5px solid #e2e8f0; box-sizing: border-box; font-size: 15px; background: #f8fafc; margin-top: 5px; }
+        .btn-login { width:100%; padding:18px; background:#27ae60; color:white; border:none; border-radius:14px; font-weight:800; font-size:16px; cursor:pointer; margin-top: 20px; }
+        #error-msg { background: #fff1f0; color: #e74c3c; padding: 12px; border-radius: 12px; font-size: 12px; margin-bottom: 20px; font-weight: 600; border: 1px solid #ffccc7; display: none; }
+        .loading { opacity: 0.5; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div style="margin-bottom: 30px;">
+            <div style="background: #f0fdf4; width: 70px; height: 70px; border-radius: 20px; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px; border: 1px solid #dcfce7;">
+                <img src="images/test.png" alt="ERRIHO" style="height: 40px; width: auto;">
+            </div>
+            <h2 style="color: #27ae60; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -1px;">WELCOME TO ERRIHO PORTAL</h2>
+            <p style="font-size: 11px; color: #64748b; margin-top: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;">ErriHo Personal Finance</p>
+            <p style="font-size: 11px; color: #64748b; margin-top: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;">This portal allows you to securely view your financial statements and settle payments. Please provide your account credentials below</p>
+        </div>
+
+        <div id="error-msg">❌ Invalid Username or Passcode</div>
+
+        <form id="loginForm">
+            <div style="text-align: left; margin-bottom: 15px;">
+                <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-left: 5px;">Username</label>
+                <input type="text" id="acc" placeholder="Enter username" required>
+            </div>
+            <div style="text-align: left; margin-bottom: 25px;">
+                <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-left: 5px;">Passcode</label>
+                <input type="password" id="pass" placeholder="Enter passcode" required>
+            </div>
+            <button type="submit" class="btn-login" id="loginBtn">AUTHORIZE LOGIN</button>
+        </form>
+
+        <div style="margin-top: 20px;">
+            <a href="javascript:void(0)" onclick="showLoginHelp()" style="font-size: 13px; color: #888; text-decoration: none; font-weight: 600;">Need help with your passcode?</a>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
+
+        loginForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const acc = document.getElementById('acc').value;
+            const pass = document.getElementById('pass').value;
+            const btn = document.getElementById('loginBtn');
+            const error = document.getElementById('error-msg');
+
+            btn.innerText = "VERIFYING...";
+            btn.classList.add('loading');
+            error.style.display = 'none';
+
+            try {
+                const response = await fetch(`${baseUrl}?acc=${encodeURIComponent(acc)}&pass=${encodeURIComponent(pass)}`);
+                const data = await response.json();
+
+                if (data && data.status !== 'error') {
+                    // I-save ang data sa LocalStorage (Parang Session)
+                    localStorage.setItem('erriho_user', JSON.stringify(data));
+                    window.location.href = 'statement.html';
+                } else {
+                    error.style.display = 'block';
+                    btn.innerText = "AUTHORIZE LOGIN";
+                    btn.classList.remove('loading');
+                }
+            } catch (err) {
+                alert("Connection error. Please try again.");
+                btn.innerText = "AUTHORIZE LOGIN";
+                btn.classList.remove('loading');
+            }
+        };
+
+        function showLoginHelp() {
+            alert("LOGIN GUIDE:\n\n1. USERNAME: Your first name in lowercase, no spaces.\n2. PASSCODE: The last 6 digits of your mobile number.");
+        }
+    </script>
+</body>
+</html>
