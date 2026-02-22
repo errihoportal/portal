@@ -278,7 +278,7 @@
         const msgElement = document.getElementById('overlayMsg');
         const countdown = setInterval(() => {
             seconds--;
-            msgElement.innerHTML = `Thank you! Status: <b>VERIFYING</b>.<br>Refreshing in ${seconds}s...`;
+            msgElement.innerHTML = `Thank you! Status: <b>VERIFYING</b>.`Checking your proof of payment.<br>`<br>Refreshing in ${seconds}s...`;
             if (seconds <= 0) { clearInterval(countdown); window.location.reload(); }
         }, 1000);
     }
