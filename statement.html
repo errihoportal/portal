@@ -197,7 +197,10 @@
             console.log("Sync failed:", err);
         }
     };
+
     function populateData() {
+        if(!data) return;
+        
         // Basic Info
         document.getElementById('dispName').innerText = data.name.toUpperCase();
         document.getElementById('dispAccRef').innerText = data.accRef;
@@ -209,7 +212,7 @@
         ratingEl.innerText = rating + "%";
         ratingEl.style.color = rating >= 80 ? '#27ae60' : (rating >= 50 ? '#f39c12' : '#e74c3c');
 
-        // Hero Logic
+        // Hero Logic (Overdue vs Next Due)
         let overdueTotal = 0;
         let overdueLabels = [];
         let nextDue = null;
@@ -221,7 +224,7 @@
             if (st === 'OVERDUE') {
                 overdueTotal += parseFloat(item.total);
                 overdueLabels.push("Bill " + (idx + 1));
-            } else if (st === 'DUE' && !nextDue) {
+            } else if ((st === 'DUE' || st === 'PENDING') && !nextDue) {
                 nextDue = item;
             }
         });
@@ -237,6 +240,7 @@
             hSub.innerText = "Overdue for " + overdueLabels.join(" & ") + ". Please settle immediately.";
         } else if (nextDue) {
             hLabel.innerText = "Next Due Date: " + nextDue.mo;
+            hLabel.style.color = "#aaa";
             hAmount.innerText = fmt(nextDue.total);
             hSub.innerText = "Keep your account in good standing.";
         } else {
