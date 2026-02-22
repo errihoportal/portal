@@ -6,7 +6,7 @@
     
     <title>Erriho Payment Portal</title>
     <meta property="og:title" content="Erriho Payment Portal">
-    <meta property="og:description" content="Securely view your statement and pay your bill online.">
+    <meta property="og:description" content="Securely pay your bill online.">
     <meta property="og:image" content="https://i.imgur.com/mmKrxxl.png"> 
     <meta property="og:type" content="website">
     
@@ -175,7 +175,7 @@
             billData = data;
             renderData(data);
         } catch (error) {
-            document.getElementById('loader').innerHTML = "Error loading data. Please try muli.";
+            document.getElementById('loader').innerHTML = "Error loading data. Please try again.";
         }
     }
 
@@ -229,7 +229,7 @@
         if (data.isGracePeriod === "YES" && status === "unpaid") {
             document.getElementById('gracePeriodArea').innerHTML = `
                 <div class="grace-period-box">
-                    <strong>✨ Grace Period Applied:</strong> Late fees and interest are temporarily waived.
+                    <strong>✨ Grace Period Applied:</strong> Late fees and interest are temporarily waived. Settle today to save!
                 </div>`;
         }
 
@@ -273,15 +273,15 @@
     }
 
     function showSuccess() {
+        document.querySelector('.close-overlay').style.display = 'none';
         document.getElementById('overlay').style.display = 'flex';
         let seconds = 5;
         const msgElement = document.getElementById('overlayMsg');
-        const countdown = setInterval(() => {
-            seconds--;
-            msgElement.innerHTML = `Thank you! Status: <b>VERIFYING</b>.<br>Refreshing in ${seconds}s...`;
-            if (seconds <= 0) { clearInterval(countdown); window.location.reload(); }
-        }, 1000);
-    }
+        const updateMsg = (s) => {
+            msgElement.innerHTML = `Thank you! Status: <b>VERIFYING</b>.<br>` +
+                                   `Checking your proof of payment.<br>` +
+                                   `<small style="color:#e67e22">Refreshing in ${s}s...</small>`;
+        }
 
     function toggleModal(show) {
         document.getElementById('instrModal').style.display = show ? 'flex' : 'none';
@@ -289,7 +289,7 @@
 
     function copyAmount() {
         const amountText = document.getElementById('totalAmount').innerText.replace(/,/g, '');
-        navigator.clipboard.writeText(amountText).then(() => { alert("Amount copied: ₱" + amountText); });
+        navigator.clipboard.writeText(amountText).then(() => { alert("Amount successfully copied: ₱" + amountText); });
     }
 </script>
 
