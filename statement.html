@@ -157,35 +157,46 @@
     window.onload = async () => {
         document.getElementById('mainContent').style.display = 'block';
         
+        // Step A: Ipakita muna ang lumang data (Instant Load)
         populateData();
         
         if (!localStorage.getItem('hasSeenWelcome_v2')) {
             document.getElementById('welcomePortalModal').style.display = 'flex';
         }
 
-        // --- BAGONG LOGIC: Mag-sync sa Server para sa Live Updates ---
+        // Step B: Mag-sync sa server para sa pinakabagong balance
+        const dateEl = document.getElementById('asOfDate');
+        dateEl.innerText = "🔄 SYNCING LIVE DATA...";
+        dateEl.style.color = "#27ae60";
+
         try {
-            console.log("Syncing with server...");
-            // Gagamitin natin ang saved credentials para mag-fetch uli
-            const response = await fetch(`${baseUrl}?acc=${encodeURIComponent(data.accRef)}&pass=${encodeURIComponent(data.passcode)}`);
+            // SIGURADUHIN: data.accRef at data.passcode ay may laman galing sa login
+            const url = `${baseUrl}?acc=${encodeURIComponent(data.accRef)}&pass=${encodeURIComponent(data.passcode || data.pass)}`;
+            
+            const response = await fetch(url);
             const newData = await response.json();
 
             if (newData && newData.status !== 'error') {
-                // I-update ang LocalStorage para sa susunod na refresh
+                // I-save ang passcode sa bago para hindi mawala sa susunod na refresh
+                const passcodeToSave = data.passcode || data.pass;
+                newData.passcode = passcodeToSave; 
+
                 localStorage.setItem('erriho_user', JSON.stringify(newData));
-                data = newData; // I-update ang variable
+                data = newData; // I-update ang global variable
                 
-                // Burahin ang lumang listahan bago i-populate uli
+                // Clear and Re-populate
                 document.getElementById('scheduleList').innerHTML = '<span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>';
+                populateData();
                 
-                populateData(); // I-render ang bagong data
+                dateEl.innerText = "✅ UPDATED JUST NOW";
+                dateEl.style.color = "#aaa";
                 console.log("Data synced successfully!");
             }
         } catch (err) {
-            console.log("Offline mode: Using cached data.");
+            dateEl.innerText = "⚠️ OFFLINE MODE";
+            console.log("Sync failed:", err);
         }
     };
-
     function populateData() {
         // Basic Info
         document.getElementById('dispName').innerText = data.name.toUpperCase();
