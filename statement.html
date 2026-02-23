@@ -189,7 +189,9 @@
 <script>
     // 1. Security Check & Initial Data
     let data = JSON.parse(localStorage.getItem('erriho_user'));
-    if (!data) { window.location.href = 'index.html'; }
+    if (!data || !data.passcode) { 
+    window.location.replace('index.html'); 
+}
 
     const baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
     const fmt = (num) => "₱" + parseFloat(num).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
