@@ -40,8 +40,19 @@
 </div>
 
 <script>
-    // PALITAN ITO NG IYONG ACTUAL WEB APP URL MULA SA DEPLOYMENT
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
+
+    // 1. ANTI-BACK LOGIC: Check kung galing sa lumang session
+    window.onload = function() {
+        const expiry = sessionStorage.getItem("payExpiry");
+        if (expiry) {
+            const currentTime = new Date().getTime();
+            if (currentTime > expiry) {
+                sessionStorage.clear();
+                alert("Session expired. Please enter your passcode again.");
+            }
+        }
+    };
 
     async function handlePay() {
         const pin = document.getElementById("passcode").value.trim();
@@ -55,17 +66,26 @@
             return;
         }
 
-        // UI State: Loading
         error.style.display = "none";
         loading.style.display = "block";
         btn.disabled = true;
 
         try {
+            // Tatawag sa Google Apps Script
             const response = await fetch(`${SCRIPT_URL}?action=verifyPasscode&pin=${pin}`);
             const result = await response.json();
 
             if (result.status === "success" && result.link) {
-                window.location.href = result.link;
+                // --- 2. SET 5 MINUTE TIMER ---
+                const expiryTime = new Date().getTime() + (5 * 60 * 1000); // 5 mins from now
+                sessionStorage.setItem("payExpiry", expiryTime);
+
+                alert("You have 5 minutes to complete your payment. This session will expire after that.");
+
+                // --- 3. SECURE REDIRECT ---
+                // 'replace' gamit natin para hindi ma-save ang payment link sa browser back history
+                window.location.replace(result.link);
+
             } else {
                 throw new Error("Invalid");
             }
@@ -83,6 +103,5 @@
         if (e.key === "Enter") handlePay();
     });
 </script>
-
 </body>
 </html>
