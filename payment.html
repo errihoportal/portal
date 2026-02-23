@@ -152,9 +152,15 @@
 </div>
 
 <script>
-    if (sessionStorage.getItem("erriho_authorized") !== "TRUE") {
-        window.location.replace("index.html"); 
-    }
+    // SMART GUARD: Papasukin kung Authorized O KAYA ay kung galing sa direct Email Link (may ROW at BILL)
+const urlParamsCheck = new URLSearchParams(window.location.search);
+const hasDirectLink = urlParamsCheck.has('row') && urlParamsCheck.has('bill');
+const isAuthorized = sessionStorage.getItem("erriho_authorized") === "TRUE";
+
+if (!isAuthorized && !hasDirectLink) {
+    // Kung hindi authorized at walang direct link, balik sa login
+    window.location.replace("index.html"); 
+}
 
     let globalTimer; // Dito natin ise-save ang timer para mapatay natin mamaya
     
