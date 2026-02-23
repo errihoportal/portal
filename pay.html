@@ -97,31 +97,11 @@
     <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
 
-    // 1. PINAKAMALAKAS NA AUTO-REFRESH LOGIC
-    function forceFresh() {
-        // I-clear ang input field para sigurado
-        document.getElementById("passcode").value = "";
-        // I-reload ang page para ma-reset ang lahat ng states
-        window.location.reload();
-    }
-
-    // Kapag binalikan ang page mula sa "Back" button
-    window.addEventListener('pageshow', function(event) {
-        if (event.persisted) {
-            forceFresh();
-        }
-    });
-
-    // Dagdag na layer: Kapag naging "visible" ulit ang tab (mobile back fix)
-    document.addEventListener("visibilitychange", function() {
-        if (document.visibilityState === 'visible') {
-            const lastAccess = sessionStorage.getItem("linkClicked");
-            if (lastAccess === "true") {
-                sessionStorage.removeItem("linkClicked");
-                forceFresh();
-            }
-        }
-    });
+    // --- ANTI-BACK LOGIC (Mananatili ito) ---
+    window.history.pushState(null, null, window.location.href);
+    window.onpopstate = function () {
+        window.history.go(1);
+    };
 
     async function handlePay() {
         const pin = document.getElementById("passcode").value.trim();
@@ -144,11 +124,21 @@
             const result = await response.json();
 
             if (result.status === "success" && result.link) {
-                // Mag-iwan ng marka na nag-click na tayo ng link
-                sessionStorage.setItem("linkClicked", "true");
+                // --- BAGONG LOGIC DITO ---
+                // Bubuksan natin ang payment link sa bagong tab O sa parehong tab
+                // Pero bago iyon, itatakda natin ang pay.html na mag-reload sa susunod na pagbisita
                 
-                // I-redirect sa payment link
-                window.location.href = result.link;
+                setTimeout(function() {
+                    // Ito ang magpapatakbo ng redirect
+                    window.location.href = result.link;
+                }, 100);
+
+                // Ito ang "killer move": Kapag nag-back sila, itong "reload" 
+                // ang madadatnan nila imbes na yung "verifying" state.
+                window.onbeforeunload = function() {
+                    document.getElementById("passcode").value = "";
+                };
+
             } else {
                 throw new Error("Invalid");
             }
@@ -160,6 +150,11 @@
             btn.disabled = false;
         }
     }
+
+    // Dagdag na siguridad: Pagka-load na pagka-load, linisin ang input
+    window.onload = function() {
+        document.getElementById("passcode").value = "";
+    };
 
     function showLoginHelp() {
         alert("Please enter the 6-digit passcode from your statement.");
