@@ -95,15 +95,33 @@
     </div>
 
     <script>
-    // 1. Eto ang logic para sa Auto-Refresh kapag nag-Back sila
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
+
+    // 1. PINAKAMALAKAS NA AUTO-REFRESH LOGIC
+    function forceFresh() {
+        // I-clear ang input field para sigurado
+        document.getElementById("passcode").value = "";
+        // I-reload ang page para ma-reset ang lahat ng states
+        window.location.reload();
+    }
+
+    // Kapag binalikan ang page mula sa "Back" button
     window.addEventListener('pageshow', function(event) {
-        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
-            // Burahin ang passcode field at i-refresh ang page para "Locked" ulit
-            window.location.reload();
+        if (event.persisted) {
+            forceFresh();
         }
     });
 
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
+    // Dagdag na layer: Kapag naging "visible" ulit ang tab (mobile back fix)
+    document.addEventListener("visibilitychange", function() {
+        if (document.visibilityState === 'visible') {
+            const lastAccess = sessionStorage.getItem("linkClicked");
+            if (lastAccess === "true") {
+                sessionStorage.removeItem("linkClicked");
+                forceFresh();
+            }
+        }
+    });
 
     async function handlePay() {
         const pin = document.getElementById("passcode").value.trim();
@@ -126,7 +144,10 @@
             const result = await response.json();
 
             if (result.status === "success" && result.link) {
-                // Pagka-click, lilipat na sa Payment Link
+                // Mag-iwan ng marka na nag-click na tayo ng link
+                sessionStorage.setItem("linkClicked", "true");
+                
+                // I-redirect sa payment link
                 window.location.href = result.link;
             } else {
                 throw new Error("Invalid");
@@ -141,7 +162,7 @@
     }
 
     function showLoginHelp() {
-        alert("Please enter the 6-digit passcode from your statement. Contact support if you need a new code.");
+        alert("Please enter the 6-digit passcode from your statement.");
     }
 
     document.getElementById("passcode").addEventListener("keyup", (e) => {
