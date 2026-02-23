@@ -95,50 +95,63 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
 
-        async function handlePay() {
-            const pin = document.getElementById("passcode").value.trim();
-            const error = document.getElementById("error-msg");
-            const loading = document.getElementById("loading");
-            const btn = document.getElementById("payBtn");
+    // --- ANTI-BACK LOGIC ---
+    // Kapag binuksan ang page, naglalagay tayo ng "dummy" state sa history.
+    // Kapag pinindot ang 'Back' mula sa payment link, itong page ang lalabas
+    // pero hindi na nila pabalik na maki-click yung payment link.
+    window.history.pushState(null, null, window.location.href);
+    window.onpopstate = function () {
+        window.history.go(1);
+    };
 
-            if (pin.length < 4) {
-                error.innerText = "⚠️ Please enter your 6-digit passcode.";
-                error.style.display = "block";
-                return;
-            }
+    async function handlePay() {
+        const pin = document.getElementById("passcode").value.trim();
+        const error = document.getElementById("error-msg");
+        const loading = document.getElementById("loading");
+        const btn = document.getElementById("payBtn");
 
-            error.style.display = "none";
-            loading.style.display = "block";
-            btn.disabled = true;
-
-            try {
-                const response = await fetch(`${SCRIPT_URL}?action=verifyPasscode&pin=${pin}`);
-                const result = await response.json();
-
-                if (result.status === "success" && result.link) {
-                    // Gamit ang replace para hindi na mabalikan (Anti-Back)
-                    window.location.replace(result.link);
-                } else {
-                    throw new Error("Invalid");
-                }
-            } catch (e) {
-                error.style.display = "block";
-                document.getElementById("passcode").value = "";
-            } finally {
-                loading.style.display = "none";
-                btn.disabled = false;
-            }
+        if (pin.length < 4) {
+            error.innerText = "⚠️ Please enter your 6-digit passcode.";
+            error.style.display = "block";
+            return;
         }
 
-        function showLoginHelp() {
-            alert("Please enter the 6-digit passcode from your statement. Contact support if you need a new code.");
-        }
+        error.style.display = "none";
+        loading.style.display = "block";
+        btn.disabled = true;
 
-        document.getElementById("passcode").addEventListener("keyup", (e) => {
-            if (e.key === "Enter") handlePay();
-        });
-    </script>
+        try {
+            const response = await fetch(`${SCRIPT_URL}?action=verifyPasscode&pin=${pin}`);
+            const result = await response.json();
+
+            if (result.status === "success" && result.link) {
+                // Option A: window.location.href (Para pwede silang mag-back sa pay.html)
+                // Option B: window.location.replace (Para lalaktawan ang pay.html sa back button)
+                
+                // Gagamitin natin ang normal na redirect para makabalik sila sa pay.html, 
+                // pero dahil sa pushState sa taas, hindi na nila maba-back ulit papunta sa link.
+                window.location.href = result.link;
+            } else {
+                throw new Error("Invalid");
+            }
+        } catch (e) {
+            error.style.display = "block";
+            document.getElementById("passcode").value = "";
+        } finally {
+            loading.style.display = "none";
+            btn.disabled = false;
+        }
+    }
+
+    function showLoginHelp() {
+        alert("Please enter the 6-digit passcode from your statement. Contact support if you need a new code.");
+    }
+
+    document.getElementById("passcode").addEventListener("keyup", (e) => {
+        if (e.key === "Enter") handlePay();
+    });
+</script>
 </body>
 </html>
