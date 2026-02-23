@@ -18,7 +18,6 @@
         
         /* Hero Section */
         .hero-section { background: linear-gradient(135deg, #1a1a1a, #333); color: white; border-radius: 20px; padding: 25px; text-align: center; margin-bottom: 25px; }
-        .amount-hero { font-size: 42px; font-weight: 800; margin: 5px 0; color: #fff; }
         .amount-hero { font-size: 42px; font-weight: 800; margin: 5px 0; color: #fff; line-height: 1.2; word-wrap: break-word; }
         .due-label { font-size: 11px; font-weight: 600; color: #aaa; margin: 0; text-transform: uppercase; }
 
@@ -98,84 +97,67 @@
         </div>
     </div>
 
-    
-    
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-    <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
-        <span class="detail-label">Loan Type</span>
-        <div id="dispLoanType" style="font-size: 14px; font-weight: 700; margin-top: 5px;">---</div>
+        <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
+            <span class="detail-label">Loan Type</span>
+            <div id="dispLoanType" style="font-size: 14px; font-weight: 700; margin-top: 5px;">---</div>
+        </div>
+        <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
+            <span class="detail-label">Loan Plan</span>
+            <div id="dispPlan" style="font-size: 14px; font-weight: 700; margin-top: 5px;">---</div>
+        </div>
+        <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
+            <span class="detail-label">Interest Rate</span>
+            <div id="dispRate" style="font-size: 14px; font-weight: 700; margin-top: 5px;">0%</div>
+        </div>
+        <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
+            <span class="detail-label">Payment Status</span>
+            <div id="dispStatusCount" style="font-size: 14px; font-weight: 700; margin-top: 5px;">0 of 0 Paid</div>
+        </div>
     </div>
-
-    <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
-        <span class="detail-label">Loan Plan</span>
-        <div id="dispPlan" style="font-size: 14px; font-weight: 700; margin-top: 5px;">---</div>
-    </div>
-
-    <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
-        <span class="detail-label">Interest Rate</span>
-        <div id="dispRate" style="font-size: 14px; font-weight: 700; margin-top: 5px;">0%</div>
-    </div>
-
-    <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
-        <span class="detail-label">Payment Status</span>
-        <div id="dispStatusCount" style="font-size: 14px; font-weight: 700; margin-top: 5px;">0 of 0 Paid</div>
-    </div>
-</div>
 
     <div style="background: white; border-radius: 20px; border: 1px solid #eee; padding: 20px; margin-bottom: 25px;">
-    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-        <span style="color: #555; font-size: 13px;">Original Loan Amount</span>
-        <span id="breakLoan" style="font-weight: 700;">₱0.00</span>
-    </div>
-
-    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-        <span style="color: #555; font-size: 13px;">Monthly Interest Amount</span>
-        <span id="breakInt" style="font-weight: 700;">₱0.00</span>
-    </div>
-
-    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-    <span style="color: #555; font-size: 13px;">Monthly Payment</span>
-    <span id="breakMonthly" style="font-weight: 700; color: var(--primary-green);">₱0.00</span>
-</div>
-
-    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-        <span style="color: #555; font-size: 13px;">Processing Fee</span>
-        <span id="breakFee" style="font-weight: 700;">₱0.00</span>
-    </div>
-
-    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-        <span style="color: #555; font-size: 13px;">Total Late Payment Fees</span>
-        <span id="breakLate" style="font-weight: 700; color: #e67e22;">₱0.00</span>
-    </div>
-
-    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-        <span style="color: #555; font-size: 13px;">Total Daily Interest Charge</span>
-        <span id="breakDailyInt" style="font-weight: 700; color: #e67e22;">₱0.00</span>
-    </div>
-    
-    <div style="height: 1px; background: #f0f0f0; margin: 15px 0;"></div>
-    
-    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-        <span style="color: #555; font-size: 13px;">Total Amount Paid</span>
-        <span id="breakPaid" style="font-weight: 700; color: #27ae60;">₱0.00</span>
-    </div>
-    
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px;">
-        <div>
-            <div style="font-weight: 800; color: #1a1a1a; font-size: 14px;">Total Outstanding Balance</div>
-            <div id="asOfDate" style="font-size: 9px; color: #aaa; font-weight: 700; text-transform: uppercase;">
-                UPDATED TODAY
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span style="color: #555; font-size: 13px;">Original Loan Amount</span>
+            <span id="breakLoan" style="font-weight: 700;">₱0.00</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span style="color: #555; font-size: 13px;">Monthly Interest Amount</span>
+            <span id="breakInt" style="font-weight: 700;">₱0.00</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span style="color: #555; font-size: 13px;">Monthly Payment</span>
+            <span id="breakMonthly" style="font-weight: 700; color: var(--primary-green);">₱0.00</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span style="color: #555; font-size: 13px;">Processing Fee</span>
+            <span id="breakFee" style="font-weight: 700;">₱0.00</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span style="color: #555; font-size: 13px;">Total Late Payment Fees</span>
+            <span id="breakLate" style="font-weight: 700; color: #e67e22;">₱0.00</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span style="color: #555; font-size: 13px;">Total Daily Interest Charge</span>
+            <span id="breakDailyInt" style="font-weight: 700; color: #e67e22;">₱0.00</span>
+        </div>
+        <div style="height: 1px; background: #f0f0f0; margin: 15px 0;"></div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span style="color: #555; font-size: 13px;">Total Amount Paid</span>
+            <span id="breakPaid" style="font-weight: 700; color: #27ae60;">₱0.00</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px;">
+            <div>
+                <div style="font-weight: 800; color: #1a1a1a; font-size: 14px;">Total Outstanding Balance</div>
+                <div id="asOfDate" style="font-size: 9px; color: #aaa; font-weight: 700; text-transform: uppercase;">UPDATED TODAY</div>
             </div>
-        </div>
-        <div id="dispBalance" style="font-size: 26px; font-weight: 800; color: #e74c3c; letter-spacing: -1px;">
-            ₱0.00
+            <div id="dispBalance" style="font-size: 26px; font-weight: 800; color: #e74c3c; letter-spacing: -1px;">₱0.00</div>
         </div>
     </div>
-</div>
-    
-    <button class="btn-pay-animated" onclick="goToPaymentPortal()">
-    <span>💸</span> PROCEED TO PAYMENT
-</button>
+
+    <a id="payLinkBtn" href="javascript:void(0)" onclick="goToPaymentPage()" style="text-decoration:none;">
+        <button class="btn-pay-animated"><span>💸</span> PROCEED TO PAYMENT</button>
+    </a>
 
     <div class="schedule-container" id="scheduleList">
         <span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>
@@ -187,26 +169,16 @@
 </div>
 
 <script>
-    // 1. Security Check & Initial Data
     let data = JSON.parse(localStorage.getItem('erriho_user'));
-    if (!data || !data.passcode) { 
-    window.location.replace('index.html'); 
-}
+    if (!data || !data.passcode) { window.location.replace('index.html'); }
 
     const baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
     const fmt = (num) => "₱" + parseFloat(num).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
     window.onload = async () => {
         document.getElementById('mainContent').style.display = 'block';
-        
-        // Step A: Instant Load mula sa Storage (Para walang delay sa mata ng user)
         populateData();
-        
-        if (!localStorage.getItem('hasSeenWelcome_v2')) {
-            document.getElementById('welcomePortalModal').style.display = 'flex';
-        }
-
-        // Step B: Background Live Sync (Ito ang kukuha ng fresh data sa Google Sheets)
+        if (!localStorage.getItem('hasSeenWelcome_v2')) { document.getElementById('welcomePortalModal').style.display = 'flex'; }
         const dateEl = document.getElementById('asOfDate');
         dateEl.innerText = "🔄 SYNCING LIVE DATA...";
         dateEl.style.color = "#27ae60";
@@ -215,51 +187,38 @@
             const url = `${baseUrl}?acc=${encodeURIComponent(data.accRef)}&pass=${encodeURIComponent(data.passcode || data.pass)}`;
             const response = await fetch(url);
             const newData = await response.json();
-
             if (newData && newData.status !== 'error') {
                 const passcodeToSave = data.passcode || data.pass;
                 newData.passcode = passcodeToSave; 
-                
-                // I-save ang bagong data para sa susunod na pag-open
                 localStorage.setItem('erriho_user', JSON.stringify(newData));
                 data = newData; 
-                
-                // REFRESH: Lilinisin ang listahan bago i-populate para hindi madoble
                 populateData();
-                
                 dateEl.innerText = "✅ UPDATED JUST NOW";
                 dateEl.style.color = "#aaa";
             }
         } catch (err) {
             dateEl.innerText = "⚠️ OFFLINE MODE";
-            console.error("Sync error:", err);
         }
     };
 
     function populateData() {
         if(!data) return;
-        
-        // Identity Info
         document.getElementById('dispName').innerText = data.name.toUpperCase();
         document.getElementById('dispAccRef').innerText = data.accRef;
         document.getElementById('modalGreeting').innerText = "Hello, " + data.name.split(' ')[0] + "!";
         
-        // Credit Rating Section
         const rating = Math.round(parseFloat(data.creditRating));
         const ratingEl = document.getElementById('dispRating');
         const colorCont = document.getElementById('ratingColorContainer');
         const statusCont = document.getElementById('ratingStatusContainer');
-
         ratingEl.innerText = rating;
         let rColor, rText, rBg;
         if (rating >= 80) { rColor = '#27ae60'; rText = '● GOOD'; rBg = '#e6f9ed'; } 
         else if (rating >= 50) { rColor = '#f39c12'; rText = '● ELIGIBLE'; rBg = '#fff9eb'; } 
         else { rColor = '#e74c3c'; rText = '● AT RISK'; rBg = '#fff1f0'; }
-
         colorCont.style.color = rColor;
         statusCont.innerHTML = `<span style="font-size: 8px; font-weight: 800; color: ${rColor}; background: ${rBg}; padding: 2px 6px; border-radius: 10px;">${rText}</span>`;
 
-        // Hero Calculation (PHP Style Logic)
         let overdueTotal = 0;
         let overdueLabels = [];
         let nextDue = null;
@@ -284,26 +243,21 @@
             hLabel.innerText = "⚠️ ACCOUNT OVERDUE";
             hLabel.style.color = "#ff7675";
             hAmount.innerText = fmt(overdueTotal);
-            hSubCont.innerHTML = `<div style="font-size: 12px; margin-top: 10px; line-height: 1.4; opacity: 0.9;">Your account is currently <strong>Overdue</strong> for ${overdueLabels.join(" & ")}.<br>Please settle this immediately.</div>`;
+            hSubCont.innerHTML = `<div style="font-size: 12px; margin-top: 10px; line-height: 1.4; opacity: 0.9;">Overdue for ${overdueLabels.join(" & ")}.</div>`;
         } else if (nextDue) {
             hLabel.innerText = "Next Due Date: " + nextDue.mo;
             hLabel.style.color = "#aaa";
             hAmount.innerText = fmt(nextDue.total);
-            hSubCont.innerHTML = `<p style="font-size: 11px; opacity: 0.8; margin-top: 5px;">Keep your account in good standing by paying on time.</p>`;
+            hSubCont.innerHTML = `<p style="font-size: 11px; opacity: 0.8; margin-top: 5px;">Keep your account in good standing.</p>`;
         } else {
-            hAmount.style.fontSize = "24px";
-            hAmount.innerText = "LOAN FULLY SETTLED";
-            hLabel.innerText = "Thank you for your business!";
-            hLabel.style.color = "var(--primary-green)";
-            hSubCont.innerHTML = "";
+            hAmount.innerText = "LOAN SETTLED";
+            hLabel.innerText = "Thank you!";
         }
 
-        // Numbers & Stats Update
         document.getElementById('dispLoanType').innerText = data.loanType || "---";
         document.getElementById('dispPlan').innerText = data.loanPlan;
         document.getElementById('dispRate').innerText = (parseFloat(data.intRate) * 100) + "%";
         document.getElementById('dispStatusCount').innerText = `${paidCount} of ${data.schedule.length} Paid`;
-        
         document.getElementById('breakLoan').innerText = fmt(data.loanAmount);
         document.getElementById('breakInt').innerText = fmt(data.intAmount);
         document.getElementById('breakMonthly').innerText = fmt(data.monthlyPayment);
@@ -312,9 +266,7 @@
         document.getElementById('breakDailyInt').innerText = fmt(data.totalDailyInt || 0);
         document.getElementById('breakPaid').innerText = fmt(data.totalPaid || 0);
         document.getElementById('dispBalance').innerText = fmt(data.balance);
-        document.getElementById('payLink').href = data.payLink;
 
-        // Repayment Items (LILINISIN MUNA bago dagdagan)
         const list = document.getElementById('scheduleList');
         list.innerHTML = '<span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>';
         
@@ -328,10 +280,7 @@
                 <div class="bill-header">
                     <div class="bill-info">
                         <span style="font-size:14px; font-weight:700;">${item.mo}</span>
-                        <div style="display: flex; align-items: center; gap: 5px;">
-                            <span style="font-size:11px; color:#888;">Bill ${idx + 1}</span>
-                            <span style="font-size: 9px; color: var(--primary-green); font-weight: 700; animation: blink 1.5s infinite;">• Tap Details</span>
-                        </div>
+                        <span style="font-size: 9px; color: var(--primary-green); font-weight: 700;">• Tap Details</span>
                     </div>
                     <div class="bill-amount-status">
                         <div style="font-weight:800; font-size: 15px;">${fmt(item.total)}</div>
@@ -342,48 +291,30 @@
                 <div class="details-pane">
                     <div class="details-grid">
                         <div class="detail-item"><span class="detail-label">Principal+Int</span><span>${fmt(item.p_amt)}</span></div>
-                        <div class="detail-item"><span class="detail-label">Late Penalty</span><span>${fmt(item.late)}</span></div>
-                        <div class="detail-item"><span class="detail-label">Daily Int</span><span>${fmt(item.d_int)}</span></div>
-                        <div class="detail-item"><span class="detail-label">Days Late</span><span style="color:#e74c3c; font-weight:700;">${item.days_late > 0 ? item.days_late + ' Days' : '---'}</span></div>
                         <div class="detail-item"><span class="detail-label">Ref</span><span>${item.ref || '---'}</span></div>
-                        <div class="detail-item"><span class="detail-label">Pay Date</span><span>${item.p_date || '---'}</span></div>
+                        <div class="detail-item"><span class="detail-label">Late</span><span>${fmt(item.late)}</span></div>
+                        <div class="detail-item"><span class="detail-label">Daily Int</span><span>${fmt(item.d_int)}</span></div>
                     </div>
                 </div>`;
             list.appendChild(row);
         });
     }
 
+    // PINAKAMAHALAGANG DAGDAG:
+    function goToPaymentPage() {
+        // 1. Hanapin ang unang bill na hindi pa paid para makuha ang REF
+        let billRef = "1"; 
+        const nextBill = data.schedule.find(i => i.st.toUpperCase() !== 'PAID');
+        if (nextBill) billRef = nextBill.ref || "1";
+
+        // 2. I-redirect sa payment.html bitbit ang Account at Bill Ref
+        window.location.href = `payment.html?acc=${encodeURIComponent(data.accRef)}&bill=${encodeURIComponent(billRef)}`;
+    }
+
     function closeWelcomeModal() {
         document.getElementById('welcomePortalModal').style.display = 'none';
         localStorage.setItem('hasSeenWelcome_v2', 'true');
     }
-
-    function goToPaymentPortal() {
-    let userData = JSON.parse(localStorage.getItem('erriho_user'));
-    
-    if (userData && userData.schedule) {
-        // Hanapin ang unang bill na UNPAID o OVERDUE
-        const activeBill = userData.schedule.find(item => 
-            ['UNPAID', 'OVERDUE', 'DUE', 'PENDING'].includes(item.st.toUpperCase())
-        );
-
-        if (activeBill) {
-            // Kunin ang Bill Number (halimbawa: "Bill 1" -> "1")
-            // Sa loop mo kanina, ginamit mo ang index + 1
-            const billIndex = userData.schedule.indexOf(activeBill) + 1;
-            
-            // I-construct ang URL na may row o acc, at bill number
-            // Kung ang Apps Script mo ay laging natinginan sa Account Ref, gamitin ang 'acc'
-            const portalUrl = `payment.html?acc=${encodeURIComponent(userData.accRef)}&bill=${billIndex}`;
-            
-            window.location.href = portalUrl;
-        } else {
-            alert("All bills are fully paid! Thank you.");
-        }
-    } else {
-        alert("Session Error: Please log in again.");
-    }
-}
 </script>
 </body>
 </html>
