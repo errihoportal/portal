@@ -104,9 +104,9 @@
             <div id="dispPlan" style="font-size: 14px; font-weight: 700; margin-top: 5px;">---</div>
         </div>
         <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
-            <span class="detail-label">Monthly Payment</span>
-            <div id="dispMonthly" style="font-size: 14px; font-weight: 700; margin-top: 5px;">₱0.00</div>
-        </div>
+    <span class="detail-label">Loan Type</span>
+    <div id="dispLoanType" style="font-size: 14px; font-weight: 700; margin-top: 5px;">---</div>
+</div>
         <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
             <span class="detail-label">Interest Rate</span>
             <div id="dispRate" style="font-size: 14px; font-weight: 700; margin-top: 5px;">0%</div>
@@ -279,7 +279,7 @@
 
         // Numbers & Stats
         document.getElementById('dispPlan').innerText = data.loanPlan;
-        document.getElementById('dispMonthly').innerText = fmt(data.monthlyPayment);
+        document.getElementById('dispLoanType').innerText = data.loanType;
         document.getElementById('dispRate').innerText = (parseFloat(data.intRate) * 100) + "%";
         document.getElementById('dispStatusCount').innerText = `${paidCount} of ${data.schedule.length} Paid`;
         
