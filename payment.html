@@ -152,6 +152,12 @@
 </div>
 
 <script>
+    if (sessionStorage.getItem("erriho_authorized") !== "TRUE") {
+        window.location.replace("index.html"); 
+    }
+
+    let globalTimer; // Dito natin ise-save ang timer para mapatay natin mamaya
+    
     // 1. URL Parameter Logic (Replacement for PHP $_GET)
     const urlParams = new URLSearchParams(window.location.search);
     const ROW = urlParams.get('row');
@@ -233,6 +239,26 @@
                 </div>`;
         }
 
+        // 2. UNIVERSAL AUTO-EXIT TIMER (Ilagay ito sa DULO ng renderData function)
+        let exitSecs = 300; // 1 Minute
+        
+        // Gumawa tayo ng maliit na text sa baba ng card para sa timer
+        const timerDiv = document.createElement('div');
+        timerDiv.id = "session-timer";
+        timerDiv.style = "font-size: 11px; color: #94a3b8; text-align: center; margin-top: 15px; font-weight: 600;";
+        document.querySelector('.bill-card').appendChild(timerDiv);
+
+        const globalTimer = setInterval(() => {
+            exitSecs--;
+            timerDiv.innerHTML = `<i class="fas fa-clock"></i> Session expires in ${exitSecs}s`;
+            
+            if (exitSecs <= 0) {
+                clearInterval(globalTimer);
+                sessionStorage.removeItem("erriho_authorized"); // Burahin ang susi
+                window.location.replace("index.html"); // Balik sa login
+            }
+        }, 1000);
+
         document.getElementById('loader').style.display = 'none';
         document.getElementById('mainContainer').style.display = 'block';
     }
@@ -251,8 +277,13 @@
     }
 
     function uploadFile() {
+        if (globalTimer) { 
+        clearInterval(globalTimer); 
+        console.log("Timer stopped because upload started.");
+    }
         const fileInput = document.getElementById('fileInput');
         const submitBtn = document.getElementById('submitBtn');
+        
         if (fileInput.files.length === 0) { alert("Please select a photo of your receipt."); return; }
         submitBtn.disabled = true;
         submitBtn.innerText = "Uploading... Please wait";
