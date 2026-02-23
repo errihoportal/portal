@@ -6,13 +6,26 @@
     <title>ERRIHO PORTAL | Secure Payment</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Mananatili ang iyong lumang CSS dito... */
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #fdfdfd; padding: 20px; }
-        .login-card { background: #ffffff; padding: 35px 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 400px; text-align: center; border: 1px solid #eee; }
+        .login-card { background: #ffffff; padding: 35px 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 400px; text-align: center; border: 1px solid #eee; position: relative; }
         .brand { font-weight: 800; color: #2e7d32; letter-spacing: 1px; margin-bottom: 5px; font-size: 14px; }
         h2 { color: #202124; margin: 10px 0; font-size: 24px; }
         .instructions { font-size: 13px; color: #5f6368; line-height: 1.5; margin-bottom: 25px; }
+        
+        /* Timer Style */
+        #timer-display {
+            display: none;
+            background: #fff3e0;
+            color: #e65100;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 14px;
+            border: 1px dashed #ffb74d;
+        }
+
         input { width: 100%; padding: 16px; margin-top: 5px; border: 2px solid #dadce0; border-radius: 12px; font-size: 20px; text-align: center; letter-spacing: 5px; outline: none; transition: 0.3s; background: #f8f9fa; }
         input:focus { border-color: #2e7d32; background: #fff; }
         button { width: 100%; padding: 16px; background: #2e7d32; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 15px; }
@@ -26,6 +39,11 @@
 <div class="login-card">
     <img src="https://errihoportal.github.io/portal/images/logo.png" alt="Logo" style="width: 70px; margin-bottom: 10px;">
     <div class="brand">ERRIHO PAYMENT PORTAL</div>
+    
+    <div id="timer-display">
+        <i class="fas fa-clock"></i> Session expires in: <span id="time">05:00</span>
+    </div>
+
     <h2>Pay Now</h2>
     <p class="instructions">Please enter your 6-digit passcode to proceed.</p>
 
@@ -41,18 +59,50 @@
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
+    let countdownInterval;
 
-    // 1. ANTI-BACK LOGIC: Check kung galing sa lumang session
     window.onload = function() {
+        checkSession();
+    };
+
+    function checkSession() {
         const expiry = sessionStorage.getItem("payExpiry");
         if (expiry) {
             const currentTime = new Date().getTime();
             if (currentTime > expiry) {
                 sessionStorage.clear();
-                alert("Session expired. Please enter your passcode again.");
+                alert("Your 5-minute session has expired.");
+                window.location.reload();
+            } else {
+                // Kung may active session pa, ipakita ang timer
+                startTimer(expiry);
             }
         }
-    };
+    }
+
+    function startTimer(expiry) {
+        const timerDisplay = document.getElementById("timer-display");
+        const timeSpan = document.getElementById("time");
+        timerDisplay.style.display = "block";
+
+        countdownInterval = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = expiry - now;
+
+            if (distance < 0) {
+                clearInterval(countdownInterval);
+                sessionStorage.clear();
+                alert("Session expired!");
+                window.location.reload();
+                return;
+            }
+
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            timeSpan.innerHTML = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }, 1000);
+    }
 
     async function handlePay() {
         const pin = document.getElementById("passcode").value.trim();
@@ -71,19 +121,15 @@
         btn.disabled = true;
 
         try {
-            // Tatawag sa Google Apps Script
             const response = await fetch(`${SCRIPT_URL}?action=verifyPasscode&pin=${pin}`);
             const result = await response.json();
 
             if (result.status === "success" && result.link) {
-                // --- 2. SET 5 MINUTE TIMER ---
-                const expiryTime = new Date().getTime() + (5 * 60 * 1000); // 5 mins from now
+                const expiryTime = new Date().getTime() + (5 * 60 * 1000);
                 sessionStorage.setItem("payExpiry", expiryTime);
 
-                alert("You have 5 minutes to complete your payment. This session will expire after that.");
-
-                // --- 3. SECURE REDIRECT ---
-                // 'replace' gamit natin para hindi ma-save ang payment link sa browser back history
+                // Buksan ang link at simulan ang timer bago ang redirect
+                // Note: Gagamit tayo ng replace para sa 'anti-back'
                 window.location.replace(result.link);
 
             } else {
@@ -103,5 +149,6 @@
         if (e.key === "Enter") handlePay();
     });
 </script>
+
 </body>
 </html>
