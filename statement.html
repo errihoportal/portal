@@ -369,7 +369,7 @@
     if (userData && userData.accRef) {
         // I-construct ang URL papuntang paymentportal.html
         // Ginagamit natin ang account reference (AccRef) para ma-identify ang row sa portal
-        const portalUrl = `paymentportal.html?acc=${encodeURIComponent(userData.accRef)}`;
+        const portalUrl = `payment.html?acc=${encodeURIComponent(userData.accRef)}`;
         
         // I-redirect ang user
         window.location.href = portalUrl;
