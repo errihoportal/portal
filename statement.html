@@ -175,9 +175,9 @@ statement.php v 2
     </div>
 </div>
     
-    <button class="btn-pay-animated" onclick="goToPaymentPortal()">
-    <span>💸</span> PROCEED TO PAYMENT
-</button>
+    <a id="payLinkBtn" href="javascript:void(0)" onclick="goToPaymentPage()" style="text-decoration:none;">
+        <button class="btn-pay-animated"><span>💸</span> PROCEED TO PAYMENT</button>
+    </a>
 
     <div class="schedule-container" id="scheduleList">
         <span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>
@@ -360,32 +360,16 @@ statement.php v 2
         localStorage.setItem('hasSeenWelcome_v2', 'true');
     }
 
-    function goToPaymentPortal() {
-    let userData = JSON.parse(localStorage.getItem('erriho_user'));
-    
-    if (userData && userData.schedule) {
-        // Hanapin ang unang bill na UNPAID o OVERDUE
-        const activeBill = userData.schedule.find(item => 
-            ['UNPAID', 'OVERDUE', 'DUE', 'PENDING'].includes(item.st.toUpperCase())
-        );
+    // PINAKAMAHALAGANG DAGDAG:
+    function goToPaymentPage() {
+        // 1. Hanapin ang unang bill na hindi pa paid para makuha ang REF
+        let billRef = "1"; 
+        const nextBill = data.schedule.find(i => i.st.toUpperCase() !== 'PAID');
+        if (nextBill) billRef = nextBill.ref || "1";
 
-        if (activeBill) {
-            // Kunin ang Bill Number (halimbawa: "Bill 1" -> "1")
-            // Sa loop mo kanina, ginamit mo ang index + 1
-            const billIndex = userData.schedule.indexOf(activeBill) + 1;
-            
-            // I-construct ang URL na may row o acc, at bill number
-            // Kung ang Apps Script mo ay laging natinginan sa Account Ref, gamitin ang 'acc'
-            const portalUrl = `payment.html?acc=${encodeURIComponent(userData.accRef)}&bill=${billIndex}`;
-            
-            window.location.href = portalUrl;
-        } else {
-            alert("All bills are fully paid! Thank you.");
-        }
-    } else {
-        alert("Session Error: Please log in again.");
+        // 2. I-redirect sa payment.html bitbit ang Account at Bill Ref
+        window.location.href = `payment.html?acc=${encodeURIComponent(data.accRef)}&bill=${encodeURIComponent(billRef)}`;
     }
-}
 </script>
 </body>
 </html>
