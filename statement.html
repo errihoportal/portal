@@ -79,11 +79,17 @@
                 <span id="dispAccRef" style="font-family: monospace; font-size: 13px; font-weight: 700; color: var(--primary-green); background: #e8f5e9; padding: 2px 8px; border-radius: 5px;">---</span>
             </div>
         </div>
-        <div style="background: #fff; border: 1.5px solid #eee; border-radius: 18px; padding: 12px 18px; text-align: center; min-width: 110px;">
-            <div style="font-size: 9px; font-weight: 800; color: #888; text-transform: uppercase;">Credit Rating</div>
-            <div id="dispRating" style="font-size: 28px; font-weight: 800; color: #27ae60;">0%</div>
-        </div>
+        
+        <div style="background: #fff; border: 1.5px solid #eee; border-radius: 18px; padding: 12px 18px; text-align: center; min-width: 110px; box-shadow: 0 5px 15px rgba(0,0,0,0.03);">
+    <div style="font-size: 9px; font-weight: 800; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Credit Rating</div>
+    
+    <div id="ratingColorContainer" style="font-size: 28px; font-weight: 800; line-height: 1;">
+        <span id="dispRating">0</span><span style="font-size: 14px;">%</span>
     </div>
+
+    <div style="margin-top: 5px;" id="ratingStatusContainer">
+        </div>
+</div>
 
     <div class="hero-section" id="heroBox">
         <p class="due-label" id="heroLabel">STATUS LOADING</p>
@@ -207,10 +213,39 @@
         document.getElementById('modalGreeting').innerText = "Hello, " + data.name.split(' ')[0] + "!";
         
         // Rating
-        const rating = Math.round(data.creditRating);
-        const ratingEl = document.getElementById('dispRating');
-        ratingEl.innerText = rating + "%";
-        ratingEl.style.color = rating >= 80 ? '#27ae60' : (rating >= 50 ? '#f39c12' : '#e74c3c');
+        // --- UPDATED RATING LOGIC (PHP Style) ---
+const rating = Math.round(parseFloat(data.creditRating));
+const ratingEl = document.getElementById('dispRating');
+const colorCont = document.getElementById('ratingColorContainer');
+const statusCont = document.getElementById('ratingStatusContainer');
+
+// 1. I-update ang numero
+ratingEl.innerText = rating;
+
+// 2. I-set ang kulay at status badge base sa rating
+let rColor, rText, rBg;
+
+if (rating >= 80) {
+    rColor = '#27ae60';
+    rText = '● GOOD';
+    rBg = '#e6f9ed';
+} else if (rating >= 50) {
+    rColor = '#f39c12';
+    rText = '● ELIGIBLE';
+    rBg = '#fff9eb';
+} else {
+    rColor = '#e74c3c';
+    rText = '● AT RISK';
+    rBg = '#fff1f0';
+}
+
+// 3. I-apply ang styles sa HTML
+colorCont.style.color = rColor;
+statusCont.innerHTML = `
+    <span style="font-size: 9px; font-weight: 800; color: ${rColor}; background: ${rBg}; padding: 3px 8px; border-radius: 20px;">
+        ${rText}
+    </span>
+`;
 
         // Hero Logic (Overdue vs Next Due)
         let overdueTotal = 0;
