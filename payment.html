@@ -174,12 +174,14 @@ if (!isAuthorized && !hasDirectLink) {
     let billData = {};
 
     window.onload = function() {
-        if(!ROW || !BILL) {
-            document.getElementById('loader').innerHTML = "Invalid Link. Please check your EMAIL/SMS.";
-            return;
-        }
+    // Papasukin kung may (ROW at BILL) OR kung may (ACC)
+    if ((ROW && BILL) || ACC) {
         fetchData();
-    };
+    } else {
+        document.getElementById('loader').innerHTML = "Invalid Link. Please check your EMAIL/SMS or Portal.";
+        return;
+    }
+};
 
     async function fetchData() {
         try {
@@ -262,17 +264,18 @@ if (!isAuthorized && !hasDirectLink) {
         timerDiv.style = "font-size: 11px; color: #94a3b8; text-align: center; margin-top: 15px; font-weight: 600;";
         document.querySelector('.bill-card').appendChild(timerDiv);
 
-        const globalTimer = setInterval(() => {
+        // Alisin ang "const" dito para magamit ang global variable sa taas
+        globalTimer = setInterval(() => { 
             exitSecs--;
             timerDiv.innerHTML = `<i class="fas fa-clock"></i> Session expires in ${exitSecs}s`;
             
             if (exitSecs <= 0) {
                 clearInterval(globalTimer);
-                sessionStorage.removeItem("erriho_authorized"); // Burahin ang susi
-                window.location.replace("index.html"); // Balik sa login
+                sessionStorage.removeItem("erriho_authorized");
+                window.location.replace("index.html");
             }
         }, 1000);
-
+        
         document.getElementById('loader').style.display = 'none';
         document.getElementById('mainContainer').style.display = 'block';
     }
