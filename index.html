@@ -139,6 +139,7 @@
                 const data = await response.json();
 
                 if (data && data.status !== 'error') {
+                    data.passcode = pass;
                     localStorage.setItem('erriho_user', JSON.stringify(data));
                     window.location.href = 'statement.html';
                 } else {
