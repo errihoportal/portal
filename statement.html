@@ -359,20 +359,27 @@
     }
 
     function goToPaymentPortal() {
-    // 1. Kunin ang saved data mula sa localStorage
     let userData = JSON.parse(localStorage.getItem('erriho_user'));
     
-    // 2. I-check kung may 'row' data na nakuha sa login
-    // Note: Siguraduhin na ang Apps Script mo ay nagpapadala ng 'accRef' o 'row' index.
-    // Gagamitin natin ang AccRef bilang basehan kung wala kang explicit na 'row' id.
-    
-    if (userData && userData.accRef) {
-        // I-construct ang URL papuntang paymentportal.html
-        // Ginagamit natin ang account reference (AccRef) para ma-identify ang row sa portal
-        const portalUrl = `payment.html?acc=${encodeURIComponent(userData.accRef)}`;
-        
-        // I-redirect ang user
-        window.location.href = portalUrl;
+    if (userData && userData.schedule) {
+        // Hanapin ang unang bill na UNPAID o OVERDUE
+        const activeBill = userData.schedule.find(item => 
+            ['UNPAID', 'OVERDUE', 'DUE', 'PENDING'].includes(item.st.toUpperCase())
+        );
+
+        if (activeBill) {
+            // Kunin ang Bill Number (halimbawa: "Bill 1" -> "1")
+            // Sa loop mo kanina, ginamit mo ang index + 1
+            const billIndex = userData.schedule.indexOf(activeBill) + 1;
+            
+            // I-construct ang URL na may row o acc, at bill number
+            // Kung ang Apps Script mo ay laging natinginan sa Account Ref, gamitin ang 'acc'
+            const portalUrl = `payment.html?acc=${encodeURIComponent(userData.accRef)}&bill=${billIndex}`;
+            
+            window.location.href = portalUrl;
+        } else {
+            alert("All bills are fully paid! Thank you.");
+        }
     } else {
         alert("Session Error: Please log in again.");
     }
