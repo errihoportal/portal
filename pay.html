@@ -94,10 +94,18 @@
         </div>
     </div>
 
-    <script>
+   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
 
-    // --- ANTI-BACK LOGIC (Mananatili ito) ---
+    // 1. AUTO-REFRESH LOGIC (Sinisigurado na fresh ang page pagka-back)
+    window.addEventListener('pageshow', function(event) {
+        // Kapag nanggaling sa Back button o History
+        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            window.location.reload();
+        }
+    });
+
+    // 2. ANTI-BACK HISTORY (Pinipigilan ang pag-back pabalik sa payment link)
     window.history.pushState(null, null, window.location.href);
     window.onpopstate = function () {
         window.history.go(1);
@@ -124,20 +132,15 @@
             const result = await response.json();
 
             if (result.status === "success" && result.link) {
-                // --- BAGONG LOGIC DITO ---
-                // Bubuksan natin ang payment link sa bagong tab O sa parehong tab
-                // Pero bago iyon, itatakda natin ang pay.html na mag-reload sa susunod na pagbisita
                 
-                setTimeout(function() {
-                    // Ito ang magpapatakbo ng redirect
-                    window.location.href = result.link;
-                }, 100);
+                // Magsagawa ng cleanup sa UI bago umalis
+                document.getElementById("passcode").value = "";
+                loading.innerText = "Redirecting securely...";
 
-                // Ito ang "killer move": Kapag nag-back sila, itong "reload" 
-                // ang madadatnan nila imbes na yung "verifying" state.
-                window.onbeforeunload = function() {
-                    document.getElementById("passcode").value = "";
-                };
+                // GAMITIN ANG REPLACE (Ito ang pumatay sa History)
+                // Imbes na magdagdag ng step sa history, papalitan nito ang 'pay.html'
+                // para pag nag-back sila, lalampasan ang link at babalik sa index.html
+                window.location.replace(result.link);
 
             } else {
                 throw new Error("Invalid");
@@ -150,11 +153,6 @@
             btn.disabled = false;
         }
     }
-
-    // Dagdag na siguridad: Pagka-load na pagka-load, linisin ang input
-    window.onload = function() {
-        document.getElementById("passcode").value = "";
-    };
 
     function showLoginHelp() {
         alert("Please enter the 6-digit passcode from your statement.");
