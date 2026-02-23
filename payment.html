@@ -152,13 +152,14 @@
 </div>
 
 <script>
-    // SMART GUARD: Papasukin kung Authorized O KAYA ay kung galing sa direct Email Link (may ROW at BILL)
+    // SMART GUARD: Papasukin kung Authorized O KAYA ay kung may dalang valid parameters (acc/row)
 const urlParamsCheck = new URLSearchParams(window.location.search);
-const hasDirectLink = urlParamsCheck.has('row') && urlParamsCheck.has('bill');
+const hasPortalLink = urlParamsCheck.has('acc') && urlParamsCheck.has('bill'); // Galing sa Statement
+const hasDirectLink = urlParamsCheck.has('row') && urlParamsCheck.has('bill'); // Galing sa Email
 const isAuthorized = sessionStorage.getItem("erriho_authorized") === "TRUE";
 
-if (!isAuthorized && !hasDirectLink) {
-    // Kung hindi authorized at walang direct link, balik sa login
+// KUNG wala lahat yan, doon lang siya ibabalik sa index
+if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     window.location.replace("index.html"); 
 }
 
