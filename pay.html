@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ERRIHO PORTAL | Secure Payment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Mananatili ang iyong lumang CSS dito... */
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #fdfdfd; padding: 20px; }
+        .login-card { background: #ffffff; padding: 35px 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 400px; text-align: center; border: 1px solid #eee; }
+        .brand { font-weight: 800; color: #2e7d32; letter-spacing: 1px; margin-bottom: 5px; font-size: 14px; }
+        h2 { color: #202124; margin: 10px 0; font-size: 24px; }
+        .instructions { font-size: 13px; color: #5f6368; line-height: 1.5; margin-bottom: 25px; }
+        input { width: 100%; padding: 16px; margin-top: 5px; border: 2px solid #dadce0; border-radius: 12px; font-size: 20px; text-align: center; letter-spacing: 5px; outline: none; transition: 0.3s; background: #f8f9fa; }
+        input:focus { border-color: #2e7d32; background: #fff; }
+        button { width: 100%; padding: 16px; background: #2e7d32; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 15px; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .error-msg { color: #d93025; font-size: 13px; margin-top: 15px; display: none; font-weight: 500; }
+        .loading { display: none; font-size: 12px; color: #2e7d32; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <img src="https://errihoportal.page.gd/images/test.png" alt="Logo" style="width: 70px; margin-bottom: 10px;">
+    <div class="brand">ERRIHO PAYMENT PORTAL</div>
+    <h2>Pay Now</h2>
+    <p class="instructions">Please enter your 6-digit passcode to proceed.</p>
+
+    <div style="text-align: left;">
+        <label style="font-size: 11px; font-weight: bold;">ENTER PASSCODE</label>
+        <input type="password" id="passcode" placeholder="••••••" maxlength="6" inputmode="numeric">
+        <div id="loading" class="loading"><i class="fas fa-spinner fa-spin"></i> Checking passcode...</div>
+        <div id="error" class="error-msg">❌ Invalid passcode. Please try again.</div>
+    </div>
+
+    <button id="payBtn" onclick="handlePay()">PROCEED TO PAYMENT</button>
+</div>
+
+<script>
+    // PALITAN ITO NG IYONG ACTUAL WEB APP URL MULA SA DEPLOYMENT
+    const SCRIPT_URL = "SUBUKAN_MO_DITO_ANG_IYONG_WEB_APP_URL";
+
+    async function handlePay() {
+        const pin = document.getElementById("passcode").value.trim();
+        const error = document.getElementById("error");
+        const loading = document.getElementById("loading");
+        const btn = document.getElementById("payBtn");
+
+        if (pin.length < 4) {
+            error.innerText = "⚠️ Please enter a valid passcode.";
+            error.style.display = "block";
+            return;
+        }
+
+        // UI State: Loading
+        error.style.display = "none";
+        loading.style.display = "block";
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(`${SCRIPT_URL}?action=verifyPasscode&pin=${pin}`);
+            const result = await response.json();
+
+            if (result.status === "success" && result.link) {
+                window.location.href = result.link;
+            } else {
+                throw new Error("Invalid");
+            }
+        } catch (e) {
+            error.innerText = "❌ Invalid passcode. Please check and try again.";
+            error.style.display = "block";
+            document.getElementById("passcode").value = "";
+        } finally {
+            loading.style.display = "none";
+            btn.disabled = false;
+        }
+    }
+
+    document.getElementById("passcode").addEventListener("keyup", (e) => {
+        if (e.key === "Enter") handlePay();
+    });
+</script>
+
+</body>
+</html>
