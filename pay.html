@@ -95,16 +95,15 @@
     </div>
 
     <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
+    // 1. Eto ang logic para sa Auto-Refresh kapag nag-Back sila
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            // Burahin ang passcode field at i-refresh ang page para "Locked" ulit
+            window.location.reload();
+        }
+    });
 
-    // --- ANTI-BACK LOGIC ---
-    // Kapag binuksan ang page, naglalagay tayo ng "dummy" state sa history.
-    // Kapag pinindot ang 'Back' mula sa payment link, itong page ang lalabas
-    // pero hindi na nila pabalik na maki-click yung payment link.
-    window.history.pushState(null, null, window.location.href);
-    window.onpopstate = function () {
-        window.history.go(1);
-    };
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
 
     async function handlePay() {
         const pin = document.getElementById("passcode").value.trim();
@@ -127,11 +126,7 @@
             const result = await response.json();
 
             if (result.status === "success" && result.link) {
-                // Option A: window.location.href (Para pwede silang mag-back sa pay.html)
-                // Option B: window.location.replace (Para lalaktawan ang pay.html sa back button)
-                
-                // Gagamitin natin ang normal na redirect para makabalik sila sa pay.html, 
-                // pero dahil sa pushState sa taas, hindi na nila maba-back ulit papunta sa link.
+                // Pagka-click, lilipat na sa Payment Link
                 window.location.href = result.link;
             } else {
                 throw new Error("Invalid");
