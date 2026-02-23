@@ -97,15 +97,14 @@
    <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
 
-    // 1. AUTO-REFRESH LOGIC (Sinisigurado na fresh ang page pagka-back)
+    // 1. AUTO-REFRESH LOGIC
     window.addEventListener('pageshow', function(event) {
-        // Kapag nanggaling sa Back button o History
         if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
             window.location.reload();
         }
     });
 
-    // 2. ANTI-BACK HISTORY (Pinipigilan ang pag-back pabalik sa payment link)
+    // 2. ANTI-BACK HISTORY
     window.history.pushState(null, null, window.location.href);
     window.onpopstate = function () {
         window.history.go(1);
@@ -137,16 +136,16 @@
 
                 // 2. Linisin ang UI
                 document.getElementById("passcode").value = "";
-                loading.innerText = "Checking your bill, please wait...";
+                loading.innerText = "Verifying account and retrieving bill...";
 
-                // 3. I-redirect gamit ang replace (para hindi mabalikan sa history)
+                // 3. I-redirect gamit ang replace
                 window.location.replace(result.link);
-            }
-
             } else {
+                // Ito ang itinama natin, inalis ang sobrang bracket sa taas nito
                 throw new Error("Invalid");
             }
         } catch (e) {
+            error.innerText = "❌ Invalid Passcode. Please try again.";
             error.style.display = "block";
             document.getElementById("passcode").value = "";
         } finally {
@@ -156,7 +155,7 @@
     }
 
     function showLoginHelp() {
-        alert("LOGIN ASSISTANCE:\n\nPlease check your Email or Messenger for your official login credentials. If you haven't received them yet, please contact us using the support links below.");
+        alert("LOGIN ASSISTANCE:\n\nPlease check your Email or Messenger for your official login credentials.");
     }
 
     document.getElementById("passcode").addEventListener("keyup", (e) => {
