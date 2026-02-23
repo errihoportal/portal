@@ -132,15 +132,16 @@
             const result = await response.json();
 
             if (result.status === "success" && result.link) {
-                
-                // Magsagawa ng cleanup sa UI bago umalis
-                document.getElementById("passcode").value = "";
-                loading.innerText = "Redirecting securely...";
+                // 1. Maglagay ng "Susi" sa browser session
+                sessionStorage.setItem("erriho_authorized", "TRUE");
 
-                // GAMITIN ANG REPLACE (Ito ang pumatay sa History)
-                // Imbes na magdagdag ng step sa history, papalitan nito ang 'pay.html'
-                // para pag nag-back sila, lalampasan ang link at babalik sa index.html
+                // 2. Linisin ang UI
+                document.getElementById("passcode").value = "";
+                loading.innerText = "Checking your bill, please wait...";
+
+                // 3. I-redirect gamit ang replace (para hindi mabalikan sa history)
                 window.location.replace(result.link);
+            }
 
             } else {
                 throw new Error("Invalid");
