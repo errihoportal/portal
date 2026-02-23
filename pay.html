@@ -21,23 +21,7 @@
             box-shadow: 0 15px 40px rgba(0,0,0,0.08); 
             text-align: center; 
             border: 1px solid #f1f1f1; 
-            position: relative; 
         }
-
-        /* Timer Display Style */
-        #timer-display {
-            display: none;
-            background: #fff1f0;
-            color: #e74c3c;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 13px;
-            margin-bottom: 20px;
-            font-weight: 600;
-            border: 1px solid #ffccc7;
-            animation: slideDown 0.5s ease-out;
-        }
-        @keyframes slideDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         input { 
             width: 100%; 
@@ -45,13 +29,12 @@
             border-radius: 15px; 
             border: 1.5px solid #e2e8f0; 
             box-sizing: border-box; 
-            font-size: 24px; /* Malaki para sa passcode */
+            font-size: 24px; 
             background: #f8fafc; 
             margin-top: 5px; 
             text-align: center;
             letter-spacing: 8px;
             outline: none;
-            transition: 0.3s;
         }
         input:focus { border-color: #27ae60; background: #fff; }
 
@@ -66,16 +49,12 @@
             font-size:16px; 
             cursor:pointer; 
             margin-top: 20px; 
-            transition: 0.3s;
         }
-        .btn-pay:hover { background: #219150; }
-        .btn-pay:disabled { background: #94a3b8; cursor: not-allowed; }
+        .btn-pay:disabled { background: #94a3b8; }
 
         #error-msg { background: #fff1f0; color: #e74c3c; padding: 12px; border-radius: 12px; font-size: 12px; margin-top: 15px; font-weight: 600; border: 1px solid #ffccc7; display: none; }
         
         .loading-text { font-size: 12px; color: #64748b; margin-top: 10px; display: none; }
-
-        .support-link { text-decoration: none; color: #64748b; font-size: 13px; font-weight: 600; }
         .back-portal { display: inline-block; margin-top: 20px; font-size: 13px; color: #27ae60; text-decoration: none; font-weight: 700; }
     </style>
 </head>
@@ -84,95 +63,39 @@
     <div class="login-card">
         <div style="margin-bottom: 30px;">
             <div style="background: #f0fdf4; width: 70px; height: 70px; border-radius: 20px; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px; border: 1px solid #dcfce7;">
-                <img src="images/logo.png" alt="ERRIHO" style="height: 40px; width: auto;">
+                <img src="https://errihoportal.github.io/portal/images/logo.png" alt="ERRIHO" style="height: 40px; width: auto;">
             </div>
             <h2 style="color: #27ae60; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -1px;">PAY NOW</h2>
             <p style="font-size: 11px; color: #64748b; margin-top: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;">Secure Payment Gateway</p>
         </div>
 
-        <div id="timer-display">
-            <i class="fas fa-clock"></i> Session expires in: <span id="time">05:00</span>
-        </div>
-
         <p style="font-size: 13px; color: #475569; line-height: 1.5; margin-bottom: 20px;">
-            Please enter your <b>6-digit passcode</b> to access the payment portal.
+            Please enter your <b>6-digit passcode</b> to proceed to the secure payment page.
         </p>
 
-        <div id="error-msg">❌ Invalid Passcode. Please check and try again.</div>
+        <div id="error-msg">❌ Invalid Passcode. Please try again.</div>
 
         <div style="text-align: left; margin-bottom: 15px;">
-            <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-left: 5px;">Enter Passcode</label>
+            <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-left: 5px;">Passcode</label>
             <input type="password" id="passcode" placeholder="••••••" maxlength="6" inputmode="numeric">
         </div>
 
-        <div id="loading" class="loading-text"><i class="fas fa-spinner fa-spin"></i> Verifying...</div>
+        <div id="loading" class="loading-text"><i class="fas fa-spinner fa-spin"></i> Loading secure link...</div>
         
-        <button id="payBtn" class="btn-pay" onclick="handlePay()">AUTHORIZE PAYMENT</button>
+        <button id="payBtn" class="btn-pay" onclick="handlePay()">PROCEED TO PAYMENT</button>
 
         <div style="margin-top: 25px; border-top: 1px solid #f1f1f1; padding-top: 20px;">
-            <a href="javascript:void(0)" onclick="showLoginHelp()" style="font-size: 13px; color: #64748b; text-decoration: none; font-weight: 600; display: block; margin-bottom: 15px;">
-                Can't sign in? View Login Guide
-            </a>
-
-            <p style="font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; margin-bottom: 12px;">Contact Support</p>
-            
+            <a href="javascript:void(0)" onclick="showLoginHelp()" style="font-size: 13px; color: #64748b; text-decoration: none; font-weight: 600; display: block; margin-bottom: 15px;">Can't sign in? View Login Guide</a>
             <div style="display: flex; justify-content: center; gap: 20px;">
-                <a href="https://m.me/errihopersonalfinance" target="_blank" style="text-decoration: none; color: #0084FF; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 5px;">
-                    <span>💬 Messenger</span>
-                </a>
-                <a href="mailto:info.erriho@gmail.com?subject=Payment%20Assistance" style="text-decoration: none; color: #e74c3c; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 5px;">
-                    <span>✉️ Email Us</span>
-                </a>
+                <a href="https://m.me/errihopersonalfinance" target="_blank" style="text-decoration: none; color: #0084FF; font-size: 13px; font-weight: 600;">💬 Messenger</a>
+                <a href="mailto:info.erriho@gmail.com" style="text-decoration: none; color: #e74c3c; font-size: 13px; font-weight: 600;">✉️ Email Us</a>
             </div>
-
             <a href="index.html" class="back-portal"><i class="fas fa-arrow-left"></i> Back to Portal</a>
         </div>
     </div>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
-        let countdownInterval;
-
-        window.onload = function() {
-            checkSession();
-        };
-
-        function checkSession() {
-            const expiry = sessionStorage.getItem("payExpiry");
-            if (expiry) {
-                const currentTime = new Date().getTime();
-                if (currentTime > expiry) {
-                    sessionStorage.clear();
-                    alert("Your 5-minute session has expired.");
-                    window.location.reload();
-                } else {
-                    startTimer(expiry);
-                }
-            }
-        }
-
-        function startTimer(expiry) {
-            const timerDisplay = document.getElementById("timer-display");
-            const timeSpan = document.getElementById("time");
-            timerDisplay.style.display = "block";
-
-            countdownInterval = setInterval(() => {
-                const now = new Date().getTime();
-                const distance = expiry - now;
-
-                if (distance < 0) {
-                    clearInterval(countdownInterval);
-                    sessionStorage.clear();
-                    alert("Session expired! Please login again.");
-                    window.location.reload();
-                    return;
-                }
-
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                timeSpan.innerHTML = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            }, 1000);
-        }
 
         async function handlePay() {
             const pin = document.getElementById("passcode").value.trim();
@@ -181,7 +104,7 @@
             const btn = document.getElementById("payBtn");
 
             if (pin.length < 4) {
-                error.innerText = "⚠️ Please enter a valid passcode.";
+                error.innerText = "⚠️ Please enter your 6-digit passcode.";
                 error.style.display = "block";
                 return;
             }
@@ -195,11 +118,7 @@
                 const result = await response.json();
 
                 if (result.status === "success" && result.link) {
-                    // Set 5 Minute Expiry
-                    const expiryTime = new Date().getTime() + (5 * 60 * 1000);
-                    sessionStorage.setItem("payExpiry", expiryTime);
-                    
-                    // Secure Redirect
+                    // Gamit ang replace para hindi na mabalikan (Anti-Back)
                     window.location.replace(result.link);
                 } else {
                     throw new Error("Invalid");
@@ -214,7 +133,7 @@
         }
 
         function showLoginHelp() {
-            alert("PAYMENT LOGIN ASSISTANCE:\n\nPlease enter the 6-digit passcode provided in your statement or SMS reminder. If you lost your code, contact support below.");
+            alert("Please enter the 6-digit passcode from your statement. Contact support if you need a new code.");
         }
 
         document.getElementById("passcode").addEventListener("keyup", (e) => {
