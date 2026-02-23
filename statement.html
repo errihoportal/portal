@@ -123,28 +123,51 @@
 </div>
 
     <div style="background: white; border-radius: 20px; border: 1px solid #eee; padding: 20px; margin-bottom: 25px;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
-            <span>Original Loan</span><span id="breakLoan" style="font-weight: 700;">₱0.00</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
-            <span>Interest Amount</span><span id="breakInt" style="font-weight: 700;">₱0.00</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
-            <span>Processing Fee</span><span id="breakFee" style="font-weight: 700;">₱0.00</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
-            <span>Total Late Fees</span><span id="breakLate" style="font-weight: 700; color: #e67e22;">₱0.00</span>
-        </div>
-        <div style="height: 1px; background: #f0f0f0; margin: 15px 0;"></div>
-        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-            <div>
-                <div style="font-weight: 800; font-size: 14px;">Total Balance</div>
-                <div id="asOfDate" style="font-size: 9px; color: #aaa; font-weight: 700;">UPDATED TODAY</div>
-            </div>
-            <div id="dispBalance" style="font-size: 26px; font-weight: 800; color: #e74c3c;">₱0.00</div>
-        </div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+        <span style="color: #555; font-size: 13px;">Original Loan Amount</span>
+        <span id="breakLoan" style="font-weight: 700;">₱0.00</span>
     </div>
 
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+        <span style="color: #555; font-size: 13px;">Monthly Interest Amount</span>
+        <span id="breakInt" style="font-weight: 700;">₱0.00</span>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+        <span style="color: #555; font-size: 13px;">Processing Fee</span>
+        <span id="breakFee" style="font-weight: 700;">₱0.00</span>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+        <span style="color: #555; font-size: 13px;">Total Late Payment Fees</span>
+        <span id="breakLate" style="font-weight: 700; color: #e67e22;">₱0.00</span>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+        <span style="color: #555; font-size: 13px;">Total Daily Interest Charge</span>
+        <span id="breakDailyInt" style="font-weight: 700; color: #e67e22;">₱0.00</span>
+    </div>
+    
+    <div style="height: 1px; background: #f0f0f0; margin: 15px 0;"></div>
+    
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+        <span style="color: #555; font-size: 13px;">Total Amount Paid</span>
+        <span id="breakPaid" style="font-weight: 700; color: #27ae60;">₱0.00</span>
+    </div>
+    
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px;">
+        <div>
+            <div style="font-weight: 800; color: #1a1a1a; font-size: 14px;">Total Outstanding Balance</div>
+            <div id="asOfDate" style="font-size: 9px; color: #aaa; font-weight: 700; text-transform: uppercase;">
+                UPDATED TODAY
+            </div>
+        </div>
+        <div id="dispBalance" style="font-size: 26px; font-weight: 800; color: #e74c3c; letter-spacing: -1px;">
+            ₱0.00
+        </div>
+    </div>
+</div>
+    
     <a id="payLink" href="#" target="_blank" style="text-decoration:none;">
         <button class="btn-pay-animated"><span>💸</span> PROCEED TO PAYMENT</button>
     </a>
@@ -278,6 +301,8 @@
         document.getElementById('breakInt').innerText = fmt(data.intAmount);
         document.getElementById('breakFee').innerText = fmt(data.processingFee);
         document.getElementById('breakLate').innerText = fmt(data.totalLateFee);
+        document.getElementById('breakDailyInt').innerText = fmt(data.totalDailyInt || 0);
+        document.getElementById('breakPaid').innerText = fmt(data.totalPaid || 0);
         document.getElementById('dispBalance').innerText = fmt(data.balance);
         document.getElementById('payLink').href = data.payLink;
 
