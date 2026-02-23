@@ -134,6 +134,11 @@
     </div>
 
     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+    <span style="color: #555; font-size: 13px;">Monthly Payment</span>
+    <span id="breakMonthly" style="font-weight: 700; color: var(--primary-green);">₱0.00</span>
+</div>
+
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
         <span style="color: #555; font-size: 13px;">Processing Fee</span>
         <span id="breakFee" style="font-weight: 700;">₱0.00</span>
     </div>
@@ -299,6 +304,7 @@
         
         document.getElementById('breakLoan').innerText = fmt(data.loanAmount);
         document.getElementById('breakInt').innerText = fmt(data.intAmount);
+        document.getElementById('breakMonthly').innerText = fmt(data.monthlyPayment);
         document.getElementById('breakFee').innerText = fmt(data.processingFee);
         document.getElementById('breakLate').innerText = fmt(data.totalLateFee);
         document.getElementById('breakDailyInt').innerText = fmt(data.totalDailyInt || 0);
