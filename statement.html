@@ -173,8 +173,8 @@
     </div>
 </div>
     
-    <a id="payLink" href="https://errihoportal.github.io/portal/pay.html" target="_blank" style="text-decoration:none;">
-    <button class="btn-pay-animated"><span>💸</span> PROCEED TO PAYMENT</button>
+    <a id="payLink" href="javascript:void(0);" style="text-decoration:none;">
+    <button class="btn-pay-animated" onclick="goToPaymentPortal()"><span>💸</span> PROCEED TO PAYMENT</button>
 </a>
 
     <div class="schedule-container" id="scheduleList">
@@ -357,6 +357,26 @@
         document.getElementById('welcomePortalModal').style.display = 'none';
         localStorage.setItem('hasSeenWelcome_v2', 'true');
     }
+
+    function goToPaymentPortal() {
+    // 1. Kunin ang saved data mula sa localStorage
+    let userData = JSON.parse(localStorage.getItem('erriho_user'));
+    
+    // 2. I-check kung may 'row' data na nakuha sa login
+    // Note: Siguraduhin na ang Apps Script mo ay nagpapadala ng 'accRef' o 'row' index.
+    // Gagamitin natin ang AccRef bilang basehan kung wala kang explicit na 'row' id.
+    
+    if (userData && userData.accRef) {
+        // I-construct ang URL papuntang paymentportal.html
+        // Ginagamit natin ang account reference (AccRef) para ma-identify ang row sa portal
+        const portalUrl = `paymentportal.html?row=${encodeURIComponent(userData.accRef)}`;
+        
+        // I-redirect ang user
+        window.location.href = portalUrl;
+    } else {
+        alert("Session Error: Please log out and log in again.");
+    }
+}
 </script>
 </body>
 </html>
