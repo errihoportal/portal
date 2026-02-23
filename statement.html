@@ -101,23 +101,26 @@
     
     
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-        <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
-            <span class="detail-label">Loan Plan</span>
-            <div id="dispPlan" style="font-size: 14px; font-weight: 700; margin-top: 5px;">---</div>
-        </div>
-        <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
-    <span class="detail-label">Loan Type</span>
-    <div id="dispLoanType" style="font-size: 14px; font-weight: 700; margin-top: 5px;">---</div>
-</div>
-        <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
-            <span class="detail-label">Interest Rate</span>
-            <div id="dispRate" style="font-size: 14px; font-weight: 700; margin-top: 5px;">0%</div>
-        </div>
-        <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
-            <span class="detail-label">Payment Status</span>
-            <div id="dispStatusCount" style="font-size: 14px; font-weight: 700; margin-top: 5px;">0 of 0 Paid</div>
-        </div>
+    <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
+        <span class="detail-label">Loan Type</span>
+        <div id="dispLoanType" style="font-size: 14px; font-weight: 700; margin-top: 5px;">---</div>
     </div>
+
+    <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
+        <span class="detail-label">Loan Plan</span>
+        <div id="dispPlan" style="font-size: 14px; font-weight: 700; margin-top: 5px;">---</div>
+    </div>
+
+    <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
+        <span class="detail-label">Interest Rate</span>
+        <div id="dispRate" style="font-size: 14px; font-weight: 700; margin-top: 5px;">0%</div>
+    </div>
+
+    <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
+        <span class="detail-label">Payment Status</span>
+        <div id="dispStatusCount" style="font-size: 14px; font-weight: 700; margin-top: 5px;">0 of 0 Paid</div>
+    </div>
+</div>
 
     <div style="background: white; border-radius: 20px; border: 1px solid #eee; padding: 20px; margin-bottom: 25px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
@@ -280,8 +283,8 @@
         }
 
         // Numbers & Stats
-        document.getElementById('dispPlan').innerText = data.loanPlan;
         document.getElementById('dispLoanType').innerText = data.loanType;
+        document.getElementById('dispPlan').innerText = data.loanPlan;
         document.getElementById('dispRate').innerText = (parseFloat(data.intRate) * 100) + "%";
         document.getElementById('dispStatusCount').innerText = `${paidCount} of ${data.schedule.length} Paid`;
         
