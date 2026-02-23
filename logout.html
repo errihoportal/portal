@@ -2,10 +2,11 @@
 <html>
 <body>
     <script>
-        // Burahin ang session record
+        // 1. Burahin lahat ng records
         localStorage.removeItem('erriho_user');
-        // Ibalik sa login page
-        window.location.href = "index.html";
+        
+        // 2. Clear history and redirect (Para hindi na maka-BACK)
+        window.location.replace("index.html");
     </script>
 </body>
 </html>
