@@ -169,14 +169,14 @@
     window.onload = async () => {
         document.getElementById('mainContent').style.display = 'block';
         
-        // Step A: Instant Load
+        // Step A: Instant Load mula sa Storage (Para walang delay sa mata ng user)
         populateData();
         
         if (!localStorage.getItem('hasSeenWelcome_v2')) {
             document.getElementById('welcomePortalModal').style.display = 'flex';
         }
 
-        // Step B: Live Sync
+        // Step B: Background Live Sync (Ito ang kukuha ng fresh data sa Google Sheets)
         const dateEl = document.getElementById('asOfDate');
         dateEl.innerText = "🔄 SYNCING LIVE DATA...";
         dateEl.style.color = "#27ae60";
@@ -189,16 +189,20 @@
             if (newData && newData.status !== 'error') {
                 const passcodeToSave = data.passcode || data.pass;
                 newData.passcode = passcodeToSave; 
+                
+                // I-save ang bagong data para sa susunod na pag-open
                 localStorage.setItem('erriho_user', JSON.stringify(newData));
                 data = newData; 
                 
-                document.getElementById('scheduleList').innerHTML = '<span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>';
+                // REFRESH: Lilinisin ang listahan bago i-populate para hindi madoble
                 populateData();
+                
                 dateEl.innerText = "✅ UPDATED JUST NOW";
                 dateEl.style.color = "#aaa";
             }
         } catch (err) {
             dateEl.innerText = "⚠️ OFFLINE MODE";
+            console.error("Sync error:", err);
         }
     };
 
@@ -218,19 +222,14 @@
 
         ratingEl.innerText = rating;
         let rColor, rText, rBg;
-
-        if (rating >= 80) {
-            rColor = '#27ae60'; rText = '● GOOD'; rBg = '#e6f9ed';
-        } else if (rating >= 50) {
-            rColor = '#f39c12'; rText = '● ELIGIBLE'; rBg = '#fff9eb';
-        } else {
-            rColor = '#e74c3c'; rText = '● AT RISK'; rBg = '#fff1f0';
-        }
+        if (rating >= 80) { rColor = '#27ae60'; rText = '● GOOD'; rBg = '#e6f9ed'; } 
+        else if (rating >= 50) { rColor = '#f39c12'; rText = '● ELIGIBLE'; rBg = '#fff9eb'; } 
+        else { rColor = '#e74c3c'; rText = '● AT RISK'; rBg = '#fff1f0'; }
 
         colorCont.style.color = rColor;
         statusCont.innerHTML = `<span style="font-size: 8px; font-weight: 800; color: ${rColor}; background: ${rBg}; padding: 2px 6px; border-radius: 10px;">${rText}</span>`;
 
-        // --- UPDATED HERO LOGIC (PHP STYLE) ---
+        // Hero Calculation (PHP Style Logic)
         let overdueTotal = 0;
         let overdueLabels = [];
         let nextDue = null;
@@ -247,43 +246,30 @@
             }
         });
 
-        const hBox = document.getElementById('heroBox');
         const hLabel = document.getElementById('heroLabel');
         const hAmount = document.getElementById('heroAmount');
         const hSubCont = document.getElementById('heroSubContainer');
 
         if (overdueTotal > 0) {
-            // PHP: if (!empty($overdueBills))
             hLabel.innerText = "⚠️ ACCOUNT OVERDUE";
             hLabel.style.color = "#ff7675";
-            hLabel.style.fontWeight = "800";
             hAmount.innerText = fmt(overdueTotal);
-            hSubCont.innerHTML = `
-                <div style="font-size: 12px; margin-top: 10px; line-height: 1.4; opacity: 0.9;">
-                    Your account is currently <strong>Overdue</strong> for 
-                    ${overdueLabels.join(" & ")}.
-                    <br>
-                    Please settle this immediately to avoid further penalties.
-                </div>`;
+            hSubCont.innerHTML = `<div style="font-size: 12px; margin-top: 10px; line-height: 1.4; opacity: 0.9;">Your account is currently <strong>Overdue</strong> for ${overdueLabels.join(" & ")}.<br>Please settle this immediately.</div>`;
         } else if (nextDue) {
-            // PHP: elseif ($nextDueBill)
             hLabel.innerText = "Next Due Date: " + nextDue.mo;
             hLabel.style.color = "#aaa";
-            hLabel.style.fontWeight = "600";
             hAmount.innerText = fmt(nextDue.total);
             hSubCont.innerHTML = `<p style="font-size: 11px; opacity: 0.8; margin-top: 5px;">Keep your account in good standing by paying on time.</p>`;
         } else {
-            // PHP: else (Fully Settled)
             hAmount.style.fontSize = "24px";
-            hAmount.style.margin = "15px 0";
             hAmount.innerText = "LOAN FULLY SETTLED";
             hLabel.innerText = "Thank you for your business!";
             hLabel.style.color = "var(--primary-green)";
-            hSubCont.innerHTML = ""; // Alisin ang sub-text
+            hSubCont.innerHTML = "";
         }
 
-        // Numbers & Stats
-        document.getElementById('dispLoanType').innerText = data.loanType;
+        // Numbers & Stats Update
+        document.getElementById('dispLoanType').innerText = data.loanType || "---";
         document.getElementById('dispPlan').innerText = data.loanPlan;
         document.getElementById('dispRate').innerText = (parseFloat(data.intRate) * 100) + "%";
         document.getElementById('dispStatusCount').innerText = `${paidCount} of ${data.schedule.length} Paid`;
@@ -295,12 +281,13 @@
         document.getElementById('dispBalance').innerText = fmt(data.balance);
         document.getElementById('payLink').href = data.payLink;
 
-        // Repayment Items
+        // Repayment Items (LILINISIN MUNA bago dagdagan)
         const list = document.getElementById('scheduleList');
+        list.innerHTML = '<span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>';
+        
         data.schedule.forEach((item, idx) => {
             const st = item.st.toUpperCase();
             const stClass = st === 'PAID' ? 'status-paid' : (st === 'OVERDUE' ? 'status-overdue' : '');
-            
             const row = document.createElement('div');
             row.className = 'bill-row';
             row.onclick = function() { this.classList.toggle('active'); };
@@ -309,7 +296,7 @@
                     <div class="bill-info">
                         <span style="font-size:14px; font-weight:700;">${item.mo}</span>
                         <div style="display: flex; align-items: center; gap: 5px;">
-                            <span style="font-size:11px; color:#888;">Bill Number ${idx + 1}</span>
+                            <span style="font-size:11px; color:#888;">Bill ${idx + 1}</span>
                             <span style="font-size: 9px; color: var(--primary-green); font-weight: 700; animation: blink 1.5s infinite;">• Tap Details</span>
                         </div>
                     </div>
@@ -328,8 +315,7 @@
                         <div class="detail-item"><span class="detail-label">Ref</span><span>${item.ref || '---'}</span></div>
                         <div class="detail-item"><span class="detail-label">Pay Date</span><span>${item.p_date || '---'}</span></div>
                     </div>
-                </div>
-            `;
+                </div>`;
             list.appendChild(row);
         });
     }
