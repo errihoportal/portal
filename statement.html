@@ -71,7 +71,7 @@
         <div style="font-size: 10px; font-weight: 800; color: #aaa; letter-spacing: 2px; margin-top: 5px;">ERRIHO PORTAL</div>
     </div>
 
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; gap: 15px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 15px;">
         <div style="flex: 1;">
             <h2 id="dispName" style="margin: 0; font-size: 22px; font-weight: 800; color: #1a1a1a; line-height: 1.2;">---</h2>
             <div style="margin-top: 8px; display: flex; align-items: center; gap: 5px;">
@@ -80,16 +80,14 @@
             </div>
         </div>
         
-        <div style="background: #fff; border: 1.5px solid #eee; border-radius: 18px; padding: 12px 18px; text-align: center; min-width: 110px; box-shadow: 0 5px 15px rgba(0,0,0,0.03);">
-    <div style="font-size: 9px; font-weight: 800; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Credit Rating</div>
-    
-    <div id="ratingColorContainer" style="font-size: 28px; font-weight: 800; line-height: 1;">
-        <span id="dispRating">0</span><span style="font-size: 14px;">%</span>
-    </div>
-
-    <div style="margin-top: 5px;" id="ratingStatusContainer">
+        <div style="background: #fff; border: 1.5px solid #eee; border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 100px; box-shadow: 0 5px 15px rgba(0,0,0,0.03);">
+            <div style="font-size: 9px; font-weight: 800; color: #888; text-transform: uppercase; margin-bottom: 3px;">Credit Rating</div>
+            <div id="ratingColorContainer" style="font-size: 24px; font-weight: 800; line-height: 1;">
+                <span id="dispRating">0</span><span style="font-size: 12px;">%</span>
+            </div>
+            <div style="margin-top: 5px;" id="ratingStatusContainer"></div>
         </div>
-</div>
+    </div>
 
     <div class="hero-section" id="heroBox">
         <p class="due-label" id="heroLabel">STATUS LOADING</p>
@@ -145,7 +143,7 @@
 
     <div class="schedule-container" id="scheduleList">
         <span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>
-        </div>
+    </div>
 
     <div style="margin-top: 20px; font-size: 9px; color: #bbb; text-transform: uppercase; letter-spacing: 2px;">
         *** This is a system-generated document ***
@@ -163,91 +161,68 @@
     window.onload = async () => {
         document.getElementById('mainContent').style.display = 'block';
         
-        // Step A: Ipakita muna ang lumang data (Instant Load)
+        // Step A: Instant Load
         populateData();
         
         if (!localStorage.getItem('hasSeenWelcome_v2')) {
             document.getElementById('welcomePortalModal').style.display = 'flex';
         }
 
-        // Step B: Mag-sync sa server para sa pinakabagong balance
+        // Step B: Live Sync
         const dateEl = document.getElementById('asOfDate');
         dateEl.innerText = "🔄 SYNCING LIVE DATA...";
         dateEl.style.color = "#27ae60";
 
         try {
-            // SIGURADUHIN: data.accRef at data.passcode ay may laman galing sa login
             const url = `${baseUrl}?acc=${encodeURIComponent(data.accRef)}&pass=${encodeURIComponent(data.passcode || data.pass)}`;
-            
             const response = await fetch(url);
             const newData = await response.json();
 
             if (newData && newData.status !== 'error') {
-                // I-save ang passcode sa bago para hindi mawala sa susunod na refresh
                 const passcodeToSave = data.passcode || data.pass;
                 newData.passcode = passcodeToSave; 
-
                 localStorage.setItem('erriho_user', JSON.stringify(newData));
-                data = newData; // I-update ang global variable
+                data = newData; 
                 
-                // Clear and Re-populate
                 document.getElementById('scheduleList').innerHTML = '<span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>';
                 populateData();
-                
                 dateEl.innerText = "✅ UPDATED JUST NOW";
                 dateEl.style.color = "#aaa";
-                console.log("Data synced successfully!");
             }
         } catch (err) {
             dateEl.innerText = "⚠️ OFFLINE MODE";
-            console.log("Sync failed:", err);
         }
     };
 
     function populateData() {
         if(!data) return;
         
-        // Basic Info
+        // Identity Info
         document.getElementById('dispName').innerText = data.name.toUpperCase();
         document.getElementById('dispAccRef').innerText = data.accRef;
         document.getElementById('modalGreeting').innerText = "Hello, " + data.name.split(' ')[0] + "!";
         
-        // Rating
-        // --- UPDATED RATING LOGIC (PHP Style) ---
-const rating = Math.round(parseFloat(data.creditRating));
-const ratingEl = document.getElementById('dispRating');
-const colorCont = document.getElementById('ratingColorContainer');
-const statusCont = document.getElementById('ratingStatusContainer');
+        // Credit Rating Section
+        const rating = Math.round(parseFloat(data.creditRating));
+        const ratingEl = document.getElementById('dispRating');
+        const colorCont = document.getElementById('ratingColorContainer');
+        const statusCont = document.getElementById('ratingStatusContainer');
 
-// 1. I-update ang numero
-ratingEl.innerText = rating;
+        ratingEl.innerText = rating;
+        let rColor, rText, rBg;
 
-// 2. I-set ang kulay at status badge base sa rating
-let rColor, rText, rBg;
+        if (rating >= 80) {
+            rColor = '#27ae60'; rText = '● GOOD'; rBg = '#e6f9ed';
+        } else if (rating >= 50) {
+            rColor = '#f39c12'; rText = '● ELIGIBLE'; rBg = '#fff9eb';
+        } else {
+            rColor = '#e74c3c'; rText = '● AT RISK'; rBg = '#fff1f0';
+        }
 
-if (rating >= 80) {
-    rColor = '#27ae60';
-    rText = '● GOOD';
-    rBg = '#e6f9ed';
-} else if (rating >= 50) {
-    rColor = '#f39c12';
-    rText = '● ELIGIBLE';
-    rBg = '#fff9eb';
-} else {
-    rColor = '#e74c3c';
-    rText = '● AT RISK';
-    rBg = '#fff1f0';
-}
+        colorCont.style.color = rColor;
+        statusCont.innerHTML = `<span style="font-size: 8px; font-weight: 800; color: ${rColor}; background: ${rBg}; padding: 2px 6px; border-radius: 10px;">${rText}</span>`;
 
-// 3. I-apply ang styles sa HTML
-colorCont.style.color = rColor;
-statusCont.innerHTML = `
-    <span style="font-size: 9px; font-weight: 800; color: ${rColor}; background: ${rBg}; padding: 3px 8px; border-radius: 20px;">
-        ${rText}
-    </span>
-`;
-
-        // Hero Logic (Overdue vs Next Due)
+        // Hero Calculation
         let overdueTotal = 0;
         let overdueLabels = [];
         let nextDue = null;
@@ -283,7 +258,7 @@ statusCont.innerHTML = `
             hLabel.innerText = "Congratulations!";
         }
 
-        // Stats & Breakdown
+        // Numbers & Stats
         document.getElementById('dispPlan').innerText = data.loanPlan;
         document.getElementById('dispMonthly').innerText = fmt(data.monthlyPayment);
         document.getElementById('dispRate').innerText = (parseFloat(data.intRate) * 100) + "%";
@@ -296,7 +271,7 @@ statusCont.innerHTML = `
         document.getElementById('dispBalance').innerText = fmt(data.balance);
         document.getElementById('payLink').href = data.payLink;
 
-        // Schedule Rendering
+        // Repayment Items
         const list = document.getElementById('scheduleList');
         data.schedule.forEach((item, idx) => {
             const st = item.st.toUpperCase();
