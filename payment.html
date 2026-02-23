@@ -160,8 +160,9 @@
     
     // 1. URL Parameter Logic (Replacement for PHP $_GET)
     const urlParams = new URLSearchParams(window.location.search);
-    const ROW = urlParams.get('row');
-    const BILL = urlParams.get('bill');
+    const ROW = urlParams.get('row') || ""; // Pwedeng empty kung acc ang gagamitin
+    const BILL = urlParams.get('bill') || "";
+    const ACC = urlParams.get('acc') || ""; // <--- DAGDAG ITO PARA SA STATEMENT.HTML
 
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
     let billData = {};
@@ -176,8 +177,15 @@
 
     async function fetchData() {
         try {
-            const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getData&row=${ROW}&bill=${BILL}`);
+            // Ngayon, nagpapadala na tayo ng acc parameter sa Google Script
+            const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getData&row=${ROW}&bill=${BILL}&acc=${ACC}`);
             const data = await response.json();
+            
+            if (data.status === "error") {
+                document.getElementById('loader').innerHTML = "Error: " + data.message;
+                return;
+            }
+            
             billData = data;
             renderData(data);
         } catch (error) {
