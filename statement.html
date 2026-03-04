@@ -393,7 +393,18 @@ if (data.schedule && Array.isArray(data.schedule)) {
     data.schedule.forEach((item, idx) => {
         const st = item.st ? item.st.toUpperCase() : 'PENDING';
         const stClass = st === 'PAID' ? 'status-paid' : (st === 'OVERDUE' ? 'status-overdue' : 'status-unpaid');
-        
+
+        // --- DITO ANG LOGIC PARA SA DISPLAY AMOUNT ---
+        let displayAmount;
+        if (st === 'PAID') {
+            displayAmount = item.p_amount; // Payment Amount kapag PAID
+        } else if (st === 'OVERDUE') {
+            displayAmount = item.total;    // Total Balance (with penalties) kapag OVERDUE
+        } else {
+            displayAmount = item.p_amt;    // Principal + Interest lang kapag UNPAID/PENDING
+        }
+        // ---------------------------------------------
+
         const row = document.createElement('div');
         row.className = 'bill-row';
         row.addEventListener('click', function() {
