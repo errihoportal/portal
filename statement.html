@@ -186,35 +186,31 @@
 </div>
 
 <script>
-    // 1. Security Check & Initial Data
+    // 1. Initial Data Load
     let data = JSON.parse(localStorage.getItem('erriho_user'));
-if (!data || (!data.passcode && !data.pass)) { 
-    window.location.replace('index.html'); 
-}
+
+    // Security Check
+    if (!data || (!data.passcode && !data.pass)) { 
+        window.location.replace('index.html'); 
+    }
 
     const baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
-    const fmt = (num) => "₱" + parseFloat(num).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    const fmt = (num) => "₱" + parseFloat(num || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-   window.onload = async () => {
-        if (!localStorage.getItem('erriho_user')) {
-            window.location.replace('index.html');
-            return;
-        }
-
+    window.onload = async () => {
         document.getElementById('mainContent').style.display = 'block';
-        
-        // 1. Ipakita agad ang lumang data habang naghihintay ng sync
+
+        // Unang load ng data mula sa storage
         populateData();
 
         if (!localStorage.getItem('hasSeenWelcome_v2')) {
             document.getElementById('welcomePortalModal').style.display = 'flex';
         }
 
-        // 2. Umpisahan ang Live Sync (Takbo agad + Repeat every 30s)
+        // Simulan ang Auto-Sync
         startLiveSync();
     };
 
-    // BAGONG FUNCTION PARA SA REAL-TIME AUTO-UPDATE
     async function startLiveSync() {
         const dateEl = document.getElementById('asOfDate');
         
@@ -223,21 +219,24 @@ if (!data || (!data.passcode && !data.pass)) {
             dateEl.style.color = "#27ae60";
 
             try {
-                // Nagdagdag ng Timestamp (_=...) para iwas sa "cache" ng browser
-                const url = `${baseUrl}?acc=${encodeURIComponent(data.accRef)}&pass=${encodeURIComponent(data.passcode || data.pass)}&_=${new Date().getTime()}`;
-                const response = await fetch(url);
+                // DAGDAG: Cache Buster (?_=[timestamp]) para pilitin ang Google Sheets na magbigay ng fresh data
+                const syncUrl = `${baseUrl}?acc=${encodeURIComponent(data.accRef)}&pass=${encodeURIComponent(data.passcode || data.pass)}&nocache=${new Date().getTime()}`;
+                
+                const response = await fetch(syncUrl);
                 const newData = await response.json();
 
                 if (newData && newData.status !== 'error') {
-                    // I-update ang global variable 'data'
-                    const passcodeToSave = data.passcode || data.pass;
-                    newData.passcode = passcodeToSave;
+                    // 1. Panatilihin ang passcode
+                    const currentPass = data.passcode || data.pass;
+                    newData.passcode = currentPass;
+
+                    // 2. I-OVERWRITE ang global 'data' variable (ITO ANG FIX)
                     data = newData;
 
-                    // I-save sa storage para sa susunod na login
+                    // 3. I-save sa LocalStorage
                     localStorage.setItem('erriho_user', JSON.stringify(newData));
 
-                    // RE-RENDER UI (Dito magbabago ang numbers sa screen mo nang kusa)
+                    // 4. I-REFRESH ang UI nang walang reload
                     populateData();
 
                     dateEl.innerText = "✅ LIVE UPDATED: " + new Date().toLocaleTimeString();
@@ -245,156 +244,110 @@ if (!data || (!data.passcode && !data.pass)) {
                 }
             } catch (err) {
                 dateEl.innerText = "⚠️ SYNC PAUSED (OFFLINE)";
-                dateEl.style.color = "#e74c3c";
                 console.error("Sync error:", err);
             }
         };
 
-        // Takbo agad pagka-open
+        // Unang sync pagka-open
         await performSync();
 
-        // Uulitin ang process tuwing 30 seconds (30000ms)
-        setInterval(performSync, 30000);
+        // Mag-auto update tuwing 20 seconds
+        setInterval(performSync, 20000);
     }
-    
+
     function populateData() {
         if(!data) return;
         
-        // Identity Info
+        // Identity & Header
         document.getElementById('dispName').innerText = data.name.toUpperCase();
         document.getElementById('dispAccRef').innerText = data.accRef;
         document.getElementById('modalGreeting').innerText = "Hello, " + data.name.split(' ')[0] + "!";
         
-        // Credit Rating Section
-        const rating = Math.round(parseFloat(data.creditRating));
+        // Credit Rating
+        const rating = Math.round(parseFloat(data.creditRating || 0));
         const ratingEl = document.getElementById('dispRating');
         const colorCont = document.getElementById('ratingColorContainer');
         const statusCont = document.getElementById('ratingStatusContainer');
-
         ratingEl.innerText = rating;
-        let rColor, rText, rBg;
-        if (rating >= 80) { rColor = '#27ae60'; rText = '● GOOD'; rBg = '#e6f9ed'; } 
-        else if (rating >= 50) { rColor = '#f39c12'; rText = '● ELIGIBLE'; rBg = '#fff9eb'; } 
-        else { rColor = '#e74c3c'; rText = '● AT RISK'; rBg = '#fff1f0'; }
-
+        let rColor = rating >= 80 ? '#27ae60' : (rating >= 50 ? '#f39c12' : '#e74c3c');
+        let rText = rating >= 80 ? '● GOOD' : (rating >= 50 ? '● ELIGIBLE' : '● AT RISK');
         colorCont.style.color = rColor;
-        statusCont.innerHTML = `<span style="font-size: 8px; font-weight: 800; color: ${rColor}; background: ${rBg}; padding: 2px 6px; border-radius: 10px;">${rText}</span>`;
+        statusCont.innerHTML = `<span style="font-size: 8px; font-weight: 800; color: ${rColor}; background: ${rColor}15; padding: 2px 6px; border-radius: 10px;">${rText}</span>`;
 
-        // Hero Calculation (PHP Style Logic)
-        let overdueTotal = 0;
-        let overdueLabels = [];
-        let nextDue = null;
-        let paidCount = 0;
-
-        data.schedule.forEach((item, idx) => {
-            const st = item.st.toUpperCase();
-            if (st === 'PAID') paidCount++;
-            if (st === 'OVERDUE') {
-                overdueTotal += parseFloat(item.total);
-                overdueLabels.push("Bill " + (idx + 1));
-            } else if ((st === 'DUE' || st === 'PENDING' || st === 'UNPAID') && !nextDue) {
-                nextDue = item;
-            }
-        });
-
-        const hLabel = document.getElementById('heroLabel');
-        const hAmount = document.getElementById('heroAmount');
-        const hSubCont = document.getElementById('heroSubContainer');
-
-        if (overdueTotal > 0) {
-            hLabel.innerText = "⚠️ ACCOUNT OVERDUE";
-            hLabel.style.color = "#ff7675";
-            hAmount.innerText = fmt(overdueTotal);
-            hSubCont.innerHTML = `<div style="font-size: 12px; margin-top: 10px; line-height: 1.4; opacity: 0.9;">Your account is currently <strong>Overdue</strong> for ${overdueLabels.join(" & ")}.<br>Please settle this immediately.</div>`;
-        } else if (nextDue) {
-            hLabel.innerText = "Next Due Date: " + nextDue.mo;
-            hLabel.style.color = "#aaa";
-            hAmount.innerText = fmt(nextDue.total);
-            hSubCont.innerHTML = `<p style="font-size: 11px; opacity: 0.8; margin-top: 5px;">Keep your account in good standing by paying on time.</p>`;
-        } else {
-            hAmount.style.fontSize = "24px";
-            hAmount.innerText = "LOAN FULLY SETTLED";
-            hLabel.innerText = "Thank you for your business!";
-            hLabel.style.color = "var(--primary-green)";
-            hSubCont.innerHTML = "";
-        }
-
-        // Numbers & Stats Update
-        document.getElementById('dispLoanType').innerText = data.loanType || "---";
-        document.getElementById('dispPlan').innerText = data.loanPlan;
-        document.getElementById('dispRate').innerText = (parseFloat(data.intRate) * 100) + "%";
-        document.getElementById('dispStatusCount').innerText = `${paidCount} of ${data.schedule.length} Paid`;
-        
+        // Balance & Totals
+        document.getElementById('dispBalance').innerText = fmt(data.balance);
         document.getElementById('breakLoan').innerText = fmt(data.loanAmount);
         document.getElementById('breakInt').innerText = fmt(data.intAmount);
         document.getElementById('breakMonthly').innerText = fmt(data.monthlyPayment);
         document.getElementById('breakFee').innerText = fmt(data.processingFee);
         document.getElementById('breakLate').innerText = fmt(data.totalLateFee);
-        document.getElementById('breakDailyInt').innerText = fmt(data.totalDailyInt || 0);
-        document.getElementById('breakPaid').innerText = fmt(data.totalPaid || 0);
-        document.getElementById('dispBalance').innerText = fmt(data.balance);
-        
+        document.getElementById('breakDailyInt').innerText = fmt(data.totalDailyInt);
+        document.getElementById('breakPaid').innerText = fmt(data.totalPaid);
+        document.getElementById('dispLoanType').innerText = data.loanType || "---";
+        document.getElementById('dispPlan').innerText = data.loanPlan || "---";
+        document.getElementById('dispRate').innerText = (parseFloat(data.intRate || 0) * 100) + "%";
 
-        // REPAYMENT ITEMS SECTION
-       const list = document.getElementById('scheduleList');
-        // Linisin muna ang list para hindi madoble tuwing mag-re-refresh
+        // Hero Logic (Overdue vs Next Due)
+        let overdueTotal = 0;
+        let nextDue = null;
+        let paidCount = 0;
+        data.schedule.forEach((item) => {
+            if (item.st.toUpperCase() === 'PAID') paidCount++;
+            if (item.st.toUpperCase() === 'OVERDUE') overdueTotal += parseFloat(item.total);
+            if (!nextDue && ['DUE','PENDING','UNPAID'].includes(item.st.toUpperCase())) nextDue = item;
+        });
+        document.getElementById('dispStatusCount').innerText = `${paidCount} of ${data.schedule.length} Paid`;
+
+        // Update Repayment List
+        const list = document.getElementById('scheduleList');
         list.innerHTML = '<span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>';
-        if (data.schedule && Array.isArray(data.schedule)) {
-            data.schedule.forEach((item, idx) => {
-                const st = item.st ? item.st.toUpperCase() : 'PENDING';
-                const stClass = st === 'PAID' ? 'status-paid' : (st === 'OVERDUE' ? 'status-overdue' : '');
-                
-                const row = document.createElement('div');
-                row.className = 'bill-row';
-                
-                // Pinatibay na toggle function
-                row.addEventListener('click', function() {
-                    this.classList.toggle('active');
-                });
-
-                row.innerHTML = `
-                    <div class="bill-header">
-                        <div class="bill-info">
-                            <span style="font-size:14px; font-weight:700;">${item.mo || 'No Date'}</span>
-                            <div style="display: flex; align-items: center; gap: 5px;">
-                                <span style="font-size:11px; color:#888;">Bill ${idx + 1}</span>
-                                <span style="font-size: 9px; color: var(--primary-green); font-weight: 700; animation: blink 1.5s infinite;">• Tap Details</span>
-                            </div>
-                        </div>
-                        <div class="bill-amount-status">
-                            <div style="font-weight:800; font-size: 15px;">${fmt(item.total || 0)}</div>
-                            <span class="status ${stClass}">${st}</span>
-                            <div class="action-circle">+</div>
-                        </div>
-                    </div>
-                    <div class="details-pane">
-                        <div class="details-grid">
-                            <div class="detail-item"><span class="detail-label">Principal+Int</span><span>${fmt(item.p_amt || 0)}</span></div>
-                            <div class="detail-item"><span class="detail-label">Late Penalty</span><span>${fmt(item.late || 0)}</span></div>
-                            <div class="detail-item"><span class="detail-label">Daily Int</span><span>${fmt(item.d_int || 0)}</span></div>
-                            <div class="detail-item"><span class="detail-label">Days Late</span><span style="color:#e74c3c; font-weight:700;">${item.days_late > 0 ? item.days_late + ' Days' : '---'}</span></div>
-                            <div class="detail-item"><span class="detail-label">Ref</span><span>${item.ref || '---'}</span></div>
-                            <div class="detail-item"><span class="detail-label">Pay Date</span><span>${item.p_date || '---'}</span></div>
-                        </div>
-                    </div>`;
-                list.appendChild(row);
-            });
-        }
-    } // Dulo ng populateData
         
+        data.schedule.forEach((item, idx) => {
+            const st = item.st.toUpperCase();
+            const stClass = st === 'PAID' ? 'status-paid' : (st === 'OVERDUE' ? 'status-overdue' : '');
+            const row = document.createElement('div');
+            row.className = 'bill-row';
+            row.onclick = function() { this.classList.toggle('active'); };
+            
+            // Logic para sa Days Late
+            const daysLateVal = parseInt(item.days_late || 0);
+            const daysLateDisplay = daysLateVal > 0 ? daysLateVal + ' Days' : (st === 'PAID' && daysLateVal != 0 ? daysLateVal + ' Days' : '0');
+
+            row.innerHTML = `
+                <div class="bill-header">
+                    <div class="bill-info">
+                        <span style="font-size:14px; font-weight:700;">${item.mo}</span>
+                        <span style="font-size:11px; color:#888;">Bill ${idx + 1}</span>
+                    </div>
+                    <div class="bill-amount-status">
+                        <div style="font-weight:800; font-size: 15px;">${fmt(item.total)}</div>
+                        <span class="status ${stClass}">${st}</span>
+                        <div class="action-circle">+</div>
+                    </div>
+                </div>
+                <div class="details-pane">
+                    <div class="details-grid">
+                        <div class="detail-item"><span class="detail-label">Principal+Int</span><span>${fmt(item.p_amt)}</span></div>
+                        <div class="detail-item"><span class="detail-label">Late Penalty</span><span>${fmt(item.late)}</span></div>
+                        <div class="detail-item"><span class="detail-label">Daily Int</span><span>${fmt(item.d_int)}</span></div>
+                        <div class="detail-item"><span class="detail-label">Days Late</span><span style="color:#e74c3c; font-weight:700;">${daysLateDisplay}</span></div>
+                        <div class="detail-item"><span class="detail-label">Ref</span><span>${item.ref || '---'}</span></div>
+                        <div class="detail-item"><span class="detail-label">Pay Date</span><span>${item.p_date || '---'}</span></div>
+                    </div>
+                </div>`;
+            list.appendChild(row);
+        });
+    }
+
     function closeWelcomeModal() {
         document.getElementById('welcomePortalModal').style.display = 'none';
         localStorage.setItem('hasSeenWelcome_v2', 'true');
     }
 
-    // PINAKAMAHALAGANG DAGDAG:
     function goToPaymentPage() {
-        // 1. Hanapin ang unang bill na hindi pa paid para makuha ang REF
         let billRef = "1"; 
         const nextBill = data.schedule.find(i => i.st.toUpperCase() !== 'PAID');
         if (nextBill) billRef = nextBill.ref || "1";
-
-        // 2. I-redirect sa payment.html bitbit ang Account at Bill Ref
         window.location.href = `payment.html?acc=${encodeURIComponent(data.accRef)}&bill=${encodeURIComponent(billRef)}`;
     }
 </script>
