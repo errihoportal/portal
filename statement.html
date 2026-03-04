@@ -37,6 +37,10 @@
         .status-paid { background: #e6f9ed; color: #27ae60; }
         .status-overdue { background: #fff1f0; color: #e74c3c; }
 
+        .status-unpaid { background: #fff9eb; color: #f39c12; } /* Orange */
+.status-paid { background: #e6f9ed; color: #27ae60; }   /* Green */
+.status-overdue { background: #fff1f0; color: #e74c3c; } /* Red */
+
         .btn-pay-animated { background: var(--primary-green); color: white; border: none; padding: 18px; width: 100%; border-radius: 16px; font-weight: 800; cursor: pointer; font-size: 18px; margin-top: 10px; transition: 0.3s; display: block; text-align: center; text-decoration: none; }
         
         .active .details-pane { display: block; }
@@ -250,7 +254,7 @@
         colorCont.style.color = rColor;
         statusCont.innerHTML = `<span style="font-size: 8px; font-weight: 800; color: ${rColor}; background: ${rBg}; padding: 2px 6px; border-radius: 10px;">${rText}</span>`;
 
-        // Hero Calculation (PHP Style Logic)
+        // Hero Calculation Logic
         let overdueTotal = 0;
         let overdueLabels = [];
         let nextDue = null;
@@ -259,6 +263,7 @@
         data.schedule.forEach((item, idx) => {
             const st = item.st.toUpperCase();
             if (st === 'PAID') paidCount++;
+            
             if (st === 'OVERDUE') {
                 overdueTotal += parseFloat(item.total);
                 overdueLabels.push("Bill " + (idx + 1));
@@ -267,26 +272,35 @@
             }
         });
 
+        const hBox = document.getElementById('heroBox');
         const hLabel = document.getElementById('heroLabel');
         const hAmount = document.getElementById('heroAmount');
         const hSubCont = document.getElementById('heroSubContainer');
 
+        // CONDITION 1: OVERDUE (RED)
         if (overdueTotal > 0) {
+            hBox.style.background = "linear-gradient(135deg, #d63031, #e74c3c)"; // Solid Red Gradient
             hLabel.innerText = "⚠️ ACCOUNT OVERDUE";
-            hLabel.style.color = "#ff7675";
+            hLabel.style.color = "#ffbdbe";
             hAmount.innerText = fmt(overdueTotal);
-            hSubCont.innerHTML = `<div style="font-size: 12px; margin-top: 10px; line-height: 1.4; opacity: 0.9;">Your account is currently <strong>Overdue</strong> for ${overdueLabels.join(" & ")}.<br>Please settle this immediately.</div>`;
-        } else if (nextDue) {
-            hLabel.innerText = "Next Due Date: " + nextDue.mo;
-            hLabel.style.color = "#aaa";
+            hSubCont.innerHTML = `<div style="font-size: 12px; margin-top: 10px; line-height: 1.4; opacity: 0.9;">Your account is <strong>Overdue</strong> for ${overdueLabels.join(" & ")}.</div>`;
+        } 
+        // CONDITION 2: UNPAID/PENDING (ORANGE)
+        else if (nextDue) {
+            hBox.style.background = "linear-gradient(135deg, #e67e22, #f39c12)"; // Solid Orange Gradient
+            hLabel.innerText = "NEXT DUE DATE: " + nextDue.mo;
+            hLabel.style.color = "#fff3cd";
             hAmount.innerText = fmt(nextDue.total);
-            hSubCont.innerHTML = `<p style="font-size: 11px; opacity: 0.8; margin-top: 5px;">Keep your account in good standing by paying on time.</p>`;
-        } else {
+            hSubCont.innerHTML = `<p style="font-size: 11px; opacity: 0.9; margin-top: 5px;">Keep your account in good standing.</p>`;
+        } 
+        // CONDITION 3: FULLY SETTLED (GREEN)
+        else {
+            hBox.style.background = "linear-gradient(135deg, #219150, #27ae60)"; // Solid Green Gradient
             hAmount.style.fontSize = "24px";
             hAmount.innerText = "LOAN FULLY SETTLED";
-            hLabel.innerText = "Thank you for your business!";
-            hLabel.style.color = "var(--primary-green)";
-            hSubCont.innerHTML = "";
+            hLabel.innerText = "THANK YOU!";
+            hLabel.style.color = "#e6f9ed";
+            hSubCont.innerHTML = `<p style="font-size: 11px; opacity: 0.9; margin-top: 5px;">You have no outstanding balance.</p>`;
         }
 
         // Numbers & Stats Update
@@ -310,7 +324,7 @@
         if (data.schedule && Array.isArray(data.schedule)) {
             data.schedule.forEach((item, idx) => {
                 const st = item.st ? item.st.toUpperCase() : 'PENDING';
-                const stClass = st === 'PAID' ? 'status-paid' : (st === 'OVERDUE' ? 'status-overdue' : '');
+                const stClass = st === 'PAID' ? 'status-paid' : (st === 'OVERDUE' ? 'status-overdue' : 'status-unpaid');
                 
                 const row = document.createElement('div');
                 row.className = 'bill-row';
