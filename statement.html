@@ -422,23 +422,31 @@
         }
     };
 
-    function populateData() {
-    if(!data) {
-        console.error("No data found in localStorage");
-        return;
-    }
-    
-    // 1. Identity Info sa Dashboard (Full Name - Naka-UPPERCASE pa rin ito)
-    document.getElementById('dispName').innerText = (data.name || "User").toUpperCase();
-    document.getElementById('dispAccRef').innerText = data.accRef || "N/A";
-    
-    // 2. Greeting sa Modal (First Name lang at Proper Case)
-    const greet = document.getElementById('modalUserName'); // Binago ko mula 'modalGreeting' papuntang 'modalUserName'
-if(greet && data.name) {
-    let firstName = data.name.split(' ')[0].toLowerCase();
-    firstName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
-    greet.innerText = firstName; // Pangalan na lang ilalagay dito kasi may "Hello," na sa HTML mo
-}
+   function populateData() {
+        if(!data) {
+            console.error("No data found in localStorage");
+            return;
+        }
+        
+        // --- 1. Identity Info (Dashboard) ---
+        const dispName = document.getElementById('dispName');
+        if(dispName) dispName.innerText = (data.name || "User").toUpperCase();
+        
+        const dispAcc = document.getElementById('dispAccRef');
+        if(dispAcc) dispAcc.innerText = data.accRef || "N/A";
+        
+        // --- 2. Greeting sa Modal (Safe Fix) ---
+        const greet = document.getElementById('modalUserName');
+        if(greet) {
+            if (data.name && data.name.toString().trim() !== "") {
+                // Kinukuha ang unang word, ginagawang lowercase, tapos Capital ang simula
+                let raw = data.name.toString().split(' ')[0].toLowerCase();
+                let fixedName = raw.charAt(0).toUpperCase() + raw.slice(1);
+                greet.innerText = fixedName;
+            } else {
+                greet.innerText = "User";
+            }
+        }
         
         // Credit Rating Section
         const rating = Math.round(parseFloat(data.creditRating || 0));
