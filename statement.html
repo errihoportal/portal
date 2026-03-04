@@ -421,10 +421,12 @@ if (data.schedule && Array.isArray(data.schedule)) {
                     </div>
                 </div>
                 <div class="bill-amount-status">
-                    <div style="font-weight:800; font-size: 15px;">${fmt(displayAmount || 0)}</div>
-                    <span class="status ${stClass}">${st}</span>
-                    <div class="action-circle">+</div>
-                </div>
+    <div style="font-weight:800; font-size: 15px; color: ${st === 'PAID' ? 'var(--primary-green)' : (st === 'OVERDUE' ? '#e74c3c' : '#1a1a1a')};">
+        ${fmt(displayAmount || 0)}
+    </div>
+    <span class="status ${stClass}">${st}</span>
+    <div class="action-circle">+</div>
+</div>
             </div>
             <div class="details-pane">
                 <div class="details-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
