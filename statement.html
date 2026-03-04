@@ -384,6 +384,27 @@
     </div>
 </div>
 
+    <div id="timeoutModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(5px);">
+    <div style="background:white; padding:35px 25px; border-radius:30px; text-align:center; max-width:340px; width:100%; box-shadow:0 25px 50px rgba(0,0,0,0.3); border: 1px solid #eee;">
+        <div style="font-size:50px; margin-bottom:20px; animation: pulse 1.5s infinite;">⏳</div>
+        <h3 style="margin:0 0 10px 0; color:#1a1a1a; font-size: 22px; font-weight: 800;">Session Expiring</h3>
+        <p style="font-size:14px; color:#666; line-height: 1.5; margin-bottom:25px;">
+            Your session will end in <strong id="secondsLeft" style="color:#e74c3c; font-size: 18px;">30</strong> seconds due to inactivity. Do you want to stay?
+        </p>
+        <button onclick="stayLoggedIn()" style="width:100%; padding:18px; background:#27ae60; color:white; border:none; border-radius:18px; font-weight:800; font-size: 16px; cursor:pointer; box-shadow: 0 10px 20px rgba(39, 174, 96, 0.2);">
+            YES, KEEP ME LOGGED IN
+        </button>
+    </div>
+</div>
+
+<style>
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+</style>
+
 
 <script>
     // 1. Security Check & Initial Data
@@ -392,28 +413,65 @@
         window.location.replace('index.html'); 
     }
 
-    // --- AUTO LOGOUT LOGIC (5 MINUTES) ---
+   // --- START: AUTO LOGOUT LOGIC ---
+    let warningTimer;
     let logoutTimer;
-    const sessionTimeout = 5 * 10 * 1000; // 5 minuto (in milliseconds)
+    let countdownInterval;
+    
+    // Config: 5 mins total (4.5 mins idle + 30 secs warning)
+    const warningTime = 4.5 * 60 * 1000; 
+    const sessionTimeout = 5 * 60 * 1000; 
 
     function resetTimer() {
+        // Itago ang modal kung sakaling nakalabas na
+        const modal = document.getElementById('timeoutModal');
+        if(modal) modal.style.display = 'none';
+        
+        // Burahin ang mga tumatakbong timers
+        clearTimeout(warningTimer);
         clearTimeout(logoutTimer);
-        logoutTimer = setTimeout(() => {
-            // Burahin ang session data at bumalik sa login
-            localStorage.removeItem('erriho_user');
-            window.location.replace('index.html');
-        }, sessionTimeout);
+        clearInterval(countdownInterval);
+
+        // Simulan ang bagong countdown
+        warningTimer = setTimeout(showWarning, warningTime);
+        logoutTimer = setTimeout(logoutUser, sessionTimeout);
     }
 
-    // Bantayan ang mga galaw ng user para i-reset ang timer
+    function showWarning() {
+        const modal = document.getElementById('timeoutModal');
+        if(modal) modal.style.display = 'flex';
+        
+        let seconds = 30; 
+        const secondsEl = document.getElementById('secondsLeft');
+        
+        countdownInterval = setInterval(() => {
+            seconds--;
+            if(secondsEl) secondsEl.innerText = seconds;
+            if(seconds <= 0) clearInterval(countdownInterval);
+        }, 1000);
+
+        // Mobile Vibration (Optional: gagana lang kung may user interaction muna)
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    }
+
+    function stayLoggedIn() {
+        resetTimer(); // Balik sa normal
+    }
+
+    function logoutUser() {
+        localStorage.removeItem('erriho_user');
+        window.location.replace('index.html');
+    }
+
+    // Event Listeners para sa Computer at Mobile
     window.onload = resetTimer;
     window.onmousemove = resetTimer;
-    window.onmousedown = resetTimer; // pati clicks
-    window.ontouchstart = resetTimer; // para sa mobile taps
-    window.onclick = resetTimer;     
-    window.onkeypress = resetTimer;   
-    // --------------------------------------
-
+    window.onmousedown = resetTimer; 
+    window.ontouchstart = resetTimer; // Mobile Tap
+    window.onscroll = resetTimer;     // Mobile Scroll
+    window.onkeypress = resetTimer;
+    // --- END: AUTO LOGOUT LOGIC ---
+    
     const baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
     const fmt = (num) => "₱" + parseFloat(num || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
