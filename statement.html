@@ -418,9 +418,9 @@
     let logoutTimer;
     let countdownInterval;
     
-    // Config: 5 mins total (4.5 mins idle + 30 secs warning)
-    const warningTime = 4.5 * 60 * 1000; 
-    const sessionTimeout = 5 * 60 * 1000; 
+   // Config: 2 mins total (1.5 mins idle + 30 secs warning)
+    const warningTime = 1.5 * 60 * 1000; // 1 minute and 30 seconds
+    const sessionTimeout = 2 * 60 * 1000; // 2 minutes exact
 
     function resetTimer() {
         // Itago ang modal kung sakaling nakalabas na
