@@ -372,6 +372,7 @@
         }
 
         // Numbers & Stats Update
+        document.getElementById('dispProductName').innerText = data.productName || "No Product Info";
         document.getElementById('dispLoanType').innerText = data.loanType || "---";
         document.getElementById('dispPlan').innerText = data.loanPlan;
         document.getElementById('dispRate').innerText = (parseFloat(data.intRate) * 100) + "%";
