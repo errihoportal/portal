@@ -18,7 +18,6 @@
         
         /* Hero Section */
         .hero-section { background: linear-gradient(135deg, #1a1a1a, #333); color: white; border-radius: 20px; padding: 25px; text-align: center; margin-bottom: 25px; }
-        .amount-hero { font-size: 42px; font-weight: 800; margin: 5px 0; color: #fff; }
         .amount-hero { font-size: 42px; font-weight: 800; margin: 5px 0; color: #fff; line-height: 1.2; word-wrap: break-word; }
         .due-label { font-size: 11px; font-weight: 600; color: #aaa; margin: 0; text-transform: uppercase; }
 
@@ -189,22 +188,19 @@
 <script>
     // 1. Security Check & Initial Data
     let data = JSON.parse(localStorage.getItem('erriho_user'));
-    if (!data || !data.passcode) { 
+if (!data || (!data.passcode && !data.pass)) { 
     window.location.replace('index.html'); 
 }
 
     const baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
     const fmt = (num) => "₱" + parseFloat(num).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-    window.onload = async () => {
-        document.getElementById('mainContent').style.display = 'block';
-        
-        // Step A: Instant Load mula sa Storage (Para walang delay sa mata ng user)
-        populateData();
-        
-        if (!localStorage.getItem('hasSeenWelcome_v2')) {
-            document.getElementById('welcomePortalModal').style.display = 'flex';
-        }
+   window.onload = async () => {
+    // Force redirect kung walang session
+    if (!localStorage.getItem('erriho_user')) {
+        window.location.replace('index.html');
+        return;
+    }
 
         // Step B: Background Live Sync (Ito ang kukuha ng fresh data sa Google Sheets)
         const dateEl = document.getElementById('asOfDate');
