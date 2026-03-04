@@ -187,16 +187,15 @@
 
 <script>
     // 1. Security Check & Initial Data
-    // Ginawang 'let' para safe ang data handling
     let data = JSON.parse(localStorage.getItem('erriho_user'));
-
     if (!data || (!data.passcode && !data.pass)) { 
         window.location.replace('index.html'); 
     }
 
+    const baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
     const fmt = (num) => "₱" + parseFloat(num || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-    window.onload = () => {
+    window.onload = async () => {
         if (!localStorage.getItem('erriho_user')) {
             window.location.replace('index.html');
             return;
@@ -204,30 +203,25 @@
 
         document.getElementById('mainContent').style.display = 'block';
         
-        // Ipakita ang data
+        // 1. Ipakita ang data (Tinanggal ang startLiveSync para sa auto-update)
         populateData();
 
-        // Update ang Date Display (Updated as of Today)
-        updateDateDisplay();
+        // 2. I-set ang date sa "Updated as of Today"
+        const dateEl = document.getElementById('asOfDate');
+        if (dateEl) {
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            dateEl.innerText = "Updated as of Today: " + today.toLocaleDateString('en-US', options);
+            dateEl.style.color = "#aaa";
+        }
 
         if (!localStorage.getItem('hasSeenWelcome_v2')) {
             document.getElementById('welcomePortalModal').style.display = 'flex';
         }
     };
 
-    // BAGONG FUNCTION: Papalitan ang asOfDate ng Today's Date
-    function updateDateDisplay() {
-        const dateEl = document.getElementById('asOfDate');
-        if (dateEl) {
-            const today = new Date();
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            const formattedDate = today.toLocaleDateString('en-US', options);
-            
-            dateEl.innerText = "Updated as of Today: " + formattedDate;
-            dateEl.style.color = "#aaa"; // Clean gray look
-        }
-    }
-    
+    // Tinanggal ang startLiveSync function para iwas sa loop na hindi gumagana
+
     function populateData() {
         if(!data) return;
         
@@ -237,7 +231,7 @@
         document.getElementById('modalGreeting').innerText = "Hello, " + data.name.split(' ')[0] + "!";
         
         // Credit Rating Section
-        const rating = Math.round(parseFloat(data.creditRating || 0));
+        const rating = Math.round(parseFloat(data.creditRating));
         const ratingEl = document.getElementById('dispRating');
         const colorCont = document.getElementById('ratingColorContainer');
         const statusCont = document.getElementById('ratingStatusContainer');
@@ -251,7 +245,7 @@
         colorCont.style.color = rColor;
         statusCont.innerHTML = `<span style="font-size: 8px; font-weight: 800; color: ${rColor}; background: ${rBg}; padding: 2px 6px; border-radius: 10px;">${rText}</span>`;
 
-        // Hero Calculation (Overdue vs Next Due)
+        // Hero Calculation (PHP Style Logic)
         let overdueTotal = 0;
         let overdueLabels = [];
         let nextDue = null;
@@ -286,7 +280,7 @@
             hAmount.style.fontSize = "24px";
             hAmount.innerText = "LOAN FULLY SETTLED";
             hLabel.innerText = "Thank you for your business!";
-            hLabel.style.color = "#27ae60";
+            hLabel.style.color = "var(--primary-green)";
             hSubCont.innerHTML = "";
         }
 
@@ -308,7 +302,6 @@
         // REPAYMENT ITEMS SECTION
         const list = document.getElementById('scheduleList');
         list.innerHTML = '<span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>';
-        
         if (data.schedule && Array.isArray(data.schedule)) {
             data.schedule.forEach((item, idx) => {
                 const st = item.st ? item.st.toUpperCase() : 'PENDING';
@@ -316,7 +309,9 @@
                 
                 const row = document.createElement('div');
                 row.className = 'bill-row';
-                row.addEventListener('click', function() { this.classList.toggle('active'); });
+                row.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                });
 
                 row.innerHTML = `
                     <div class="bill-header">
@@ -324,6 +319,7 @@
                             <span style="font-size:14px; font-weight:700;">${item.mo || 'No Date'}</span>
                             <div style="display: flex; align-items: center; gap: 5px;">
                                 <span style="font-size:11px; color:#888;">Bill ${idx + 1}</span>
+                                <span style="font-size: 9px; color: var(--primary-green); font-weight: 700; animation: blink 1.5s infinite;">• Tap Details</span>
                             </div>
                         </div>
                         <div class="bill-amount-status">
@@ -345,7 +341,7 @@
                 list.appendChild(row);
             });
         }
-    }
+    } 
         
     function closeWelcomeModal() {
         document.getElementById('welcomePortalModal').style.display = 'none';
