@@ -148,6 +148,7 @@
         </div>
     </div>
 
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 25px; margin-bottom: 15px;">
     <div class="hero-section" id="heroBox">
         <p class="due-label" id="heroLabel">STATUS LOADING</p>
         <div class="amount-hero" id="heroAmount">₱0.00</div>
@@ -155,7 +156,7 @@
              <p id="heroSub" style="font-size: 11px; opacity: 0.8; margin-top: 5px;">Please wait...</p>
         </div>
     </div>
-</div>
+
     
     <a id="payLinkBtn" href="javascript:void(0)" onclick="goToPaymentPage()" style="text-decoration:none;">
     <button class="btn-pay-animated">
@@ -164,10 +165,16 @@
 </a>
     
     
-   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 25px; margin-bottom: 15px;">
+    
     <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
         <span class="detail-label">Loan Type</span>
         <div id="dispLoanType" style="font-size: 14px; font-weight: 700; margin-top: 5px;">---</div>
+        
+        <div style="margin-top: 10px; border-top: 1px dashed #eee; padding-top: 8px;">
+            <span class="detail-label" style="font-size: 9px; opacity: 0.8;">Item Name</span>
+            <div id="dispProductName" style="font-size: 12px; font-weight: 700; color: #555; word-wrap: break-word;">---</div>
+        </div>
     </div>
 
     <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
@@ -177,7 +184,7 @@
 
     <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
         <span class="detail-label">Interest Rate</span>
-        <div id="dispRate" style="font-size: 14px; font-weight: 700; margin-top: 5px;">0%</div>
+        <div id="dispRate" style="font-size: 14px; font-weight: 700; margin-top: 5px; color: var(--primary-green);">0%</div>
     </div>
 
     <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
