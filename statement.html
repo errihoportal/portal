@@ -282,7 +282,7 @@
             hLabel.innerText = "⚠️ ACCOUNT OVERDUE";
             hLabel.style.color = "#ffbdbe";
             hAmount.innerText = fmt(overdueTotal);
-            hSubCont.innerHTML = `<div style="font-size: 12px; margin-top: 10px; line-height: 1.4; opacity: 0.9;">Your account is <strong>Overdue</strong> for ${overdueLabels.join(" & ")}.</div>`;
+            hSubCont.innerHTML = `<div style="font-size: 12px; margin-top: 10px; line-height: 1.4; opacity: 0.9;">Your account is <strong>Overdue</strong> for ${overdueLabels.join(" & ")}.<br>Please settle this immediately.</div>`;
         } 
         // CONDITION 2: UNPAID/PENDING (ORANGE)
         else if (nextDue) {
