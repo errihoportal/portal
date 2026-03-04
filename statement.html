@@ -187,15 +187,17 @@
 
 <script>
     // 1. Security Check & Initial Data
+    // Ginawa nating 'let' sa halip na 'const' para mapalitan ang laman nito ng live data
     let data = JSON.parse(localStorage.getItem('erriho_user'));
-if (!data || (!data.passcode && !data.pass)) { 
-    window.location.replace('index.html'); 
-}
+
+    if (!data || (!data.passcode && !data.pass)) { 
+        window.location.replace('index.html'); 
+    }
 
     const baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
-    const fmt = (num) => "₱" + parseFloat(num).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    const fmt = (num) => "₱" + parseFloat(num || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-   window.onload = async () => {
+    window.onload = async () => {
         if (!localStorage.getItem('erriho_user')) {
             window.location.replace('index.html');
             return;
@@ -203,18 +205,18 @@ if (!data || (!data.passcode && !data.pass)) {
 
         document.getElementById('mainContent').style.display = 'block';
         
-        // 1. Ipakita agad ang lumang data habang naghihintay ng sync
+        // Ipakita ang initial data mula sa storage
         populateData();
 
         if (!localStorage.getItem('hasSeenWelcome_v2')) {
             document.getElementById('welcomePortalModal').style.display = 'flex';
         }
 
-        // 2. Umpisahan ang Live Sync (Takbo agad + Repeat every 30s)
+        // Simulan ang Live Sync
         startLiveSync();
     };
 
-    // BAGONG FUNCTION PARA SA REAL-TIME AUTO-UPDATE
+    // FUNCTION PARA SA REAL-TIME AUTO-UPDATE
     async function startLiveSync() {
         const dateEl = document.getElementById('asOfDate');
         
@@ -223,21 +225,23 @@ if (!data || (!data.passcode && !data.pass)) {
             dateEl.style.color = "#27ae60";
 
             try {
-                // Nagdagdag ng Timestamp (_=...) para iwas sa "cache" ng browser
+                // Pinipilit ang browser na kumuha ng FRESH data gamit ang timestamp (_=)
                 const url = `${baseUrl}?acc=${encodeURIComponent(data.accRef)}&pass=${encodeURIComponent(data.passcode || data.pass)}&_=${new Date().getTime()}`;
                 const response = await fetch(url);
                 const newData = await response.json();
 
                 if (newData && newData.status !== 'error') {
-                    // I-update ang global variable 'data'
+                    // 1. Panatilihin ang lumang passcode para sa session
                     const passcodeToSave = data.passcode || data.pass;
                     newData.passcode = passcodeToSave;
+
+                    // 2. IMPORTANT: I-update ang global 'data' variable para magamit ng populateData()
                     data = newData;
 
-                    // I-save sa storage para sa susunod na login
+                    // 3. I-update ang localStorage para kung mag-refresh ang user, bago na ang makikita niya
                     localStorage.setItem('erriho_user', JSON.stringify(newData));
 
-                    // RE-RENDER UI (Dito magbabago ang numbers sa screen mo nang kusa)
+                    // 4. RE-RENDER UI: Dito na magbabago ang lahat ng numbers at Hero status sa screen
                     populateData();
 
                     dateEl.innerText = "✅ LIVE UPDATED: " + new Date().toLocaleTimeString();
@@ -250,11 +254,11 @@ if (!data || (!data.passcode && !data.pass)) {
             }
         };
 
-        // Takbo agad pagka-open
+        // Unang takbo pagka-load ng page
         await performSync();
 
-        // Uulitin ang process tuwing 30 seconds (30000ms)
-        setInterval(performSync, 30000);
+        // Uulitin ang process tuwing 20 seconds (Ginawang 20s para mas mabilis maramdaman ang real-time)
+        setInterval(performSync, 20000);
     }
     
     function populateData() {
@@ -266,7 +270,7 @@ if (!data || (!data.passcode && !data.pass)) {
         document.getElementById('modalGreeting').innerText = "Hello, " + data.name.split(' ')[0] + "!";
         
         // Credit Rating Section
-        const rating = Math.round(parseFloat(data.creditRating));
+        const rating = Math.round(parseFloat(data.creditRating || 0));
         const ratingEl = document.getElementById('dispRating');
         const colorCont = document.getElementById('ratingColorContainer');
         const statusCont = document.getElementById('ratingStatusContainer');
@@ -280,7 +284,7 @@ if (!data || (!data.passcode && !data.pass)) {
         colorCont.style.color = rColor;
         statusCont.innerHTML = `<span style="font-size: 8px; font-weight: 800; color: ${rColor}; background: ${rBg}; padding: 2px 6px; border-radius: 10px;">${rText}</span>`;
 
-        // Hero Calculation (PHP Style Logic)
+        // Hero Calculation
         let overdueTotal = 0;
         let overdueLabels = [];
         let nextDue = null;
@@ -315,7 +319,7 @@ if (!data || (!data.passcode && !data.pass)) {
             hAmount.style.fontSize = "24px";
             hAmount.innerText = "LOAN FULLY SETTLED";
             hLabel.innerText = "Thank you for your business!";
-            hLabel.style.color = "var(--primary-green)";
+            hLabel.style.color = "#27ae60";
             hSubCont.innerHTML = "";
         }
 
@@ -333,12 +337,11 @@ if (!data || (!data.passcode && !data.pass)) {
         document.getElementById('breakDailyInt').innerText = fmt(data.totalDailyInt || 0);
         document.getElementById('breakPaid').innerText = fmt(data.totalPaid || 0);
         document.getElementById('dispBalance').innerText = fmt(data.balance);
-        
 
         // REPAYMENT ITEMS SECTION
-       const list = document.getElementById('scheduleList');
-        // Linisin muna ang list para hindi madoble tuwing mag-re-refresh
+        const list = document.getElementById('scheduleList');
         list.innerHTML = '<span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>';
+        
         if (data.schedule && Array.isArray(data.schedule)) {
             data.schedule.forEach((item, idx) => {
                 const st = item.st ? item.st.toUpperCase() : 'PENDING';
@@ -346,11 +349,7 @@ if (!data || (!data.passcode && !data.pass)) {
                 
                 const row = document.createElement('div');
                 row.className = 'bill-row';
-                
-                // Pinatibay na toggle function
-                row.addEventListener('click', function() {
-                    this.classList.toggle('active');
-                });
+                row.addEventListener('click', function() { this.classList.toggle('active'); });
 
                 row.innerHTML = `
                     <div class="bill-header">
@@ -358,7 +357,7 @@ if (!data || (!data.passcode && !data.pass)) {
                             <span style="font-size:14px; font-weight:700;">${item.mo || 'No Date'}</span>
                             <div style="display: flex; align-items: center; gap: 5px;">
                                 <span style="font-size:11px; color:#888;">Bill ${idx + 1}</span>
-                                <span style="font-size: 9px; color: var(--primary-green); font-weight: 700; animation: blink 1.5s infinite;">• Tap Details</span>
+                                <span style="font-size: 9px; color: #27ae60; font-weight: 700; animation: blink 1.5s infinite;">• Tap Details</span>
                             </div>
                         </div>
                         <div class="bill-amount-status">
@@ -380,21 +379,17 @@ if (!data || (!data.passcode && !data.pass)) {
                 list.appendChild(row);
             });
         }
-    } // Dulo ng populateData
+    }
         
     function closeWelcomeModal() {
         document.getElementById('welcomePortalModal').style.display = 'none';
         localStorage.setItem('hasSeenWelcome_v2', 'true');
     }
 
-    // PINAKAMAHALAGANG DAGDAG:
     function goToPaymentPage() {
-        // 1. Hanapin ang unang bill na hindi pa paid para makuha ang REF
         let billRef = "1"; 
         const nextBill = data.schedule.find(i => i.st.toUpperCase() !== 'PAID');
         if (nextBill) billRef = nextBill.ref || "1";
-
-        // 2. I-redirect sa payment.html bitbit ang Account at Bill Ref
         window.location.href = `payment.html?acc=${encodeURIComponent(data.accRef)}&bill=${encodeURIComponent(billRef)}`;
     }
 </script>
