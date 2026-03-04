@@ -423,20 +423,28 @@
     };
 
     function populateData() {
-        if(!data) {
-            console.error("No data found in localStorage");
-            return;
-        }
+    if(!data) {
+        console.error("No data found in localStorage");
+        return;
+    }
+    
+    // 1. Identity Info sa Dashboard (Full Name - Naka-UPPERCASE pa rin ito)
+    document.getElementById('dispName').innerText = (data.name || "User").toUpperCase();
+    document.getElementById('dispAccRef').innerText = data.accRef || "N/A";
+    
+    // 2. Greeting sa Modal (First Name lang at Proper Case)
+    const greet = document.getElementById('modalGreeting');
+    if(greet && data.name) {
+        // Gawing lowercase muna ang unang salita (hal: JUAN -> juan)
+        let firstName = data.name.split(' ')[0].toLowerCase();
         
-        // Identity Info - nilagyan ng "---" bilang fallback
-        document.getElementById('dispName').innerText = (data.name || "User").toUpperCase();
-        document.getElementById('dispAccRef').innerText = data.accRef || "N/A";
+        // Gawing Capital ang unang letra (hal: juan -> Juan)
+        firstName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
         
-        const greet = document.getElementById('modalGreeting');
-        if(greet) {
-            const firstName = data.name ? data.name.split(' ')[0] : "Guest";
-            greet.innerText = "Hello, " + firstName + "!";
-        }
+        greet.innerText = "Hello, " + firstName + "!";
+    } else if (greet) {
+        greet.innerText = "Hello, User!";
+    }
         
         // Credit Rating Section
         const rating = Math.round(parseFloat(data.creditRating || 0));
