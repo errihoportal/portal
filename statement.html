@@ -290,14 +290,14 @@
             hLabel.innerText = "NEXT DUE DATE: " + nextDue.mo;
             hLabel.style.color = "#fff3cd";
             hAmount.innerText = fmt(nextDue.total);
-            hSubCont.innerHTML = `<p style="font-size: 11px; opacity: 0.9; margin-top: 5px;">Keep your account in good standing.</p>`;
+            hSubCont.innerHTML = `<p style="font-size: 11px; opacity: 0.9; margin-top: 5px;">Keep your account in good standing by paying on time.</p>`;
         } 
         // CONDITION 3: FULLY SETTLED (GREEN)
         else {
             hBox.style.background = "linear-gradient(135deg, #219150, #27ae60)"; // Solid Green Gradient
             hAmount.style.fontSize = "24px";
             hAmount.innerText = "LOAN FULLY SETTLED";
-            hLabel.innerText = "THANK YOU!";
+            hLabel.innerText = "Thank you for your business!";
             hLabel.style.color = "#e6f9ed";
             hSubCont.innerHTML = `<p style="font-size: 11px; opacity: 0.9; margin-top: 5px;">You have no outstanding balance.</p>`;
         }
