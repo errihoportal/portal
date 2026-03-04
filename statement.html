@@ -588,6 +588,7 @@ if (data.schedule && Array.isArray(data.schedule)) {
     }
 
     function goToPaymentPage() {
+        if(!data || !data.schedule) return;
         let billRef = "1"; 
         const nextBill = data.schedule.find(i => i.st.toUpperCase() !== 'PAID');
         if (nextBill) billRef = nextBill.ref || "1";
