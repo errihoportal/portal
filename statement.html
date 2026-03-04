@@ -681,11 +681,22 @@ if(greet) {
     }
 
     function goToPaymentPage() {
-        if(!data || !data.schedule) return;
-        let billRef = "1"; 
-        const nextBill = data.schedule.find(i => i.st.toUpperCase() !== 'PAID');
-        if (nextBill) billRef = nextBill.ref || "1";
-        window.location.href = `payment.html?acc=${encodeURIComponent(data.accRef)}&bill=${encodeURIComponent(billRef)}`;
+        // 1. I-check kung may data at kung may payLink na galing sa Google Sheet
+        if (data && data.payLink) {
+            // Kung may link sa Column Q, doon natin ipupunta ang user
+            window.location.href = data.payLink;
+        } else {
+            // 2. Fallback: Kung walang link sa Column Q, pumunta sa payment.html
+            // O kaya naman, mag-pakita ng alert
+            console.warn("No payLink found in Google Sheets. Redirecting to default payment page.");
+            
+            let billRef = "1"; 
+            if (data.schedule) {
+                const nextBill = data.schedule.find(i => i.st.toUpperCase() !== 'PAID');
+                if (nextBill) billRef = nextBill.ref || "1";
+            }
+            window.location.href = `payment.html?acc=${encodeURIComponent(data.accRef)}&bill=${encodeURIComponent(billRef)}`;
+        }
     }
 </script>
 </body>
