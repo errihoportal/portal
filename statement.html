@@ -396,29 +396,27 @@
     const fmt = (num) => "₱" + parseFloat(num || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
     window.onload = async () => {
-        // Ipakita lang ang modal kung walang 'dontShowWelcome' sa storage
-if (localStorage.getItem('dontShowWelcome') !== 'true') {
-    document.getElementById('welcomePortalModal').style.display = 'flex';
-} else {
-    document.getElementById('welcomePortalModal').style.display = 'none';
-}
+        // Ipakita ang main container
+        document.getElementById('mainContent').style.display = 'block';
 
-        document.getElementById('modalGreeting').innerText = "Hello, " + data.name.split(' ')[0] + "!";
-        
-        // 1. Ipakita ang data (Tinanggal ang startLiveSync para sa auto-update)
+        // 1. WELCOME MODAL LOGIC
+        // I-check kung pinili na ng user na wag na ipakita (dontShowWelcome)
+        if (localStorage.getItem('dontShowWelcome') !== 'true') {
+            document.getElementById('welcomePortalModal').style.display = 'flex';
+        } else {
+            document.getElementById('welcomePortalModal').style.display = 'none';
+        }
+
+        // 2. Ipakita ang data
         populateData();
 
-        // 2. I-set ang date sa "Updated as of Today"
+        // 3. I-set ang date sa "Updated as of Today"
         const dateEl = document.getElementById('asOfDate');
         if (dateEl) {
             const today = new Date();
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
             dateEl.innerText = "Updated as of Today: " + today.toLocaleDateString('en-US', options);
             dateEl.style.color = "#aaa";
-        }
-
-        if (!localStorage.getItem('hasSeenWelcome_v2')) {
-            document.getElementById('welcomePortalModal').style.display = 'flex';
         }
     };
 
