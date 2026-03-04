@@ -547,14 +547,14 @@
                                 <div style="display: flex; flex-direction: column; gap: 8px; border-right: 1px solid #eee; padding-right: 10px;">
                                     <div class="detail-item"><span class="detail-label">Overpayment</span><span style="color:var(--primary-green); font-weight:700;">${fmt(item.overpayment || 0)}</span></div>
                                     <div class="detail-item"><span class="detail-label">Principal + Int</span><span>${fmt(item.p_amt || 0)}</span></div>
-                                    <div class="detail-item"><span class="detail-label">Late Fee</span><span style="color:#e67e22;">${fmt(item.late || 0)}</span></div>
-                                    <div class="detail-item"><span class="detail-label">Daily Int.</span><span style="color:#e67e22;">${fmt(item.d_int || 0)}</span></div>
+                                    <div class="detail-item"><span class="detail-label">Late Payment Fee</span><span style="color:#e67e22;">${fmt(item.late || 0)}</span></div>
+                                    <div class="detail-item"><span class="detail-label">Daily Interest Charge</span><span style="color:#e67e22;">${fmt(item.d_int || 0)}</span></div>
                                     <div class="detail-item"><span class="detail-label">Days Late</span><span style="color:#e74c3c; font-weight:700;">${(item.days_late || 0) > 0 ? item.days_late + ' Days' : '0'}</span></div>
                                 </div>
                                 <div style="display: flex; flex-direction: column; gap: 8px;">
-                                    <div class="detail-item"><span class="detail-label">Payment Amt</span><span style="font-weight:700;">${fmt(item.p_amount || 0)}</span></div>
-                                    <div class="detail-item"><span class="detail-label">Date</span><span>${item.p_date || '---'}</span></div>
-                                    <div class="detail-item"><span class="detail-label">Ref No.</span><span style="font-family: monospace; font-size: 11px;">${item.ref || '---'}</span></div>
+                                    <div class="detail-item"><span class="detail-label">Payment Amount</span><span style="font-weight:700;">${fmt(item.p_amount || 0)}</span></div>
+                                    <div class="detail-item"><span class="detail-label">Payment Date</span><span>${item.p_date || '---'}</span></div>
+                                    <div class="detail-item"><span class="detail-label">Reference No.</span><span style="font-family: monospace; font-size: 11px;">${item.ref || '---'}</span></div>
                                 </div>
                             </div>
                         </div>`;
