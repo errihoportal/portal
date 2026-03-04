@@ -439,19 +439,19 @@
         }
         
         // Credit Rating Section
-        const rating = Math.round(parseFloat(data.creditRating));
+        const rating = Math.round(parseFloat(data.creditRating || 0));
         const ratingEl = document.getElementById('dispRating');
         const colorCont = document.getElementById('ratingColorContainer');
         const statusCont = document.getElementById('ratingStatusContainer');
 
-        ratingEl.innerText = rating;
+        if(ratingEl) ratingEl.innerText = rating;
         let rColor, rText, rBg;
         if (rating >= 80) { rColor = '#27ae60'; rText = '● GOOD'; rBg = '#e6f9ed'; } 
         else if (rating >= 50) { rColor = '#f39c12'; rText = '● ELIGIBLE'; rBg = '#fff9eb'; } 
         else { rColor = '#e74c3c'; rText = '● AT RISK'; rBg = '#fff1f0'; }
 
-        colorCont.style.color = rColor;
-        statusCont.innerHTML = `<span style="font-size: 8px; font-weight: 800; color: ${rColor}; background: ${rBg}; padding: 2px 6px; border-radius: 10px;">${rText}</span>`;
+        if(colorCont) colorCont.style.color = rColor;
+        if(statusCont) statusCont.innerHTML = `<span style="font-size: 8px; font-weight: 800; color: ${rColor}; background: ${rBg}; padding: 2px 6px; border-radius: 10px;">${rText}</span>`;
 
         // Hero Calculation Logic
         let overdueTotal = 0;
@@ -459,55 +459,48 @@
         let nextDue = null;
         let paidCount = 0;
 
-        data.schedule.forEach((item, idx) => {
-            const st = item.st.toUpperCase();
-            if (st === 'PAID') paidCount++;
-            
-            if (st === 'OVERDUE') {
-                overdueTotal += parseFloat(item.total);
-                overdueLabels.push("Bill " + (idx + 1));
-            } else if ((st === 'DUE' || st === 'PENDING' || st === 'UNPAID') && !nextDue) {
-                nextDue = item;
-            }
-        });
+        if(data.schedule && Array.isArray(data.schedule)) {
+            data.schedule.forEach((item, idx) => {
+                const st = (item.st || "").toUpperCase();
+                if (st === 'PAID') paidCount++;
+                
+                if (st === 'OVERDUE') {
+                    overdueTotal += parseFloat(item.total || 0);
+                    overdueLabels.push("Bill " + (idx + 1));
+                } else if ((st === 'DUE' || st === 'PENDING' || st === 'UNPAID') && !nextDue) {
+                    nextDue = item;
+                }
+            });
+        }
 
         const hBox = document.getElementById('heroBox');
         const hLabel = document.getElementById('heroLabel');
         const hAmount = document.getElementById('heroAmount');
         const hSubCont = document.getElementById('heroSubContainer');
 
-        // CONDITION 1: OVERDUE (RED)
         if (overdueTotal > 0) {
-            hBox.style.background = "linear-gradient(135deg, #d63031, #e74c3c)"; 
-            hLabel.innerText = "⚠️ ACCOUNT OVERDUE";
-            hLabel.style.color = "#ffbdbe";
-            hAmount.innerText = fmt(overdueTotal);
-            hSubCont.innerHTML = `<div style="font-size: 12px; margin-top: 10px; line-height: 1.4; opacity: 0.9;">Your account is <strong>Overdue</strong> for ${overdueLabels.join(" & ")}.<br>Please settle this immediately.</div>`;
-        } 
-        // CONDITION 2: UNPAID/PENDING (ORANGE)
-        else if (nextDue) {
-            hBox.style.background = "linear-gradient(135deg, #e67e22, #f39c12)"; 
-            hLabel.innerText = "NEXT DUE DATE: " + nextDue.mo;
-            hLabel.style.color = "#fff3cd";
-            hAmount.innerText = fmt(nextDue.total);
-            hSubCont.innerHTML = `<p style="font-size: 11px; opacity: 0.9; margin-top: 5px;">Keep your account in good standing by paying on time.</p>`;
-        } 
-        // CONDITION 3: FULLY SETTLED (GREEN)
-        else {
-            hBox.style.background = "linear-gradient(135deg, #219150, #27ae60)"; 
-            hAmount.style.fontSize = "24px";
-            hAmount.innerText = "LOAN FULLY SETTLED";
-            hLabel.innerText = "Thank you for your business!";
-            hLabel.style.color = "#e6f9ed";
-            hSubCont.innerHTML = `<p style="font-size: 11px; opacity: 0.9; margin-top: 5px;">You have no outstanding balance.</p>`;
+            if(hBox) hBox.style.background = "linear-gradient(135deg, #d63031, #e74c3c)";
+            if(hLabel) { hLabel.innerText = "⚠️ ACCOUNT OVERDUE"; hLabel.style.color = "#ffbdbe"; }
+            if(hAmount) hAmount.innerText = fmt(overdueTotal);
+            if(hSubCont) hSubCont.innerHTML = `<div style="font-size: 12px; margin-top: 10px; line-height: 1.4; opacity: 0.9;">Your account is <strong>Overdue</strong> for ${overdueLabels.join(" & ")}.<br>Please settle this immediately.</div>`;
+        } else if (nextDue) {
+            if(hBox) hBox.style.background = "linear-gradient(135deg, #e67e22, #f39c12)";
+            if(hLabel) { hLabel.innerText = "NEXT DUE DATE: " + (nextDue.mo || "---"); hLabel.style.color = "#fff3cd"; }
+            if(hAmount) hAmount.innerText = fmt(nextDue.total);
+            if(hSubCont) hSubCont.innerHTML = `<p style="font-size: 11px; opacity: 0.9; margin-top: 5px;">Keep your account in good standing by paying on time.</p>`;
+        } else {
+            if(hBox) hBox.style.background = "linear-gradient(135deg, #219150, #27ae60)";
+            if(hAmount) { hAmount.style.fontSize = "24px"; hAmount.innerText = "LOAN FULLY SETTLED"; }
+            if(hLabel) { hLabel.innerText = "Thank you for your business!"; hLabel.style.color = "#e6f9ed"; }
+            if(hSubCont) hSubCont.innerHTML = `<p style="font-size: 11px; opacity: 0.9; margin-top: 5px;">You have no outstanding balance.</p>`;
         }
 
         // Numbers & Stats Update
         document.getElementById('dispProductName').innerText = data.productName || "No Product Info";
         document.getElementById('dispLoanType').innerText = data.loanType || "---";
-        document.getElementById('dispPlan').innerText = data.loanPlan;
-        document.getElementById('dispRate').innerText = (parseFloat(data.intRate) * 100) + "%";
-        document.getElementById('dispStatusCount').innerText = `${paidCount} of ${data.schedule.length} Paid`;
+        document.getElementById('dispPlan').innerText = data.loanPlan || "---";
+        document.getElementById('dispRate').innerText = (parseFloat(data.intRate || 0) * 100) + "%";
+        document.getElementById('dispStatusCount').innerText = `${paidCount} of ${(data.schedule ? data.schedule.length : 0)} Paid`;
 
         document.getElementById('breakLoan').innerText = fmt(data.loanAmount);
         document.getElementById('breakInt').innerText = fmt(data.intAmount);
@@ -520,65 +513,56 @@
 
         // REPAYMENT ITEMS SECTION
         const list = document.getElementById('scheduleList');
-        list.innerHTML = '<span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>';
+        if(list) {
+            list.innerHTML = '<span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>';
+            if (data.schedule && Array.isArray(data.schedule)) {
+                data.schedule.forEach((item, idx) => {
+                    const st = (item.st || 'PENDING').toUpperCase();
+                    const stClass = st === 'PAID' ? 'status-paid' : (st === 'OVERDUE' ? 'status-overdue' : 'status-unpaid');
+                    let displayAmount = (st === 'PAID') ? item.p_amount : (st === 'OVERDUE' ? item.total : item.p_amt);
 
-        if (data.schedule && Array.isArray(data.schedule)) {
-            data.schedule.forEach((item, idx) => {
-                const st = item.st ? item.st.toUpperCase() : 'PENDING';
-                const stClass = st === 'PAID' ? 'status-paid' : (st === 'OVERDUE' ? 'status-overdue' : 'status-unpaid');
+                    const row = document.createElement('div');
+                    row.className = 'bill-row';
+                    row.addEventListener('click', function() { this.classList.toggle('active'); });
 
-                let displayAmount;
-                if (st === 'PAID') {
-                    displayAmount = item.p_amount;
-                } else if (st === 'OVERDUE') {
-                    displayAmount = item.total;
-                } else {
-                    displayAmount = item.p_amt;
-                }
-
-                const row = document.createElement('div');
-                row.className = 'bill-row';
-                row.addEventListener('click', function() {
-                    this.classList.toggle('active');
+                    row.innerHTML = `
+                        <div class="bill-header">
+                            <div class="bill-info">
+                                <span style="font-size:14px; font-weight:700;">${item.mo || 'No Date'}</span>
+                                <div style="display: flex; align-items: center; gap: 5px;">
+                                    <span style="font-size:11px; color:#888;">Bill ${idx + 1}</span>
+                                    <span style="font-size: 9px; color: var(--primary-green); font-weight: 700; animation: blink 1.5s infinite;">• Tap Details</span>
+                                </div>
+                            </div>
+                            <div class="bill-amount-status">
+                                <div style="font-weight:800; font-size: 15px; color: ${st === 'PAID' ? 'var(--primary-green)' : (st === 'OVERDUE' ? '#e74c3c' : '#1a1a1a')};">
+                                    ${fmt(displayAmount || 0)}
+                                </div>
+                                <span class="status ${stClass}">${st}</span>
+                                <div class="action-circle">+</div>
+                            </div>
+                        </div>
+                        <div class="details-pane">
+                            <div class="details-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div style="display: flex; flex-direction: column; gap: 8px; border-right: 1px solid #eee; padding-right: 10px;">
+                                    <div class="detail-item"><span class="detail-label">Overpayment</span><span style="color:var(--primary-green); font-weight:700;">${fmt(item.overpayment || 0)}</span></div>
+                                    <div class="detail-item"><span class="detail-label">Principal + Int</span><span>${fmt(item.p_amt || 0)}</span></div>
+                                    <div class="detail-item"><span class="detail-label">Late Fee</span><span style="color:#e67e22;">${fmt(item.late || 0)}</span></div>
+                                    <div class="detail-item"><span class="detail-label">Daily Int.</span><span style="color:#e67e22;">${fmt(item.d_int || 0)}</span></div>
+                                    <div class="detail-item"><span class="detail-label">Days Late</span><span style="color:#e74c3c; font-weight:700;">${(item.days_late || 0) > 0 ? item.days_late + ' Days' : '0'}</span></div>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <div class="detail-item"><span class="detail-label">Payment Amt</span><span style="font-weight:700;">${fmt(item.p_amount || 0)}</span></div>
+                                    <div class="detail-item"><span class="detail-label">Date</span><span>${item.p_date || '---'}</span></div>
+                                    <div class="detail-item"><span class="detail-label">Ref No.</span><span style="font-family: monospace; font-size: 11px;">${item.ref || '---'}</span></div>
+                                </div>
+                            </div>
+                        </div>`;
+                    list.appendChild(row);
                 });
-
-                row.innerHTML = `
-                    <div class="bill-header">
-                        <div class="bill-info">
-                            <span style="font-size:14px; font-weight:700;">${item.mo || 'No Date'}</span>
-                            <div style="display: flex; align-items: center; gap: 5px;">
-                                <span style="font-size:11px; color:#888;">Bill ${idx + 1}</span>
-                                <span style="font-size: 9px; color: var(--primary-green); font-weight: 700; animation: blink 1.5s infinite;">• Tap Details</span>
-                            </div>
-                        </div>
-                        <div class="bill-amount-status">
-                            <div style="font-weight:800; font-size: 15px; color: ${st === 'PAID' ? 'var(--primary-green)' : (st === 'OVERDUE' ? '#e74c3c' : '#1a1a1a')};">
-                                ${fmt(displayAmount || 0)}
-                            </div>
-                            <span class="status ${stClass}">${st}</span>
-                            <div class="action-circle">+</div>
-                        </div>
-                    </div>
-                    <div class="details-pane">
-                        <div class="details-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div style="display: flex; flex-direction: column; gap: 8px; border-right: 1px solid #eee; padding-right: 10px;">
-                                <div class="detail-item"><span class="detail-label">Overpayment</span><span style="color:var(--primary-green); font-weight:700;">${fmt(item.overpayment || 0)}</span></div>
-                                <div class="detail-item"><span class="detail-label">Principal + Int</span><span>${fmt(item.p_amt || 0)}</span></div>
-                                <div class="detail-item"><span class="detail-label">Late Payment Fee</span><span style="color:#e67e22;">${fmt(item.late || 0)}</span></div>
-                                <div class="detail-item"><span class="detail-label">Daily Int. Charge</span><span style="color:#e67e22;">${fmt(item.d_int || 0)}</span></div>
-                                <div class="detail-item"><span class="detail-label">Days Late</span><span style="color:#e74c3c; font-weight:700;">${item.days_late > 0 ? item.days_late + ' Days' : '0'}</span></div>
-                            </div>
-                            <div style="display: flex; flex-direction: column; gap: 8px;">
-                                <div class="detail-item"><span class="detail-label">Payment Amount</span><span style="font-weight:700;">${fmt(item.p_amount || 0)}</span></div>
-                                <div class="detail-item"><span class="detail-label">Payment Date</span><span>${item.p_date || '---'}</span></div>
-                                <div class="detail-item"><span class="detail-label">Reference No.</span><span style="font-family: monospace; font-size: 11px;">${item.ref || '---'}</span></div>
-                            </div>
-                        </div>
-                    </div>`;
-                list.appendChild(row);
-            });
+            }
         }
-    }
+    } // End of populateData
 
     function closeWelcomeModal() {
         const checkBtn = document.getElementById('dontShowAgain');
