@@ -397,14 +397,16 @@
 
     window.onload = async () => {
         // Ipakita ang main container
-        document.getElementById('mainContent').style.display = 'block';
+        const main = document.getElementById('mainContent');
+        if (main) main.style.display = 'block';
 
         // 1. WELCOME MODAL LOGIC
-        // I-check kung pinili na ng user na wag na ipakita (dontShowWelcome)
         if (localStorage.getItem('dontShowWelcome') !== 'true') {
-            document.getElementById('welcomePortalModal').style.display = 'flex';
+            const modal = document.getElementById('welcomePortalModal');
+            if (modal) modal.style.display = 'flex';
         } else {
-            document.getElementById('welcomePortalModal').style.display = 'none';
+            const modal = document.getElementById('welcomePortalModal');
+            if (modal) modal.style.display = 'none';
         }
 
         // 2. Ipakita ang data
@@ -419,8 +421,6 @@
             dateEl.style.color = "#aaa";
         }
     };
-
-    // Tinanggal ang startLiveSync function para iwas sa loop na hindi gumagana
 
     function populateData() {
         if(!data) return;
@@ -470,7 +470,7 @@
 
         // CONDITION 1: OVERDUE (RED)
         if (overdueTotal > 0) {
-            hBox.style.background = "linear-gradient(135deg, #d63031, #e74c3c)"; // Solid Red Gradient
+            hBox.style.background = "linear-gradient(135deg, #d63031, #e74c3c)"; 
             hLabel.innerText = "⚠️ ACCOUNT OVERDUE";
             hLabel.style.color = "#ffbdbe";
             hAmount.innerText = fmt(overdueTotal);
@@ -478,7 +478,7 @@
         } 
         // CONDITION 2: UNPAID/PENDING (ORANGE)
         else if (nextDue) {
-            hBox.style.background = "linear-gradient(135deg, #e67e22, #f39c12)"; // Solid Orange Gradient
+            hBox.style.background = "linear-gradient(135deg, #e67e22, #f39c12)"; 
             hLabel.innerText = "NEXT DUE DATE: " + nextDue.mo;
             hLabel.style.color = "#fff3cd";
             hAmount.innerText = fmt(nextDue.total);
@@ -486,7 +486,7 @@
         } 
         // CONDITION 3: FULLY SETTLED (GREEN)
         else {
-            hBox.style.background = "linear-gradient(135deg, #219150, #27ae60)"; // Solid Green Gradient
+            hBox.style.background = "linear-gradient(135deg, #219150, #27ae60)"; 
             hAmount.style.fontSize = "24px";
             hAmount.innerText = "LOAN FULLY SETTLED";
             hLabel.innerText = "Thank you for your business!";
@@ -501,7 +501,6 @@
         document.getElementById('dispRate').innerText = (parseFloat(data.intRate) * 100) + "%";
         document.getElementById('dispStatusCount').innerText = `${paidCount} of ${data.schedule.length} Paid`;
 
-        
         document.getElementById('breakLoan').innerText = fmt(data.loanAmount);
         document.getElementById('breakInt').innerText = fmt(data.intAmount);
         document.getElementById('breakMonthly').innerText = fmt(data.monthlyPayment);
@@ -511,75 +510,70 @@
         document.getElementById('breakPaid').innerText = fmt(data.totalPaid || 0);
         document.getElementById('dispBalance').innerText = fmt(data.balance);
 
-       // REPAYMENT ITEMS SECTION
-const list = document.getElementById('scheduleList');
-list.innerHTML = '<span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>';
+        // REPAYMENT ITEMS SECTION
+        const list = document.getElementById('scheduleList');
+        list.innerHTML = '<span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>';
 
-if (data.schedule && Array.isArray(data.schedule)) {
-    data.schedule.forEach((item, idx) => {
-        const st = item.st ? item.st.toUpperCase() : 'PENDING';
-        const stClass = st === 'PAID' ? 'status-paid' : (st === 'OVERDUE' ? 'status-overdue' : 'status-unpaid');
+        if (data.schedule && Array.isArray(data.schedule)) {
+            data.schedule.forEach((item, idx) => {
+                const st = item.st ? item.st.toUpperCase() : 'PENDING';
+                const stClass = st === 'PAID' ? 'status-paid' : (st === 'OVERDUE' ? 'status-overdue' : 'status-unpaid');
 
-        // --- DITO ANG LOGIC PARA SA DISPLAY AMOUNT ---
-        let displayAmount;
-        if (st === 'PAID') {
-            displayAmount = item.p_amount; // Payment Amount kapag PAID
-        } else if (st === 'OVERDUE') {
-            displayAmount = item.total;    // Total Balance (with penalties) kapag OVERDUE
-        } else {
-            displayAmount = item.p_amt;    // Principal + Interest lang kapag UNPAID/PENDING
+                let displayAmount;
+                if (st === 'PAID') {
+                    displayAmount = item.p_amount;
+                } else if (st === 'OVERDUE') {
+                    displayAmount = item.total;
+                } else {
+                    displayAmount = item.p_amt;
+                }
+
+                const row = document.createElement('div');
+                row.className = 'bill-row';
+                row.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                });
+
+                row.innerHTML = `
+                    <div class="bill-header">
+                        <div class="bill-info">
+                            <span style="font-size:14px; font-weight:700;">${item.mo || 'No Date'}</span>
+                            <div style="display: flex; align-items: center; gap: 5px;">
+                                <span style="font-size:11px; color:#888;">Bill ${idx + 1}</span>
+                                <span style="font-size: 9px; color: var(--primary-green); font-weight: 700; animation: blink 1.5s infinite;">• Tap Details</span>
+                            </div>
+                        </div>
+                        <div class="bill-amount-status">
+                            <div style="font-weight:800; font-size: 15px; color: ${st === 'PAID' ? 'var(--primary-green)' : (st === 'OVERDUE' ? '#e74c3c' : '#1a1a1a')};">
+                                ${fmt(displayAmount || 0)}
+                            </div>
+                            <span class="status ${stClass}">${st}</span>
+                            <div class="action-circle">+</div>
+                        </div>
+                    </div>
+                    <div class="details-pane">
+                        <div class="details-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div style="display: flex; flex-direction: column; gap: 8px; border-right: 1px solid #eee; padding-right: 10px;">
+                                <div class="detail-item"><span class="detail-label">Overpayment</span><span style="color:var(--primary-green); font-weight:700;">${fmt(item.overpayment || 0)}</span></div>
+                                <div class="detail-item"><span class="detail-label">Principal + Int</span><span>${fmt(item.p_amt || 0)}</span></div>
+                                <div class="detail-item"><span class="detail-label">Late Payment Fee</span><span style="color:#e67e22;">${fmt(item.late || 0)}</span></div>
+                                <div class="detail-item"><span class="detail-label">Daily Int. Charge</span><span style="color:#e67e22;">${fmt(item.d_int || 0)}</span></div>
+                                <div class="detail-item"><span class="detail-label">Days Late</span><span style="color:#e74c3c; font-weight:700;">${item.days_late > 0 ? item.days_late + ' Days' : '0'}</span></div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <div class="detail-item"><span class="detail-label">Payment Amount</span><span style="font-weight:700;">${fmt(item.p_amount || 0)}</span></div>
+                                <div class="detail-item"><span class="detail-label">Payment Date</span><span>${item.p_date || '---'}</span></div>
+                                <div class="detail-item"><span class="detail-label">Reference No.</span><span style="font-family: monospace; font-size: 11px;">${item.ref || '---'}</span></div>
+                            </div>
+                        </div>
+                    </div>`;
+                list.appendChild(row);
+            });
         }
-        // ---------------------------------------------
+    }
 
-        const row = document.createElement('div');
-        row.className = 'bill-row';
-        row.addEventListener('click', function() {
-            this.classList.toggle('active');
-        });
-
-        row.innerHTML = `
-            <div class="bill-header">
-                <div class="bill-info">
-                    <span style="font-size:14px; font-weight:700;">${item.mo || 'No Date'}</span>
-                    <div style="display: flex; align-items: center; gap: 5px;">
-                        <span style="font-size:11px; color:#888;">Bill ${idx + 1}</span>
-                        <span style="font-size: 9px; color: var(--primary-green); font-weight: 700; animation: blink 1.5s infinite;">• Tap Details</span>
-                    </div>
-                </div>
-                <div class="bill-amount-status">
-    <div style="font-weight:800; font-size: 15px; color: ${st === 'PAID' ? 'var(--primary-green)' : (st === 'OVERDUE' ? '#e74c3c' : '#1a1a1a')};">
-        ${fmt(displayAmount || 0)}
-    </div>
-    <span class="status ${stClass}">${st}</span>
-    <div class="action-circle">+</div>
-</div>
-            </div>
-            <div class="details-pane">
-                <div class="details-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    
-                    <div style="display: flex; flex-direction: column; gap: 8px; border-right: 1px solid #eee; padding-right: 10px;">
-                        <div class="detail-item"><span class="detail-label">Overpayment</span><span style="color:var(--primary-green); font-weight:700;">${fmt(item.overpayment || 0)}</span></div>
-                        <div class="detail-item"><span class="detail-label">Principal + Int</span><span>${fmt(item.p_amt || 0)}</span></div>
-                        <div class="detail-item"><span class="detail-label">Late Payment Fee</span><span style="color:#e67e22;">${fmt(item.late || 0)}</span></div>
-                        <div class="detail-item"><span class="detail-label">Daily Int. Charge</span><span style="color:#e67e22;">${fmt(item.d_int || 0)}</span></div>
-                        <div class="detail-item"><span class="detail-label">Days Late</span><span style="color:#e74c3c; font-weight:700;">${item.days_late > 0 ? item.days_late + ' Days' : '0'}</span></div>
-                    </div>
-
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <div class="detail-item"><span class="detail-label">Payment Amount</span><span style="font-weight:700;">${fmt(item.p_amount || 0)}</span></div>
-                        <div class="detail-item"><span class="detail-label">Payment Date</span><span>${item.p_date || '---'}</span></div>
-                        <div class="detail-item"><span class="detail-label">Reference No.</span><span style="font-family: monospace; font-size: 11px;">${item.ref || '---'}</span></div>
-                    </div>
-
-                </div>
-            </div>`;
-        list.appendChild(row);
-    });
-}
-        
     function closeWelcomeModal() {
         const checkBtn = document.getElementById('dontShowAgain');
-        // Siguraduhing existing ang element para walang error
         if (checkBtn && checkBtn.checked) {
             localStorage.setItem('dontShowWelcome', 'true');
         }
