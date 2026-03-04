@@ -158,6 +158,8 @@
     </div>
 </div>
 
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px; margin-bottom: 20px;">
+    
     <a id="payLinkBtn" href="javascript:void(0)" onclick="goToPaymentPage()" style="text-decoration:none;">
     <button class="btn-pay-animated">
         <span>💸</span> PROCEED TO PAYMENT
@@ -165,41 +167,30 @@
 </a>
     
     
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px; margin-bottom: 20px;">
-    
-    <div style="grid-column: span 2; background: #fdfdfd; padding: 18px; border-radius: 20px; border: 1.5px solid #f0f0f0; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
-        <div style="background: #e8f5e9; padding: 12px; border-radius: 14px; font-size: 22px;">📋</div>
-        <div style="flex: 1;">
-            <div id="dispLoanTypeTop" style="font-size: 10px; font-weight: 800; color: #27ae60; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 2px;">
-                FINANCING TYPE
-            </div>
-            <div id="dispProductTop" style="font-size: 17px; font-weight: 800; color: #1a1a1a; line-height: 1.2;">
-                ---
-            </div>
-        </div>
+   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+    <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
+        <span class="detail-label">Loan Type</span>
+        <div id="dispLoanType" style="font-size: 14px; font-weight: 700; margin-top: 5px;">---</div>
     </div>
 
-    <div style="background: white; padding: 15px; border-radius: 18px; border: 1px solid #eee;">
-        <span class="detail-label" style="font-size: 9px; color: #999;">ITEM NAME</span>
-        <div id="dispProductNameSmall" style="font-size: 13px; font-weight: 700; margin-top: 5px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">---</div>
+    <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
+        <span class="detail-label">Loan Plan</span>
+        <div id="dispPlan" style="font-size: 14px; font-weight: 700; margin-top: 5px;">---</div>
     </div>
 
-    <div style="background: white; padding: 15px; border-radius: 18px; border: 1px solid #eee;">
-        <span class="detail-label" style="font-size: 9px; color: #999;">LOAN PLAN</span>
-        <div id="dispPlan" style="font-size: 14px; font-weight: 700; margin-top: 5px; color: #333;">---</div>
+    <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
+        <span class="detail-label">Interest Rate</span>
+        <div id="dispRate" style="font-size: 14px; font-weight: 700; margin-top: 5px;">0%</div>
     </div>
 
-    <div style="background: white; padding: 15px; border-radius: 18px; border: 1px solid #eee;">
-        <span class="detail-label" style="font-size: 9px; color: #999;">INTEREST RATE</span>
-        <div id="dispRate" style="font-size: 14px; font-weight: 700; margin-top: 5px; color: var(--primary-green);">0%</div>
-    </div>
-
-    <div style="background: white; padding: 15px; border-radius: 18px; border: 1px solid #eee;">
-        <span class="detail-label" style="font-size: 9px; color: #999;">PAYMENT STATUS</span>
-        <div id="dispStatusCount" style="font-size: 14px; font-weight: 700; margin-top: 5px; color: #333;">0 of 0 Paid</div>
+    <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
+        <span class="detail-label">Payment Status</span>
+        <div id="dispStatusCount" style="font-size: 14px; font-weight: 700; margin-top: 5px;">0 of 0 Paid</div>
     </div>
 </div>
 
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px; margin-bottom: 20px;">
+    
     <div style="background: white; border-radius: 20px; border: 1px solid #eee; padding: 20px; margin-bottom: 25px;">
     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
         <span style="color: #555; font-size: 13px;">Original Loan Amount</span>
@@ -377,11 +368,11 @@
         }
 
         // Numbers & Stats Update
-        document.getElementById('dispLoanTypeTop').innerText = lType;
-        document.getElementById('dispProductTop').innerText = pName;
+        document.getElementById('dispLoanType').innerText = data.loanType || "---";
         document.getElementById('dispPlan').innerText = data.loanPlan;
         document.getElementById('dispRate').innerText = (parseFloat(data.intRate) * 100) + "%";
         document.getElementById('dispStatusCount').innerText = `${paidCount} of ${data.schedule.length} Paid`;
+
         
         document.getElementById('breakLoan').innerText = fmt(data.loanAmount);
         document.getElementById('breakInt').innerText = fmt(data.intAmount);
