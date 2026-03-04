@@ -421,7 +421,7 @@ if (data.schedule && Array.isArray(data.schedule)) {
                     </div>
                 </div>
                 <div class="bill-amount-status">
-                    <div style="font-weight:800; font-size: 15px;">${fmt(item.total || 0)}</div>
+                    <div style="font-weight:800; font-size: 15px;">${fmt(displayAmount || 0)}</div>
                     <span class="status ${stClass}">${st}</span>
                     <div class="action-circle">+</div>
                 </div>
