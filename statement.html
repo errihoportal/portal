@@ -225,7 +225,8 @@ if (!data || (!data.passcode && !data.pass)) {
                 newData.passcode = passcodeToSave; 
                 
                 localStorage.setItem('erriho_user', JSON.stringify(newData));
-                data = newData; 
+
+                data = newData;
                 
                 populateData(); // Refresh ang listahan
                 
