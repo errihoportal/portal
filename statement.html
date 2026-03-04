@@ -423,12 +423,20 @@
     };
 
     function populateData() {
-        if(!data) return;
+        if(!data) {
+            console.error("No data found in localStorage");
+            return;
+        }
         
-        // Identity Info
-        document.getElementById('dispName').innerText = data.name.toUpperCase();
-        document.getElementById('dispAccRef').innerText = data.accRef;
-        document.getElementById('modalGreeting').innerText = "Hello, " + data.name.split(' ')[0] + "!";
+        // Identity Info - nilagyan ng "---" bilang fallback
+        document.getElementById('dispName').innerText = (data.name || "User").toUpperCase();
+        document.getElementById('dispAccRef').innerText = data.accRef || "N/A";
+        
+        const greet = document.getElementById('modalGreeting');
+        if(greet) {
+            const firstName = data.name ? data.name.split(' ')[0] : "Guest";
+            greet.innerText = "Hello, " + firstName + "!";
+        }
         
         // Credit Rating Section
         const rating = Math.round(parseFloat(data.creditRating));
