@@ -196,49 +196,67 @@ if (!data || (!data.passcode && !data.pass)) {
     const fmt = (num) => "₱" + parseFloat(num).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
    window.onload = async () => {
-    // Force redirect kung walang session
-    if (!localStorage.getItem('erriho_user')) {
-        window.location.replace('index.html');
-        return;
-    }
+        if (!localStorage.getItem('erriho_user')) {
+            window.location.replace('index.html');
+            return;
+        }
 
-       document.getElementById('mainContent').style.display = 'block';
+        document.getElementById('mainContent').style.display = 'block';
+        
+        // 1. Ipakita agad ang lumang data habang naghihintay ng sync
+        populateData();
 
-       populateData();
-
-       if (!localStorage.getItem('hasSeenWelcome_v2')) {
+        if (!localStorage.getItem('hasSeenWelcome_v2')) {
             document.getElementById('welcomePortalModal').style.display = 'flex';
         }
 
-        // 5. Step C: Background Live Sync (Kukuha ng fresh data)
+        // 2. Umpisahan ang Live Sync (Takbo agad + Repeat every 30s)
+        startLiveSync();
+    };
+
+    // BAGONG FUNCTION PARA SA REAL-TIME AUTO-UPDATE
+    async function startLiveSync() {
         const dateEl = document.getElementById('asOfDate');
-        dateEl.innerText = "🔄 SYNCING LIVE DATA...";
-        dateEl.style.color = "#27ae60";
+        
+        const performSync = async () => {
+            dateEl.innerText = "🔄 SYNCING LIVE DATA...";
+            dateEl.style.color = "#27ae60";
 
-        try {
-            const url = `${baseUrl}?acc=${encodeURIComponent(data.accRef)}&pass=${encodeURIComponent(data.passcode || data.pass)}`;
-            const response = await fetch(url);
-            const newData = await response.json();
+            try {
+                // Nagdagdag ng Timestamp (_=...) para iwas sa "cache" ng browser
+                const url = `${baseUrl}?acc=${encodeURIComponent(data.accRef)}&pass=${encodeURIComponent(data.passcode || data.pass)}&_=${new Date().getTime()}`;
+                const response = await fetch(url);
+                const newData = await response.json();
 
-            if (newData && newData.status !== 'error') {
-                const passcodeToSave = data.passcode || data.pass;
-                newData.passcode = passcodeToSave; 
-                
-                localStorage.setItem('erriho_user', JSON.stringify(newData));
+                if (newData && newData.status !== 'error') {
+                    // I-update ang global variable 'data'
+                    const passcodeToSave = data.passcode || data.pass;
+                    newData.passcode = passcodeToSave;
+                    data = newData;
 
-                data = newData;
-                
-                populateData(); // Refresh ang listahan
-                
-                dateEl.innerText = "✅ UPDATED JUST NOW";
-                dateEl.style.color = "#aaa";
+                    // I-save sa storage para sa susunod na login
+                    localStorage.setItem('erriho_user', JSON.stringify(newData));
+
+                    // RE-RENDER UI (Dito magbabago ang numbers sa screen mo nang kusa)
+                    populateData();
+
+                    dateEl.innerText = "✅ LIVE UPDATED: " + new Date().toLocaleTimeString();
+                    dateEl.style.color = "#aaa";
+                }
+            } catch (err) {
+                dateEl.innerText = "⚠️ SYNC PAUSED (OFFLINE)";
+                dateEl.style.color = "#e74c3c";
+                console.error("Sync error:", err);
             }
-        } catch (err) {
-            dateEl.innerText = "⚠️ OFFLINE MODE";
-            console.error("Sync error:", err);
-        }
-    }; // <--- DAGDAG NA BRACKET 2 (Pangsara sa buong window.onload)
+        };
 
+        // Takbo agad pagka-open
+        await performSync();
+
+        // Uulitin ang process tuwing 30 seconds (30000ms)
+        setInterval(performSync, 30000);
+    }
+    
     function populateData() {
         if(!data) return;
         
@@ -318,10 +336,9 @@ if (!data || (!data.passcode && !data.pass)) {
         
 
         // REPAYMENT ITEMS SECTION
-        const list = document.getElementById('scheduleList');
+       const list = document.getElementById('scheduleList');
         // Linisin muna ang list para hindi madoble tuwing mag-re-refresh
         list.innerHTML = '<span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>';
-        
         if (data.schedule && Array.isArray(data.schedule)) {
             data.schedule.forEach((item, idx) => {
                 const st = item.st ? item.st.toUpperCase() : 'PENDING';
