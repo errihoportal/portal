@@ -169,14 +169,18 @@
     
     <div style="grid-column: span 2; background: #fdfdfd; padding: 15px; border-radius: 18px; border: 1.5px solid #f0f0f0; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.02);">
         <div style="background: #e8f5e9; padding: 10px; border-radius: 12px; font-size: 20px;">📦</div>
-        <div>
-            <span class="detail-label" style="font-size: 9px; color: #999; letter-spacing: 1px;">PRODUCT PURCHASED</span>
-            <div id="dispProduct" style="font-size: 15px; font-weight: 800; color: #1a1a1a; margin-top: 2px;">---</div>
+        <div style="flex: 1;">
+            <div id="dispProductType" style="font-size: 10px; font-weight: 800; color: #27ae60; letter-spacing: 1px; text-transform: uppercase;">
+                LOADING TYPE...
+            </div>
+            <div id="dispProduct" style="font-size: 16px; font-weight: 800; color: #1a1a1a; margin-top: 2px; line-height: 1.2;">
+                ---
+            </div>
         </div>
     </div>
 
-    <div style="background: white; padding: 15px; border-radius: 18px; border: 1px solid #eee; transition: 0.3s;">
-        <span class="detail-label" style="font-size: 9px; color: #999;">LOAN TYPE</span>
+    <div style="background: white; padding: 15px; border-radius: 18px; border: 1px solid #eee;">
+        <span class="detail-label" style="font-size: 9px; color: #999;">FINANCING TYPE</span>
         <div id="dispLoanType" style="font-size: 14px; font-weight: 700; margin-top: 5px; color: #333;">---</div>
     </div>
 
@@ -367,8 +371,8 @@
         }
 
         // Numbers & Stats Update
-        document.getElementById('dispProduct').innerText = data.productName || "No Product Info";
         document.getElementById('dispLoanType').innerText = data.loanType || "---";
+        document.getElementById('dispProduct').innerText = data.productName || "No Product Info";
         document.getElementById('dispPlan').innerText = data.loanPlan;
         document.getElementById('dispRate').innerText = (parseFloat(data.intRate) * 100) + "%";
         document.getElementById('dispStatusCount').innerText = `${paidCount} of ${data.schedule.length} Paid`;
