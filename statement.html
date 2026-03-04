@@ -579,17 +579,13 @@ if (data.schedule && Array.isArray(data.schedule)) {
     } 
         
     function closeWelcomeModal() {
-    // I-check kung pinindot ng user ang "Don't show this again"
-    const dontShow = document.getElementById('dontShowAgain').checked;
-    
-    if (dontShow) {
-        // I-save sa browser memory para hindi na lumitaw habang buhay (sa device na ito)
-        localStorage.setItem('dontShowWelcome', 'true');
+        const checkBtn = document.getElementById('dontShowAgain');
+        // Siguraduhing existing ang element para walang error
+        if (checkBtn && checkBtn.checked) {
+            localStorage.setItem('dontShowWelcome', 'true');
+        }
+        document.getElementById('welcomePortalModal').style.display = 'none';
     }
-    
-    // Itago ang modal
-    document.getElementById('welcomePortalModal').style.display = 'none';
-}
 
     function goToPaymentPage() {
         let billRef = "1"; 
