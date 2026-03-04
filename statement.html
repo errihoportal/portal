@@ -187,17 +187,16 @@
 
 <script>
     // 1. Security Check & Initial Data
-    // Ginawa nating 'let' sa halip na 'const' para mapalitan ang laman nito ng live data
+    // Ginawang 'let' para safe ang data handling
     let data = JSON.parse(localStorage.getItem('erriho_user'));
 
     if (!data || (!data.passcode && !data.pass)) { 
         window.location.replace('index.html'); 
     }
 
-    const baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
     const fmt = (num) => "₱" + parseFloat(num || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-    window.onload = async () => {
+    window.onload = () => {
         if (!localStorage.getItem('erriho_user')) {
             window.location.replace('index.html');
             return;
@@ -205,60 +204,28 @@
 
         document.getElementById('mainContent').style.display = 'block';
         
-        // Ipakita ang initial data mula sa storage
+        // Ipakita ang data
         populateData();
+
+        // Update ang Date Display (Updated as of Today)
+        updateDateDisplay();
 
         if (!localStorage.getItem('hasSeenWelcome_v2')) {
             document.getElementById('welcomePortalModal').style.display = 'flex';
         }
-
-        // Simulan ang Live Sync
-        startLiveSync();
     };
 
-    // FUNCTION PARA SA REAL-TIME AUTO-UPDATE
-    async function startLiveSync() {
+    // BAGONG FUNCTION: Papalitan ang asOfDate ng Today's Date
+    function updateDateDisplay() {
         const dateEl = document.getElementById('asOfDate');
-        
-        const performSync = async () => {
-            dateEl.innerText = "🔄 SYNCING LIVE DATA...";
-            dateEl.style.color = "#27ae60";
-
-            try {
-                // Pinipilit ang browser na kumuha ng FRESH data gamit ang timestamp (_=)
-                const url = `${baseUrl}?acc=${encodeURIComponent(data.accRef)}&pass=${encodeURIComponent(data.passcode || data.pass)}&_=${new Date().getTime()}`;
-                const response = await fetch(url);
-                const newData = await response.json();
-
-                if (newData && newData.status !== 'error') {
-                    // 1. Panatilihin ang lumang passcode para sa session
-                    const passcodeToSave = data.passcode || data.pass;
-                    newData.passcode = passcodeToSave;
-
-                    // 2. IMPORTANT: I-update ang global 'data' variable para magamit ng populateData()
-                    data = newData;
-
-                    // 3. I-update ang localStorage para kung mag-refresh ang user, bago na ang makikita niya
-                    localStorage.setItem('erriho_user', JSON.stringify(newData));
-
-                    // 4. RE-RENDER UI: Dito na magbabago ang lahat ng numbers at Hero status sa screen
-                    populateData();
-
-                    dateEl.innerText = "✅ LIVE UPDATED: " + new Date().toLocaleTimeString();
-                    dateEl.style.color = "#aaa";
-                }
-            } catch (err) {
-                dateEl.innerText = "⚠️ SYNC PAUSED (OFFLINE)";
-                dateEl.style.color = "#e74c3c";
-                console.error("Sync error:", err);
-            }
-        };
-
-        // Unang takbo pagka-load ng page
-        await performSync();
-
-        // Uulitin ang process tuwing 20 seconds (Ginawang 20s para mas mabilis maramdaman ang real-time)
-        setInterval(performSync, 20000);
+        if (dateEl) {
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = today.toLocaleDateString('en-US', options);
+            
+            dateEl.innerText = "Updated as of Today: " + formattedDate;
+            dateEl.style.color = "#aaa"; // Clean gray look
+        }
     }
     
     function populateData() {
@@ -284,7 +251,7 @@
         colorCont.style.color = rColor;
         statusCont.innerHTML = `<span style="font-size: 8px; font-weight: 800; color: ${rColor}; background: ${rBg}; padding: 2px 6px; border-radius: 10px;">${rText}</span>`;
 
-        // Hero Calculation
+        // Hero Calculation (Overdue vs Next Due)
         let overdueTotal = 0;
         let overdueLabels = [];
         let nextDue = null;
@@ -357,7 +324,6 @@
                             <span style="font-size:14px; font-weight:700;">${item.mo || 'No Date'}</span>
                             <div style="display: flex; align-items: center; gap: 5px;">
                                 <span style="font-size:11px; color:#888;">Bill ${idx + 1}</span>
-                                <span style="font-size: 9px; color: #27ae60; font-weight: 700; animation: blink 1.5s infinite;">• Tap Details</span>
                             </div>
                         </div>
                         <div class="bill-amount-status">
