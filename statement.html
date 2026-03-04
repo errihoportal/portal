@@ -392,6 +392,28 @@
         window.location.replace('index.html'); 
     }
 
+    // --- AUTO LOGOUT LOGIC (5 MINUTES) ---
+    let logoutTimer;
+    const sessionTimeout = 5 * 10 * 1000; // 5 minuto (in milliseconds)
+
+    function resetTimer() {
+        clearTimeout(logoutTimer);
+        logoutTimer = setTimeout(() => {
+            // Burahin ang session data at bumalik sa login
+            localStorage.removeItem('erriho_user');
+            window.location.replace('index.html');
+        }, sessionTimeout);
+    }
+
+    // Bantayan ang mga galaw ng user para i-reset ang timer
+    window.onload = resetTimer;
+    window.onmousemove = resetTimer;
+    window.onmousedown = resetTimer; // pati clicks
+    window.ontouchstart = resetTimer; // para sa mobile taps
+    window.onclick = resetTimer;     
+    window.onkeypress = resetTimer;   
+    // --------------------------------------
+
     const baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
     const fmt = (num) => "₱" + parseFloat(num || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
