@@ -43,6 +43,16 @@
         .action-circle { background: #eee; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #888; }
         .active .action-circle { transform: rotate(45deg); background: var(--danger-red); color: white; }
 
+        @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+#dispName {
+    /* Sigurado na hindi luluwas ang pangalan sa box */
+    max-width: 100%;
+}
+
         /* Modal */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 9999; }
         .modal-box { background: white; border-radius: 28px; padding: 25px; text-align: center; }
@@ -62,8 +72,11 @@
 </div>
 
 <div class="card" id="mainContent" style="display:none;">
-    <div style="text-align: right; margin-bottom: 10px;">
-        <a href="logout.html" style="text-decoration: none; font-size: 11px; font-weight: 800; color: #e74c3c; background: #fff1f0; padding: 8px 15px; border-radius: 10px; border: 1px solid #ffccc7;">Log Out ➔</a>
+    <div style="display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 15px;">
+        <button onclick="refreshData()" id="refreshBtn" style="border: 1px solid #d9d9d9; background: #fff; color: #555; font-size: 11px; font-weight: 800; padding: 8px 12px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            <span id="refreshIcon">🔄</span> Refresh
+        </button>
+        <a href="logout.html" style="text-decoration: none; font-size: 11px; font-weight: 800; color: #e74c3c; background: #fff1f0; padding: 8px 15px; border-radius: 10px; border: 1px solid #ffccc7; display: flex; align-items: center;">Log Out ➔</a>
     </div>
 
     <div style="text-align: center; margin-bottom: 30px; border-bottom: 1px solid #f0f0f0; padding-bottom: 20px;">
@@ -71,19 +84,20 @@
         <div style="font-size: 10px; font-weight: 800; color: #aaa; letter-spacing: 2px; margin-top: 5px;">ERRIHO PORTAL</div>
     </div>
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 15px;">
-        <div style="flex: 1;">
-            <h2 id="dispName" style="margin: 0; font-size: 22px; font-weight: 800; color: #1a1a1a; line-height: 1.2;">---</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 10px;">
+        <div style="flex: 1; min-width: 0;"> <h2 id="dispName" style="margin: 0; font-size: 20px; font-weight: 800; color: #1a1a1a; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ---
+            </h2>
             <div style="margin-top: 8px; display: flex; align-items: center; gap: 5px;">
-                <span style="font-size: 10px; font-weight: 800; color: #999; text-transform: uppercase;">Account No:</span>
-                <span id="dispAccRef" style="font-family: monospace; font-size: 13px; font-weight: 700; color: var(--primary-green); background: #e8f5e9; padding: 2px 8px; border-radius: 5px;">---</span>
+                <span style="font-size: 10px; font-weight: 800; color: #999; text-transform: uppercase;">Acc:</span>
+                <span id="dispAccRef" style="font-family: monospace; font-size: 12px; font-weight: 700; color: var(--primary-green); background: #e8f5e9; padding: 2px 6px; border-radius: 5px;">---</span>
             </div>
         </div>
         
-        <div style="background: #fff; border: 1.5px solid #eee; border-radius: 18px; padding: 10px 15px; text-align: center; min-width: 100px; box-shadow: 0 5px 15px rgba(0,0,0,0.03);">
-            <div style="font-size: 9px; font-weight: 800; color: #888; text-transform: uppercase; margin-bottom: 3px;">Credit Rating</div>
-            <div id="ratingColorContainer" style="font-size: 24px; font-weight: 800; line-height: 1;">
-                <span id="dispRating">0</span><span style="font-size: 12px;">%</span>
+        <div style="background: #fff; border: 1.5px solid #eee; border-radius: 18px; padding: 10px 12px; text-align: center; min-width: 85px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); flex-shrink: 0;">
+            <div style="font-size: 8px; font-weight: 800; color: #888; text-transform: uppercase; margin-bottom: 3px;">Rating</div>
+            <div id="ratingColorContainer" style="font-size: 20px; font-weight: 800; line-height: 1;">
+                <span id="dispRating">0</span><span style="font-size: 10px;">%</span>
             </div>
             <div style="margin-top: 5px;" id="ratingStatusContainer"></div>
         </div>
@@ -354,6 +368,54 @@
         if (nextBill) billRef = nextBill.ref || "1";
         window.location.href = `payment.html?acc=${encodeURIComponent(data.accRef)}&bill=${encodeURIComponent(billRef)}`;
     }
+
+    async function refreshData() {
+    const btn = document.getElementById('refreshBtn');
+    const icon = document.getElementById('refreshIcon');
+    const dateEl = document.getElementById('asOfDate');
+
+    // 1. Visual Feedback (Loading state)
+    btn.disabled = true;
+    btn.style.opacity = "0.6";
+    icon.style.display = "inline-block";
+    icon.style.animation = "spin 1s linear infinite"; // Optional: kailangan ng CSS animation
+    if(dateEl) dateEl.innerText = "🔄 Fetching latest data...";
+
+    try {
+        // 2. Tawagin ang Google Script URL (BaseUrl ay dapat defined sa itaas)
+        const url = `${baseUrl}?acc=${encodeURIComponent(data.accRef)}&pass=${encodeURIComponent(data.passcode || data.pass)}&_=${new Date().getTime()}`;
+        
+        const response = await fetch(url);
+        const newData = await response.json();
+
+        if (newData && newData.status !== 'error') {
+            // 3. I-update ang global variable at localStorage
+            const currentPass = data.passcode || data.pass;
+            newData.passcode = currentPass;
+            data = newData;
+            localStorage.setItem('erriho_user', JSON.stringify(newData));
+
+            // 4. I-refresh ang UI
+            populateData();
+            
+            // 5. Update the date display
+            const today = new Date();
+            if(dateEl) dateEl.innerText = "Updated as of Today: " + today.toLocaleDateString('en-US', {year:'numeric', month:'long', day:'numeric'});
+            
+            alert("Data successfully updated!");
+        } else {
+            alert("Update failed. Please check your connection.");
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Error connecting to server.");
+    } finally {
+        // 6. Ibalik sa normal ang button
+        btn.disabled = false;
+        btn.style.opacity = "1";
+        icon.style.animation = "none";
+    }
+}
 </script>
 </body>
 </html>
