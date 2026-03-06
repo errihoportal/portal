@@ -433,58 +433,65 @@
     let warningTimer;
     let logoutTimer;
     let countdownInterval;
-    
-  // Config: 1 min total (50 secs idle + 10 secs warning countdown)
-const warningTime = 50 * 1000;      // Lalabas ang warning pagkalipas ng 50 seconds
-const sessionTimeout = 60 * 1000;   // Mag-o-auto logout pagkalipas ng 60 seconds (1 min)
+    let isModalOpen = false; // Flag para malaman kung may warning na
+
+    const warningTime = 50 * 1000;      
+    const sessionTimeout = 60 * 1000;   
 
     function resetTimer() {
-        // Itago ang modal kung sakaling nakalabas na
+        // KUNG NAKALABAS NA ANG WARNING, HUWAG I-RESET ANG TIMER SA GALAW NG MOUSE
+        if (isModalOpen) return;
+
         const modal = document.getElementById('timeoutModal');
         if(modal) modal.style.display = 'none';
         
-        // Burahin ang mga tumatakbong timers
         clearTimeout(warningTimer);
         clearTimeout(logoutTimer);
         clearInterval(countdownInterval);
 
-        // Simulan ang bagong countdown
         warningTimer = setTimeout(showWarning, warningTime);
         logoutTimer = setTimeout(logoutUser, sessionTimeout);
     }
 
     function showWarning() {
+        isModalOpen = true; // I-lock ang timer reset
         const modal = document.getElementById('timeoutModal');
         if(modal) modal.style.display = 'flex';
         
         let seconds = 10; 
         const secondsEl = document.getElementById('secondsLeft');
+        if(secondsEl) secondsEl.innerText = seconds;
         
         countdownInterval = setInterval(() => {
             seconds--;
-            if(secondsEl) secondsEl.innerText = seconds;
-            if(seconds <= 0) clearInterval(countdownInterval);
+            if(secondsEl) secondsEl.innerText = (seconds < 0) ? 0 : seconds;
+            if(seconds <= 0) {
+                clearInterval(countdownInterval);
+                // Siguraduhin na mag-logout talaga kapag zero na
+                logoutUser();
+            }
         }, 1000);
 
-        // Mobile Vibration (Optional: gagana lang kung may user interaction muna)
         if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
     }
 
     function stayLoggedIn() {
-        resetTimer(); // Balik sa normal
+        isModalOpen = false; // I-unlock ang resetTimer
+        resetTimer(); 
     }
 
     function logoutUser() {
+        console.log("Logging out..."); // Para makita mo sa console kung nag-trigger
         localStorage.removeItem('erriho_user');
         window.location.replace('index.html');
     }
 
-    // Event Listeners para sa Computer at Mobile
+    // Event Listeners
     window.onload = resetTimer;
     window.onmousemove = resetTimer;
     window.onmousedown = resetTimer; 
-    window.ontouchstart = resetTimer; // Mobile Tap
-    window.onscroll = resetTimer;     // Mobile Scroll
+    window.ontouchstart = resetTimer; 
+    window.onscroll = resetTimer;     
     window.onkeypress = resetTimer;
     // --- END: AUTO LOGOUT LOGIC ---
     
