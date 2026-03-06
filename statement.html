@@ -602,36 +602,46 @@ if(greet) {
         if(colorCont) colorCont.style.color = rColor;
         if(statusCont) statusCont.innerHTML = `<span style="font-size: 8px; font-weight: 800; color: ${rColor}; background: ${rBg}; padding: 2px 6px; border-radius: 10px;">${rText}</span>`;
 
-     // --- HERO CALCULATION LOGIC ---
+     // --- HERO CALCULATION LOGIC (FINAL FIXED VERSION) ---
         let overdueTotal = 0;
         let overdueLabels = [];
         let nextDue = null;
         let maxDaysLate = 0;
         let activeGraceDays = 0; 
-        const now = new Date();
-        let paidCount = 0; 
+        
+        const today = new Date();
+        today.setHours(0,0,0,0); // Start of today
 
         if(data.schedule && Array.isArray(data.schedule)) {
             data.schedule.forEach((item, idx) => {
                 const st = (item.st || "").toUpperCase();
-                if (st === 'PAID') paidCount++; 
                 const dueDate = new Date(item.mo);
+                dueDate.setHours(0,0,0,0); // Start of due date
                 
-                const diffTime = dueDate.setHours(0,0,0,0) - new Date().setHours(0,0,0,0);
-                const daysUntil = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                // Kalkulahin ang agwat ng araw (Today minus Due Date)
+                const diffTime = today.getTime() - dueDate.getTime();
+                // Math.round para makuha ang saktong 1 day late kung kahapon ang due
+                const daysLateCalculated = Math.round(diffTime / (1000 * 60 * 60 * 24));
+                // Math.round din para sa countdown ng upcoming bills
+                const daysUntil = Math.round((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                
                 let itemGrace = parseInt(item.grace || 0);
 
-                if (st === 'OVERDUE') {
+                // FORCE DETECTION: Kung hindi pa PAID at lumipas na ang Due Date (daysLateCalculated > 0)
+                if (st !== 'PAID' && (st === 'OVERDUE' || daysLateCalculated > 0)) {
                     overdueTotal += parseFloat(item.total || 0);
                     overdueLabels.push("Bill " + (idx + 1));
-                    let currentDaysLate = parseInt(item.days_late || 0);
-                    if (currentDaysLate > maxDaysLate) {
-                        maxDaysLate = currentDaysLate;
-                        if(itemGrace > 0) activeGraceDays = itemGrace;
+                    
+                    // Kunin ang pinakamalalang "Late" na status
+                    if (daysLateCalculated > maxDaysLate) {
+                        maxDaysLate = daysLateCalculated;
+                        activeGraceDays = itemGrace; 
                     }
                 } 
                 
-                if ((st === 'DUE' || st === 'PENDING' || st === 'UNPAID') && !nextDue) {
+                // UPCOMING LOGIC (Dito papasok yung DUE TODAY o Future bills)
+                // Kailangan daysUntil >= 0 para hindi sumabog ang logic ng upcoming
+                if ((st === 'DUE' || st === 'PENDING' || st === 'UNPAID') && daysLateCalculated <= 0 && !nextDue) {
                     nextDue = item;
                     nextDue.daysLeft = daysUntil;
                     nextDue.billNum = idx + 1;
