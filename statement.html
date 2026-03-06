@@ -424,17 +424,18 @@
 
 <script>
     // 1. BACK BUTTON PROTECTION
-    // Kapag binalikan ang page gamit ang back button, kailangang mag-refresh para tumama sa Security Check
     window.onpageshow = function(event) {
-        if (event.persisted) {
-            window.location.reload(); 
-        }
+        if (event.persisted) window.location.reload(); 
     };
 
-    // 2. SECURITY CHECK
+    // 2. SECURITY & TIMESTAMP CHECK
     let data = JSON.parse(localStorage.getItem('erriho_user'));
-    if (!data || (!data.passcode && !data.pass)) { 
-        // .replace ay ginagamit para hindi na "ma-back" pa ang page
+    const currentTime = new Date().getTime(); // Oras ngayon
+    const sessionExpiry = 1 * 60 * 1000;      // 1 minute limit
+
+    if (!data || (currentTime - data.loginTime > sessionExpiry)) { 
+        // Kung walang data O KAYA NAMAN ay lampas na ng 1 minute simula nung huling login
+        localStorage.removeItem('erriho_user');
         window.location.replace('index.html'); 
     }
 
