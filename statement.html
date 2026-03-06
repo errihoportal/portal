@@ -585,6 +585,7 @@ if(greet) {
         let nextDue = null;
         let paidCount = 0;
         let maxDaysLate = 0;
+        let isGracePeriod = (data.grace && data.grace.toString().toUpperCase() === 'TRUE'); // Column X check
 
         const now = new Date();
 
@@ -593,27 +594,22 @@ if(greet) {
                 const st = (item.st || "").toUpperCase();
                 if (st === 'PAID') paidCount++;
 
-                // Date Parsing for logic
                 const dueDate = new Date(item.mo);
                 const timeDiff = dueDate - now;
                 const daysUntil = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
-                // LOGIC: Overdue OR (Pending/Unpaid but due within 7 days)
-                if (st === 'OVERDUE' || ((st === 'PENDING' || st === 'UNPAID' || st === 'DUE') && daysUntil <= 7 && daysUntil > -999)) {
+                // 7-DAY AUTO-ADD TO OVERDUE LOGIC
+                if (st === 'OVERDUE' || ((st === 'PENDING' || st === 'UNPAID' || st === 'DUE') && daysUntil <= 7)) {
                     overdueTotal += parseFloat(item.total || 0);
                     overdueLabels.push("Bill " + (idx + 1));
                     
                     let currentDaysLate = parseInt(item.days_late || 0);
-                    // Kung hindi pa talaga overdue sa status pero isinama natin dahil sa 7-day rule:
-                    if (st !== 'OVERDUE' && daysUntil <= 7) {
-                        // Display "Upcoming" status instead of days late if positive
-                    }
                     if (currentDaysLate > maxDaysLate) maxDaysLate = currentDaysLate;
 
                 } else if ((st === 'DUE' || st === 'PENDING' || st === 'UNPAID') && !nextDue) {
-                    // Ito ang lalabas sa Orange Box kung malayo pa ang due date (> 7 days)
                     nextDue = item;
                     nextDue.daysLeft = daysUntil;
+                    nextDue.exactDue = dueDate;
                 }
             });
         }
@@ -623,54 +619,97 @@ if(greet) {
         const hAmount = document.getElementById('heroAmount');
         const hSubCont = document.getElementById('heroSubContainer');
 
-        if (overdueTotal > 0) {
-            // --- RED BOX: OVERDUE + UPCOMING (7 DAYS RULE) ---
-            if(hBox) hBox.style.background = "linear-gradient(135deg, #d63031, #e74c3c)";
+        // RESET ANIMATIONS
+        if(hBox) hBox.style.animation = "none";
+
+        if (isGracePeriod) {
+            // --- GRACE PERIOD STATE (Green/Teal) ---
+            if(hBox) hBox.style.background = "linear-gradient(135deg, #16a085, #1abc9c)";
+            if(hLabel) { hLabel.innerText = "✨ GRACE PERIOD ACTIVE"; hLabel.style.color = "#e0faf4"; }
+            if(hAmount) hAmount.innerText = fmt(overdueTotal || (nextDue ? nextDue.total : 0));
+            if(hSubCont) {
+                hSubCont.innerHTML = `
+                    <div style="margin-top: 10px; color: white;">
+                        <span style="background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 50px; font-weight: 800; font-size: 11px;">
+                            NO PENALTY UNTIL RESET
+                        </span>
+                        <p style="font-size: 12px; margin-top: 8px; line-height: 1.4;">
+                            Please settle your balance now to <strong>save on penalties</strong>. Your account is temporarily protected.
+                        </p>
+                    </div>`;
+            }
+
+        } else if (overdueTotal > 0) {
+            // --- RED BOX: OVERDUE STATE ---
+            if(hBox) {
+                hBox.style.background = "linear-gradient(135deg, #d63031, #e74c3c)";
+                if (maxDaysLate >= 3) {
+                    hBox.style.animation = "blink-red 2s infinite"; // Blinking if 3+ days late
+                }
+            }
             if(hLabel) { hLabel.innerText = "⚠️ TOTAL AMOUNT DUE"; hLabel.style.color = "#ffbdbe"; }
             if(hAmount) hAmount.innerText = fmt(overdueTotal);
             
             if(hSubCont) {
                 hSubCont.innerHTML = `
                     <div style="font-size: 13px; margin-top: 10px; line-height: 1.4; color: white;">
-                        <span style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 5px; font-weight: 800; font-size: 11px;">
-                            ${maxDaysLate > 0 ? maxDaysLate + ' DAYS OVERDUE' : 'DUE VERY SOON'}
+                        <span style="background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 5px; font-weight: 800; font-size: 11px;">
+                            ${maxDaysLate >= 1 ? maxDaysLate + ' DAYS OVERDUE' : 'DUE VERY SOON'}
                         </span>
                         <div style="margin-top: 8px; opacity: 0.9;">
-                            Includes <strong>${overdueLabels.join(", ")}</strong>. 
-                            Please settle this immediately to avoid penalties.
+                            Settle <strong>${overdueLabels.join(", ")}</strong> immediately to maintain your credit rating.
                         </div>
                     </div>`;
             }
 
         } else if (nextDue) {
-            // --- ORANGE BOX: NEXT DUE (Realtime Countdown) ---
+            // --- ORANGE BOX: NEXT DUE (Countdown Logic) ---
             if(hBox) hBox.style.background = "linear-gradient(135deg, #e67e22, #f39c12)";
-            if(hLabel) { hLabel.innerText = "NEXT PAYMENT: " + (nextDue.mo || "---"); hLabel.style.color = "#fff3cd"; }
+            if(hLabel) { hLabel.innerText = "UPCOMING PAYMENT"; hLabel.style.color = "#fff3cd"; }
             if(hAmount) hAmount.innerText = fmt(nextDue.total);
 
-            const dLeft = nextDue.daysLeft;
-            const countdownText = dLeft === 1 ? "DUE TOMORROW" : `DUE IN ${dLeft} DAYS`;
+            const d = nextDue.daysLeft;
+            let statusTag = "";
+            let subText = `Pay on or before ${nextDue.mo} to avoid late fees.`;
+
+            if (d <= 0) {
+                statusTag = "🚨 DUE TODAY - SETTLE NOW";
+                hBox.style.animation = "pulse-orange 1.5s infinite";
+                // Start a live timer for "Today"
+                setInterval(updateLiveCountdown, 1000);
+            } else if (d === 1) {
+                statusTag = "⏳ DUE TOMORROW";
+            } else {
+                statusTag = `⏳ DUE IN ${d} DAYS`;
+            }
 
             if(hSubCont) {
                 hSubCont.innerHTML = `
-                    <div style="margin-top: 10px;">
-                        <div style="display: flex; gap: 5px; align-items: center;">
-                            <span style="font-size: 10px; background: rgba(0,0,0,0.15); padding: 4px 10px; border-radius: 50px; font-weight: 800; color: white; letter-spacing: 0.5px; border: 1px solid rgba(255,255,255,0.3);">
-                                ⏳ ${countdownText}
-                            </span>
+                    <div style="margin-top: 10px; color: white;">
+                        <div id="liveTimer" style="font-family: monospace; font-size: 14px; font-weight: 800; margin-bottom: 5px; display: ${d <= 0 ? 'block' : 'none'};">
+                            TIME LEFT: <span id="timerClock">--:--:--</span>
                         </div>
-                        <p style="font-size: 11px; opacity: 0.9; margin-top: 8px; color: white;">
-                            Account is in good standing. Pay on or before ${nextDue.mo}.
-                        </p>
+                        <span style="font-size: 10px; background: rgba(0,0,0,0.15); padding: 4px 10px; border-radius: 50px; font-weight: 800; border: 1px solid rgba(255,255,255,0.3);">
+                            ${statusTag}
+                        </span>
+                        <p style="font-size: 11px; opacity: 0.9; margin-top: 8px;">${subText}</p>
                     </div>`;
             }
+        }
 
-        } else {
-            // --- GREEN BOX: FULLY SETTLED ---
-            if(hBox) hBox.style.background = "linear-gradient(135deg, #219150, #27ae60)";
-            if(hAmount) { hAmount.style.fontSize = "24px"; hAmount.innerText = "LOAN FULLY SETTLED"; }
-            if(hLabel) { hLabel.innerText = "Thank you for your business!"; hLabel.style.color = "#e6f9ed"; }
-            if(hSubCont) hSubCont.innerHTML = `<p style="font-size: 11px; opacity: 0.9; margin-top: 5px;">You have no outstanding balance.</p>`;
+        // LIVE TIMER FUNCTION
+        function updateLiveCountdown() {
+            const timerEl = document.getElementById('timerClock');
+            if (!timerEl) return;
+            const now = new Date();
+            const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+            const diff = endOfDay - now;
+            
+            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const mins = Math.floor((diff / 1000 / 60) % 60);
+            const secs = Math.floor((diff / 1000) % 60);
+            
+            timerEl.innerText = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
        
         // Numbers & Stats Update
