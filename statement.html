@@ -743,6 +743,29 @@ if(greet) {
         document.getElementById('welcomePortalModal').style.display = 'none';
     }
 
+    // --- ITO ANG TIMER FUNCTION (Dapat ay laging nandito) ---
+function updateLiveCountdown() {
+    const timerEl = document.getElementById('timerClock');
+    if (!timerEl) return;
+    
+    const now = new Date();
+    // Itinatakda ang katapusan ng araw (11:59:59 PM)
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+    const diff = endOfDay - now;
+    
+    if (diff <= 0) {
+        timerEl.innerText = "00:00:00";
+        return;
+    }
+
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const mins = Math.floor((diff / 1000 / 60) % 60);
+    const secs = Math.floor((diff / 1000) % 60);
+    
+    // I-format para laging may dalawang digits (hal. 01:05:09)
+    timerEl.innerText = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
 function goToPaymentPage() {
         if (data && data.payLink && data.payLink.toString().startsWith('http')) {
             window.location.href = data.payLink;
