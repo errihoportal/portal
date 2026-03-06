@@ -434,9 +434,9 @@
     let logoutTimer;
     let countdownInterval;
     
-   // Config: 2 mins total (1.5 mins idle + 30 secs warning)
-    const warningTime = .1 * 60 * 1000; // 0 minute and 10 seconds
-    const sessionTimeout = 1 * 60 * 1000; // 2 minutes exact
+  // Config: 1 min total (50 secs idle + 10 secs warning countdown)
+const warningTime = 10 * 1000;      // Lalabas ang warning pagkalipas ng 10 seconds
+const sessionTimeout = 60 * 1000;   // Mag-o-auto logout pagkalipas ng 60 seconds (1 min)
 
     function resetTimer() {
         // Itago ang modal kung sakaling nakalabas na
@@ -457,7 +457,7 @@
         const modal = document.getElementById('timeoutModal');
         if(modal) modal.style.display = 'flex';
         
-        let seconds = 30; 
+        let seconds = 10; 
         const secondsEl = document.getElementById('secondsLeft');
         
         countdownInterval = setInterval(() => {
