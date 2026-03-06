@@ -590,41 +590,36 @@ if(greet) {
         if(colorCont) colorCont.style.color = rColor;
         if(statusCont) statusCont.innerHTML = `<span style="font-size: 8px; font-weight: 800; color: ${rColor}; background: ${rBg}; padding: 2px 6px; border-radius: 10px;">${rText}</span>`;
 
-       // --- HERO CALCULATION LOGIC ---
+      // --- HERO CALCULATION LOGIC ---
         let overdueTotal = 0;
         let overdueLabels = [];
         let nextDue = null;
         let maxDaysLate = 0;
-        let activeGraceDays = 0; // Para makuha ang grace days ng urgent bill
-
+        let activeGraceDays = 0; 
         const now = new Date();
+        let paidCount = 0; 
 
         if(data.schedule && Array.isArray(data.schedule)) {
             data.schedule.forEach((item, idx) => {
                 const st = (item.st || "").toUpperCase();
+                if (st === 'PAID') paidCount++; 
                 const dueDate = new Date(item.mo);
                 
-                // Calculate days (accurate difference)
                 const diffTime = dueDate.setHours(0,0,0,0) - new Date().setHours(0,0,0,0);
                 const daysUntil = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-                // Check per item Grace Period (Column X value galing sa item loop)
-                // Inaassume natin na ang 'grace' ay kasama sa bawat schedule item row
                 let itemGrace = parseInt(item.grace || 0);
 
-                // A. OVERDUE LOGIC
                 if (st === 'OVERDUE') {
                     overdueTotal += parseFloat(item.total || 0);
                     overdueLabels.push("Bill " + (idx + 1));
                     let currentDaysLate = parseInt(item.days_late || 0);
                     if (currentDaysLate > maxDaysLate) {
                         maxDaysLate = currentDaysLate;
-                        // Kung ang pinaka-overdue ay may grace period pa
                         if(itemGrace > 0) activeGraceDays = itemGrace;
                     }
                 } 
                 
-                // B. NEXT DUE / DUE TODAY LOGIC
                 if ((st === 'DUE' || st === 'PENDING' || st === 'UNPAID') && !nextDue) {
                     nextDue = item;
                     nextDue.daysLeft = daysUntil;
@@ -641,42 +636,29 @@ if(greet) {
 
         if(hBox) hBox.style.animation = "none";
 
-        // --- DISPLAY LOGIC ---
-
-        // 1. KUNG MAY OVERDUE
         if (overdueTotal > 0) {
-            // Check kung yung overdue bills ay nasa grace period pa (e.g. maxDaysLate <= grace days)
             if (activeGraceDays > 0 && maxDaysLate <= activeGraceDays) {
-                // GRACE PERIOD MODE (Teal)
                 hBox.style.background = "linear-gradient(135deg, #16a085, #1abc9c)";
                 hLabel.innerText = "✨ GRACE PERIOD ACTIVE"; hLabel.style.color = "#e0faf4";
                 hSubCont.innerHTML = `<div style="margin-top:10px; color:white;"><span style="background:rgba(255,255,255,0.2); padding:3px 10px; border-radius:50px; font-weight:800; font-size:11px;">PROTECTED MODE</span><p style="font-size:12px; margin-top:8px;">Overdue for <b>${overdueLabels.join(", ")}</b> but penalties are paused for ${activeGraceDays} days.</p></div>`;
             } else {
-                // TALAGANG OVERDUE NA (Red)
                 hBox.style.background = "linear-gradient(135deg, #d63031, #e74c3c)";
                 if (maxDaysLate >= 3) hBox.style.animation = "blink-red 2s infinite";
                 hLabel.innerText = "⚠️ ACCOUNT OVERDUE"; hLabel.style.color = "#ffbdbe";
                 hSubCont.innerHTML = `<div style="margin-top:10px; color:white;"><span style="background:rgba(0,0,0,0.2); padding:2px 8px; border-radius:5px; font-weight:800; font-size:11px;">${maxDaysLate} DAYS LATE</span><div style="margin-top:8px; opacity:0.9;">Please settle <b>${overdueLabels.join(" & ")}</b> immediately.</div></div>`;
             }
             hAmount.innerText = fmt(overdueTotal);
-
         } 
-        // 2. KUNG WALANG OVERDUE PERO MAY NEXT DUE
         else if (nextDue) {
             const d = nextDue.daysLeft;
             hAmount.innerText = fmt(nextDue.total);
-
-            if (d <= 0) { // DUE TODAY
+            if (d <= 0) {
                 hBox.style.background = "linear-gradient(135deg, #e67e22, #d35400)";
                 hBox.style.animation = "pulse-orange 1.5s infinite";
                 hLabel.innerText = `🚨 BILL #${nextDue.billNum} DUE TODAY`;
-                hSubCont.innerHTML = `
-                    <div style="margin-top:10px; color:white;">
-                        <div id="liveTimer" style="font-family:monospace; font-size:16px; font-weight:800; margin-bottom:8px; background:rgba(0,0,0,0.2); padding:5px; border-radius:5px;">TIME LEFT: <span id="timerClock">--:--:--</span></div>
-                        <span style="font-size:10px; background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:50px; font-weight:800;">SETTLE BEFORE MIDNIGHT</span>
-                    </div>`;
+                hSubCont.innerHTML = `<div style="margin-top:10px; color:white;"><div id="liveTimer" style="font-family:monospace; font-size:16px; font-weight:800; margin-bottom:8px; background:rgba(0,0,0,0.2); padding:5px; border-radius:5px;">TIME LEFT: <span id="timerClock">--:--:--</span></div><span style="font-size:10px; background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:50px; font-weight:800;">SETTLE BEFORE MIDNIGHT</span></div>`;
                 setInterval(updateLiveCountdown, 1000);
-            } else { // UPCOMING
+            } else {
                 hBox.style.background = "linear-gradient(135deg, #e67e22, #f39c12)";
                 hLabel.innerText = `UPCOMING: BILL #${nextDue.billNum}`;
                 let tag = (d === 1) ? "⏳ DUE TOMORROW" : `⏳ DUE IN ${d} DAYS`;
@@ -684,27 +666,7 @@ if(greet) {
             }
         }
 
-        // Timer function remains the same...
-        function updateLiveCountdown() {
-    const timerEl = document.getElementById('timerClock');
-    if (!timerEl) return;
-    const now = new Date();
-    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-    const diff = endOfDay - now;
-    
-    if (diff <= 0) {
-        timerEl.innerText = "00:00:00";
-        return;
-    }
-
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const mins = Math.floor((diff / 1000 / 60) % 60);
-    const secs = Math.floor((diff / 1000) % 60);
-    
-    timerEl.innerText = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-}
-       
-        // Numbers & Stats Update
+        // --- NUMBERS & STATS UPDATE ---
         document.getElementById('dispProductName').innerText = data.productName || "No Product Info";
         document.getElementById('dispLoanType').innerText = data.loanType || "---";
         document.getElementById('dispPlan').innerText = data.loanPlan || "---";
