@@ -595,16 +595,7 @@ if(greet) {
         let overdueLabels = [];
         let nextDue = null;
         let maxDaysLate = 0;
-        
-        // GRACE PERIOD CHECK (Column X)
-        // Tatanggapin nito kung TRUE, YES, o kahit anong numero na higit sa 0
-        let isGracePeriod = false;
-        if (data.grace) {
-            let gVal = data.grace.toString().toUpperCase().trim();
-            if (gVal === 'TRUE' || gVal === 'YES' || parseInt(gVal) > 0) {
-                isGracePeriod = true;
-            }
-        }
+        let activeGraceDays = 0; // Para makuha ang grace days ng urgent bill
 
         const now = new Date();
 
@@ -617,24 +608,32 @@ if(greet) {
                 const diffTime = dueDate.setHours(0,0,0,0) - new Date().setHours(0,0,0,0);
                 const daysUntil = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-                // A. OVERDUE LOGIC (Tunay na Overdue lang ang nandito)
+                // Check per item Grace Period (Column X value galing sa item loop)
+                // Inaassume natin na ang 'grace' ay kasama sa bawat schedule item row
+                let itemGrace = parseInt(item.grace || 0);
+
+                // A. OVERDUE LOGIC
                 if (st === 'OVERDUE') {
                     overdueTotal += parseFloat(item.total || 0);
                     overdueLabels.push("Bill " + (idx + 1));
                     let currentDaysLate = parseInt(item.days_late || 0);
-                    if (currentDaysLate > maxDaysLate) maxDaysLate = currentDaysLate;
+                    if (currentDaysLate > maxDaysLate) {
+                        maxDaysLate = currentDaysLate;
+                        // Kung ang pinaka-overdue ay may grace period pa
+                        if(itemGrace > 0) activeGraceDays = itemGrace;
+                    }
                 } 
                 
                 // B. NEXT DUE / DUE TODAY LOGIC
-                // Dito papasok ang countdown kahit 0 (Today) o 7 days away
                 if ((st === 'DUE' || st === 'PENDING' || st === 'UNPAID') && !nextDue) {
                     nextDue = item;
                     nextDue.daysLeft = daysUntil;
+                    nextDue.billNum = idx + 1;
+                    nextDue.graceVal = itemGrace;
                 }
             });
         }
 
-        // C. FINAL DISPLAY LOGIC (Priority)
         const hBox = document.getElementById('heroBox');
         const hLabel = document.getElementById('heroLabel');
         const hAmount = document.getElementById('heroAmount');
@@ -642,40 +641,50 @@ if(greet) {
 
         if(hBox) hBox.style.animation = "none";
 
-        if (isGracePeriod) {
-            // 1. GRACE PERIOD (Priority 1)
-            hBox.style.background = "linear-gradient(135deg, #16a085, #1abc9c)";
-            hLabel.innerText = "✨ GRACE PERIOD ACTIVE"; hLabel.style.color = "#e0faf4";
-            hAmount.innerText = fmt(overdueTotal + (nextDue ? parseFloat(nextDue.total) : 0));
-            hSubCont.innerHTML = `<div style="margin-top:10px; color:white;"><span style="background:rgba(255,255,255,0.2); padding:3px 10px; border-radius:50px; font-weight:800; font-size:11px;">PROTECTED MODE</span><p style="font-size:12px; margin-top:8px;">Please settle now to <b>save on penalties</b>. You have ${data.grace} days buffer.</p></div>`;
+        // --- DISPLAY LOGIC ---
 
-        } else if (overdueTotal > 0) {
-            // 2. OVERDUE (Priority 2)
-            hBox.style.background = "linear-gradient(135deg, #d63031, #e74c3c)";
-            if (maxDaysLate >= 3) hBox.style.animation = "blink-red 2s infinite";
-            hLabel.innerText = "⚠️ ACCOUNT OVERDUE"; hLabel.style.color = "#ffbdbe";
+        // 1. KUNG MAY OVERDUE
+        if (overdueTotal > 0) {
+            // Check kung yung overdue bills ay nasa grace period pa (e.g. maxDaysLate <= grace days)
+            if (activeGraceDays > 0 && maxDaysLate <= activeGraceDays) {
+                // GRACE PERIOD MODE (Teal)
+                hBox.style.background = "linear-gradient(135deg, #16a085, #1abc9c)";
+                hLabel.innerText = "✨ GRACE PERIOD ACTIVE"; hLabel.style.color = "#e0faf4";
+                hSubCont.innerHTML = `<div style="margin-top:10px; color:white;"><span style="background:rgba(255,255,255,0.2); padding:3px 10px; border-radius:50px; font-weight:800; font-size:11px;">PROTECTED MODE</span><p style="font-size:12px; margin-top:8px;">Overdue for <b>${overdueLabels.join(", ")}</b> but penalties are paused for ${activeGraceDays} days.</p></div>`;
+            } else {
+                // TALAGANG OVERDUE NA (Red)
+                hBox.style.background = "linear-gradient(135deg, #d63031, #e74c3c)";
+                if (maxDaysLate >= 3) hBox.style.animation = "blink-red 2s infinite";
+                hLabel.innerText = "⚠️ ACCOUNT OVERDUE"; hLabel.style.color = "#ffbdbe";
+                hSubCont.innerHTML = `<div style="margin-top:10px; color:white;"><span style="background:rgba(0,0,0,0.2); padding:2px 8px; border-radius:5px; font-weight:800; font-size:11px;">${maxDaysLate} DAYS LATE</span><div style="margin-top:8px; opacity:0.9;">Please settle <b>${overdueLabels.join(" & ")}</b> immediately.</div></div>`;
+            }
             hAmount.innerText = fmt(overdueTotal);
-            hSubCont.innerHTML = `<div style="margin-top:10px; color:white;"><span style="background:rgba(0,0,0,0.2); padding:2px 8px; border-radius:5px; font-weight:800; font-size:11px;">${maxDaysLate} DAYS LATE</span><div style="margin-top:8px; opacity:0.9;">Settle Bills: ${overdueLabels.join(", ")}</div></div>`;
 
-        } else if (nextDue) {
-            // 3. NEXT DUE / DUE TODAY (Priority 3)
+        } 
+        // 2. KUNG WALANG OVERDUE PERO MAY NEXT DUE
+        else if (nextDue) {
             const d = nextDue.daysLeft;
             hAmount.innerText = fmt(nextDue.total);
 
             if (d <= 0) { // DUE TODAY
                 hBox.style.background = "linear-gradient(135deg, #e67e22, #d35400)";
                 hBox.style.animation = "pulse-orange 1.5s infinite";
-                hLabel.innerText = "🚨 PAYMENT DUE TODAY";
-                hSubCont.innerHTML = `<div style="margin-top:10px; color:white;"><div id="liveTimer" style="font-family:monospace; font-size:16px; font-weight:800; margin-bottom:8px; background:rgba(0,0,0,0.2); padding:5px; border-radius:5px;">TIME LEFT: <span id="timerClock">--:--:--</span></div><span style="font-size:10px; background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:50px; font-weight:800;">SETTLE BEFORE MIDNIGHT</span></div>`;
+                hLabel.innerText = `🚨 BILL #${nextDue.billNum} DUE TODAY`;
+                hSubCont.innerHTML = `
+                    <div style="margin-top:10px; color:white;">
+                        <div id="liveTimer" style="font-family:monospace; font-size:16px; font-weight:800; margin-bottom:8px; background:rgba(0,0,0,0.2); padding:5px; border-radius:5px;">TIME LEFT: <span id="timerClock">--:--:--</span></div>
+                        <span style="font-size:10px; background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:50px; font-weight:800;">SETTLE BEFORE MIDNIGHT</span>
+                    </div>`;
                 setInterval(updateLiveCountdown, 1000);
             } else { // UPCOMING
                 hBox.style.background = "linear-gradient(135deg, #e67e22, #f39c12)";
-                hLabel.innerText = "UPCOMING PAYMENT";
+                hLabel.innerText = `UPCOMING: BILL #${nextDue.billNum}`;
                 let tag = (d === 1) ? "⏳ DUE TOMORROW" : `⏳ DUE IN ${d} DAYS`;
                 hSubCont.innerHTML = `<div style="margin-top:10px; color:white;"><span style="font-size:11px; background:rgba(0,0,0,0.15); padding:4px 10px; border-radius:50px; font-weight:800; border:1px solid rgba(255,255,255,0.3);">${tag}</span><p style="font-size:11px; margin-top:8px; opacity:0.9;">Due on: ${nextDue.mo}</p></div>`;
             }
         }
 
+        // Timer function remains the same...
         function updateLiveCountdown() {
     const timerEl = document.getElementById('timerClock');
     if (!timerEl) return;
