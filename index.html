@@ -156,6 +156,7 @@
 
                 if (data && data.status !== 'error') {
                     data.passcode = pass;
+                    data.loginTime = new Date().getTime();
                     localStorage.setItem('erriho_user', JSON.stringify(data));
                     window.location.href = 'statement.html';
                 } else {
