@@ -423,9 +423,18 @@
 </style>
 
 <script>
-    // 1. Security Check & Initial Data
+    // 1. BACK BUTTON PROTECTION
+    // Kapag binalikan ang page gamit ang back button, kailangang mag-refresh para tumama sa Security Check
+    window.onpageshow = function(event) {
+        if (event.persisted) {
+            window.location.reload(); 
+        }
+    };
+
+    // 2. SECURITY CHECK
     let data = JSON.parse(localStorage.getItem('erriho_user'));
     if (!data || (!data.passcode && !data.pass)) { 
+        // .replace ay ginagamit para hindi na "ma-back" pa ang page
         window.location.replace('index.html'); 
     }
 
@@ -433,13 +442,13 @@
     let warningTimer;
     let logoutTimer;
     let countdownInterval;
-    let isModalOpen = false; // Flag para malaman kung may warning na
+    let isModalOpen = false; // Flag para hindi mag-reset ang timer habang may warning
 
     const warningTime = 50 * 1000;      
     const sessionTimeout = 60 * 1000;   
 
     function resetTimer() {
-        // KUNG NAKALABAS NA ANG WARNING, HUWAG I-RESET ANG TIMER SA GALAW NG MOUSE
+        // Kung nakalabas ang warning, dedmahin ang galaw ng user
         if (isModalOpen) return;
 
         const modal = document.getElementById('timeoutModal');
@@ -454,7 +463,7 @@
     }
 
     function showWarning() {
-        isModalOpen = true; // I-lock ang timer reset
+        isModalOpen = true; 
         const modal = document.getElementById('timeoutModal');
         if(modal) modal.style.display = 'flex';
         
@@ -467,8 +476,7 @@
             if(secondsEl) secondsEl.innerText = (seconds < 0) ? 0 : seconds;
             if(seconds <= 0) {
                 clearInterval(countdownInterval);
-                // Siguraduhin na mag-logout talaga kapag zero na
-                logoutUser();
+                logoutUser(); // Force logout pag zero na
             }
         }, 1000);
 
@@ -481,12 +489,12 @@
     }
 
     function logoutUser() {
-        console.log("Logging out..."); // Para makita mo sa console kung nag-trigger
+        // BURAHIN ANG DATA AT I-REDIRECT
         localStorage.removeItem('erriho_user');
         window.location.replace('index.html');
     }
 
-    // Event Listeners
+    // Listens to these events to reset the 1-minute timer
     window.onload = resetTimer;
     window.onmousemove = resetTimer;
     window.onmousedown = resetTimer; 
@@ -499,10 +507,12 @@
     const fmt = (num) => "₱" + parseFloat(num || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
     window.onload = async () => {
-        // Ipakita ang main container
+        // Kung walang data, huwag na ituloy ang pag-load ng page
+        if (!data) return;
+
         const main = document.getElementById('mainContent');
         if (main) main.style.display = 'block';
-
+        
         // 1. WELCOME MODAL LOGIC
         if (localStorage.getItem('dontShowWelcome') !== 'true') {
             const modal = document.getElementById('welcomePortalModal');
@@ -687,27 +697,18 @@ if(greet) {
         document.getElementById('welcomePortalModal').style.display = 'none';
     }
 
-    function goToPaymentPage() {
-    // I-check kung may data, at siguraduhin na ang payLink ay hindi empty at nagsisimula sa "http"
-    if (data && data.payLink && data.payLink.toString().startsWith('http')) {
-        
-        // DADALHIN SA SPECIFIC LINK NIYA (Galing Column Q)
-        window.location.href = data.payLink;
-
-    } else {
-        // FALLBACK: Kung walang link sa Column Q, o hindi valid na URL
-        console.warn("Valid payLink not found for this user. Using default payment page.");
-        
-        let billRef = "1"; 
-        if (data.schedule && Array.isArray(data.schedule)) {
-            const nextBill = data.schedule.find(i => i.st.toUpperCase() !== 'PAID');
-            if (nextBill) billRef = nextBill.ref || "1";
+function goToPaymentPage() {
+        if (data && data.payLink && data.payLink.toString().startsWith('http')) {
+            window.location.href = data.payLink;
+        } else {
+            let billRef = "1"; 
+            if (data.schedule && Array.isArray(data.schedule)) {
+                const nextBill = data.schedule.find(i => i.st.toUpperCase() !== 'PAID');
+                if (nextBill) billRef = nextBill.ref || "1";
+            }
+            window.location.href = `payment.html?acc=${encodeURIComponent(data.accRef)}&bill=${encodeURIComponent(billRef)}`;
         }
-        
-        // Dito siya pupunta kung walang link sa Sheet
-        window.location.href = `payment.html?acc=${encodeURIComponent(data.accRef)}&bill=${encodeURIComponent(billRef)}`;
     }
-}
 </script>
 </body>
 </html>
