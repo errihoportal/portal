@@ -665,19 +665,26 @@ if(greet) {
             if (activeGraceDays > 0 && maxDaysLate <= activeGraceDays) {
                 // GRACE PERIOD MODE (Green/Teal)
                 hBox.style.background = "linear-gradient(135deg, #16a085, #2ecc71)";
-                hLabel.innerText = "✨ GRACE PERIOD ACTIVE"; hLabel.style.color = "#e0faf4";
+                hLabel.innerText = "✨ GRACE PERIOD ACTIVE"; 
+                hLabel.style.color = "#e0faf4";
+                
+                // Kalkulahin ang natitirang araw sa Grace Period
+                let remainingGrace = activeGraceDays - maxDaysLate;
+                let graceText = (remainingGrace === 0) ? "Last day of protection!" : `${remainingGrace + 1} days remaining.`;
+
                 hSubCont.innerHTML = `
                     <div style="margin-top:10px; color:white;">
                         <div id="liveTimer" style="font-family:monospace; font-size:15px; font-weight:800; background:rgba(0,0,0,0.2); padding:5px; border-radius:5px; margin-bottom:8px;">ENDS IN: <span id="timerClock">--:--:--</span></div>
                         <span style="background:rgba(255,255,255,0.2); padding:3px 10px; border-radius:50px; font-weight:800; font-size:11px;">PROTECTED MODE</span>
-                        <p style="font-size:11px; margin-top:8px;">Settle before grace period ends to avoid penalties.</p>
+                        <p style="font-size:11px; margin-top:8px;">${graceText} Settle before grace period ends to avoid penalties.</p>
                     </div>`;
                 setInterval(updateLiveCountdown, 1000);
             } else {
                 // TALAGANG OVERDUE NA (Red)
                 hBox.style.background = "linear-gradient(135deg, #d63031, #c0392b)";
                 if (maxDaysLate >= 1) hBox.style.animation = "blink-red 2s infinite";
-                hLabel.innerText = "⚠️ ACCOUNT OVERDUE"; hLabel.style.color = "#ffbdbe";
+                hLabel.innerText = "⚠️ ACCOUNT OVERDUE"; 
+                hLabel.style.color = "#ffbdbe";
                 hSubCont.innerHTML = `
                     <div style="margin-top:10px; color:white;">
                         <span style="background:rgba(0,0,0,0.2); padding:2px 8px; border-radius:5px; font-weight:800; font-size:11px;">${maxDaysLate} DAYS LATE</span>
@@ -694,7 +701,7 @@ if(greet) {
         else if (nextDue) {
             const d = nextDue.daysLeft;
             hAmount.innerText = fmt(nextDue.total);
-            hBox.style.background = "linear-gradient(135deg, #2980b9, #3498db)"; // Modern Blue
+            hBox.style.background = "linear-gradient(135deg, #2980b9, #3498db)"; 
             
             if (d <= 0) { // DUE TODAY
                 hBox.style.animation = "pulse-blue 1.5s infinite";
@@ -719,7 +726,7 @@ if(greet) {
                     </div>`;
             }
         }
-        // 3. FULLY SETTLED (Green Theme with Celebration)
+        // 3. FULLY SETTLED (Celebration Mode)
         else {
             hBox.style.background = "linear-gradient(135deg, #219150, #27ae60)";
             hBox.style.animation = "celebrate 2s infinite ease-in-out";
@@ -729,9 +736,8 @@ if(greet) {
             hLabel.style.color = "#e6f9ed";
             hSubCont.innerHTML = `
                 <div style="text-align:center;">
-                    <div style="font-size: 30px; margin: 5px 0;">🎉</div>
+                    <div style="font-size: 24px; margin: 5px 0;">🎉</div>
                     <p style="font-size: 11px; opacity: 0.9; font-weight:600;">You have no outstanding balance.</p>
-                    <p style="font-size: 9px; opacity:0.8;">Excellent credit standing!</p>
                 </div>`;
         }
        
