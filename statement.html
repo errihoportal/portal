@@ -584,6 +584,7 @@ if(greet) {
         let overdueLabels = [];
         let nextDue = null;
         let paidCount = 0;
+        let maxDaysLate = 0; // Para sa pinakamatagal na overdue
 
         if(data.schedule && Array.isArray(data.schedule)) {
             data.schedule.forEach((item, idx) => {
@@ -593,6 +594,11 @@ if(greet) {
                 if (st === 'OVERDUE') {
                     overdueTotal += parseFloat(item.total || 0);
                     overdueLabels.push("Bill " + (idx + 1));
+                    
+                    // Kunin ang pinakamataas na days_late
+                    let currentDaysLate = parseInt(item.days_late || 0);
+                    if (currentDaysLate > maxDaysLate) maxDaysLate = currentDaysLate;
+
                 } else if ((st === 'DUE' || st === 'PENDING' || st === 'UNPAID') && !nextDue) {
                     nextDue = item;
                 }
@@ -605,16 +611,50 @@ if(greet) {
         const hSubCont = document.getElementById('heroSubContainer');
 
         if (overdueTotal > 0) {
+            // --- OVERDUE STATE ---
             if(hBox) hBox.style.background = "linear-gradient(135deg, #d63031, #e74c3c)";
             if(hLabel) { hLabel.innerText = "⚠️ ACCOUNT OVERDUE"; hLabel.style.color = "#ffbdbe"; }
             if(hAmount) hAmount.innerText = fmt(overdueTotal);
-            if(hSubCont) hSubCont.innerHTML = `<div style="font-size: 12px; margin-top: 10px; line-height: 1.4; opacity: 0.9;">Your account is <strong>Overdue</strong> for ${overdueLabels.join(" & ")}.<br>Please settle this immediately.</div>`;
+            
+            if(hSubCont) {
+                hSubCont.innerHTML = `
+                    <div style="font-size: 13px; margin-top: 10px; line-height: 1.4; color: white;">
+                        <span style="background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 5px; font-weight: 800; font-size: 11px;">
+                            ${maxDaysLate} DAYS PAST DUE
+                        </span>
+                        <div style="margin-top: 8px; opacity: 0.9;">
+                            Your account is overdue for <strong>${overdueLabels.join(" & ")}</strong>. 
+                            Please settle this to avoid further interest.
+                        </div>
+                    </div>`;
+            }
+
         } else if (nextDue) {
+            // --- NEXT DUE STATE (With Countdown) ---
             if(hBox) hBox.style.background = "linear-gradient(135deg, #e67e22, #f39c12)";
-            if(hLabel) { hLabel.innerText = "NEXT DUE DATE: " + (nextDue.mo || "---"); hLabel.style.color = "#fff3cd"; }
+            if(hLabel) { hLabel.innerText = "UPCOMING PAYMENT: " + (nextDue.mo || "---"); hLabel.style.color = "#fff3cd"; }
             if(hAmount) hAmount.innerText = fmt(nextDue.total);
-            if(hSubCont) hSubCont.innerHTML = `<p style="font-size: 11px; opacity: 0.9; margin-top: 5px;">Keep your account in good standing by paying on time.</p>`;
+
+            // Countdown Logic (Simpleng calculation)
+            const dueData = nextDue.mo || ""; 
+            // Note: Ang countdown ay magdedepende kung readable ang format ng 'mo' (e.g., "October 25, 2026")
+            
+            if(hSubCont) {
+                hSubCont.innerHTML = `
+                    <div style="margin-top: 10px;">
+                        <div style="display: flex; gap: 5px; align-items: center;">
+                            <span style="font-size: 10px; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 50px; font-weight: 800; color: white; letter-spacing: 0.5px;">
+                                ⏳ DUE IN A FEW DAYS
+                            </span>
+                        </div>
+                        <p style="font-size: 11px; opacity: 0.9; margin-top: 8px; color: white;">
+                            Keep your account in good standing by paying on or before your due date.
+                        </p>
+                    </div>`;
+            }
+
         } else {
+            // --- FULLY SETTLED STATE ---
             if(hBox) hBox.style.background = "linear-gradient(135deg, #219150, #27ae60)";
             if(hAmount) { hAmount.style.fontSize = "24px"; hAmount.innerText = "LOAN FULLY SETTLED"; }
             if(hLabel) { hLabel.innerText = "Thank you for your business!"; hLabel.style.color = "#e6f9ed"; }
