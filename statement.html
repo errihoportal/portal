@@ -596,7 +596,13 @@ if(greet) {
         let nextDue = null;
         let paidCount = 0;
         let maxDaysLate = 0;
-        let isGracePeriod = (data.grace && data.grace.toString().toUpperCase() === 'TRUE'); // Column X check
+        let isGracePeriod = false;
+        if (data.grace) {
+            let gVal = data.grace.toString().toUpperCase().trim();
+            if (gVal === 'TRUE' || gVal === 'YES' || gVal === 'ACTIVE') {
+                isGracePeriod = true;
+            }
+        }
 
         const now = new Date();
 
