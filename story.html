@@ -3,31 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ERRIHO Story - Experience the Future</title>
+    <title>ERRIHO Portal - Official Launch Story</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
-        :root { --primary: #27ae60; --dark: #1a1a1a; }
+        :root { --primary: #27ae60; --dark: #0a0a0a; --accent: #f1c40f; }
         body, html { margin: 0; padding: 0; height: 100%; background: #000; font-family: 'Helvetica Neue', Arial, sans-serif; overflow: hidden; }
 
         /* Story Container */
         .story-wrapper {
             width: 100%; max-width: 450px; height: 100vh; margin: 0 auto;
-            background: linear-gradient(180deg, #000 0%, #1a1a1a 100%);
+            background: linear-gradient(180deg, #0f0f0f 0%, #1a1a1a 100%);
             position: relative; display: flex; flex-direction: column; color: white;
+            border: 1px solid #333;
         }
 
-        /* Overlay Start Button */
+        /* Overlay Start */
         #overlay {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.9);
+            position: absolute; inset: 0; background: #000;
             z-index: 100; display: flex; flex-direction: column;
             justify-content: center; align-items: center; text-align: center;
         }
-
-        .start-btn {
-            background: var(--primary); color: white; border: none;
-            padding: 20px 40px; border-radius: 50px; font-weight: 800;
-            font-size: 18px; cursor: pointer; box-shadow: 0 0 20px rgba(39, 174, 96, 0.5);
-        }
+        .record-hint { color: #888; font-size: 12px; margin-top: 15px; letter-spacing: 1px; }
 
         /* Slides */
         .slide {
@@ -38,40 +34,43 @@
         .slide.active { display: flex; }
 
         /* Progress Bars */
-        .progress-container {
-            display: flex; padding: 15px 10px; gap: 5px; z-index: 50;
-        }
-        .segment { height: 3px; background: rgba(255,255,255,0.2); flex: 1; border-radius: 2px; overflow: hidden; }
+        .progress-container { display: flex; padding: 15px 10px; gap: 5px; z-index: 50; }
+        .segment { height: 4px; background: rgba(255,255,255,0.1); flex: 1; border-radius: 10px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--primary); width: 0%; }
 
-        /* Content Styling */
-        .logo-box { width: 80px; height: 80px; background: white; border-radius: 20px; padding: 10px; margin-bottom: 30px; }
+        /* Typography */
+        .logo-box { width: 90px; height: 90px; background: white; border-radius: 25px; padding: 10px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .logo-box img { width: 100%; height: 100%; object-fit: contain; }
-        h1 { font-size: 36px; font-weight: 900; margin-bottom: 20px; line-height: 1.1; }
-        p { font-size: 18px; color: #ccc; line-height: 1.6; }
-        .highlight { color: var(--primary); }
+        
+        h1 { font-size: 42px; font-weight: 900; margin-bottom: 10px; line-height: 1; letter-spacing: -1px; }
+        h2 { font-size: 20px; font-weight: 300; color: #aaa; margin: 0; }
+        p { font-size: 19px; color: #ddd; line-height: 1.5; margin-top: 15px; }
+        .highlight { color: var(--primary); font-weight: 900; }
+        .badge { background: var(--primary); color: white; padding: 5px 15px; border-radius: 5px; font-size: 12px; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; }
 
-        /* Swipe Up */
-        .footer { position: absolute; bottom: 40px; width: 100%; text-align: center; opacity: 0; transition: 0.5s; }
-        .footer.show { opacity: 1; }
-        .cta-btn {
-            background: var(--primary); color: white; text-decoration: none;
-            padding: 15px 40px; border-radius: 50px; font-weight: 800;
-        }
+        /* Features List */
+        .feat-item { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; text-align: left; width: 100%; animation: fadeInUp 0.5s both; }
+        .feat-icon { font-size: 24px; background: rgba(39, 174, 96, 0.2); padding: 10px; border-radius: 12px; }
+
+        /* CTA */
+        .footer { position: absolute; bottom: 50px; width: 100%; text-align: center; opacity: 0; transform: translateY(20px); transition: 0.8s; }
+        .footer.show { opacity: 1; transform: translateY(0); }
+        .cta-btn { background: var(--primary); color: white; text-decoration: none; padding: 20px 50px; border-radius: 50px; font-weight: 900; font-size: 18px; display: inline-block; box-shadow: 0 10px 30px rgba(39, 174, 96, 0.4); }
     </style>
 </head>
 <body>
 
     <audio id="bgMusic" loop>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
     </audio>
 
     <div id="overlay">
         <div class="logo-box animate__animated animate__pulse animate__infinite">
             <img src="https://errihoportal.github.io/portal/images/logo.png" alt="ERRIHO">
         </div>
-        <h2 style="margin-bottom: 30px;">Your Statement is Ready</h2>
-        <button class="start-btn" onclick="startStory()">TAP TO VIEW STORY</button>
+        <h1 style="font-size: 28px;">ERRIHO PORTAL <br><span style="color:var(--primary)">COMMERCIAL</span></h1>
+        <button style="background:var(--primary); color:white; border:none; padding:15px 30px; border-radius:10px; font-weight:bold; margin-top:20px;" onclick="startStory()">START RECORDING</button>
+        <div class="record-hint">READY YOUR SCREEN RECORDER</div>
     </div>
 
     <div class="story-wrapper">
@@ -79,39 +78,65 @@
             <div class="segment"><div class="progress-fill" id="fill0"></div></div>
             <div class="segment"><div class="progress-fill" id="fill1"></div></div>
             <div class="segment"><div class="progress-fill" id="fill2"></div></div>
+            <div class="segment"><div class="progress-fill" id="fill3"></div></div>
         </div>
 
         <div class="slide active" id="slide0">
-            <div class="animate__animated animate__zoomIn">
-                <h1 class="highlight">Hello!</h1>
-                <p>We've been working on something <br><strong>special</strong> just for you.</p>
+            <div class="animate__animated animate__backInDown">
+                <div class="badge">New Era of Finance</div>
+                <h1>FINALLY,<br><span class="highlight">WE ARE LIVE.</span></h1>
+                <p>Ang pag-manage ng iyong <br> installment plan, ginawa naming <br> <strong>level up.</strong></p>
             </div>
         </div>
 
         <div class="slide" id="slide1">
-            <div class="animate__animated animate__fadeInRight">
-                <h1>The New <br>ERRIHO Portal</h1>
-                <p>Track your balance, payments, and credit score in <span class="highlight">real-time.</span></p>
+            <h2 style="margin-bottom:30px; color:white;">EVERYTHING IN ONE APP</h2>
+            <div class="feat-item" style="animation-delay: 0.2s;">
+                <div class="feat-icon">📱</div>
+                <div><strong>Real-Time Balance</strong><br><small style="color:#888;">Check anytime, anywhere.</small></div>
+            </div>
+            <div class="feat-item" style="animation-delay: 0.4s;">
+                <div class="feat-icon">📅</div>
+                <div><strong>Due Date Reminders</strong><br><small style="color:#888;">No more late payments.</small></div>
+            </div>
+            <div class="feat-item" style="animation-delay: 0.6s;">
+                <div class="feat-icon">📈</div>
+                <div><strong>Credit Score Tracker</strong><br><small style="color:#888;">Monitor your financial health.</small></div>
             </div>
         </div>
 
         <div class="slide" id="slide2">
-            <div class="animate__animated animate__backInUp">
-                <h1>Ready to <br>Explore?</h1>
-                <p>Your latest Statement of Account <br>is now waiting for you.</p>
+            <div class="animate__animated animate__zoomIn">
+                <h1 style="font-size: 30px;">HASSLE-FREE <br><span class="highlight">LOGIN</span></h1>
+                <p>Gamitin lang ang iyong:</p>
+                <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:15px; margin-top:10px;">
+                    <div style="margin-bottom:10px;">👤 <strong>First Name</strong> (lowercase)</div>
+                    <div>🔑 <strong>Mobile No.</strong> (last 6 digits)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide3">
+            <div class="animate__animated animate__heartBeat">
+                <div class="logo-box" style="margin: 0 auto 20px auto;">
+                    <img src="https://errihoportal.github.io/portal/images/logo.png" alt="ERRIHO">
+                </div>
+                <h1>YOUR PORTAL <br> IS READY.</h1>
+                <p>Visit us now at:</p>
+                <div style="color:var(--primary); font-weight:bold; font-size:16px;">errihoportal.github.io/portal</div>
             </div>
         </div>
 
         <div class="footer" id="storyFooter">
-            <div style="margin-bottom: 10px; font-size: 20px; animation: bounce 2s infinite;">^</div>
+            <div style="margin-bottom: 10px; font-size: 24px; animation: bounce 2s infinite;">☝️</div>
             <a href="https://errihoportal.github.io/portal" class="cta-btn">LOG IN NOW</a>
         </div>
     </div>
 
     <script>
         let currentSlide = 0;
-        const totalSlides = 3;
-        const slideDuration = 4000; // 4 seconds per slide
+        const totalSlides = 4;
+        const slideDuration = 3500; // 3.5 seconds - perfect speed for reading
 
         function startStory() {
             document.getElementById('overlay').style.display = 'none';
@@ -125,16 +150,13 @@
                 return;
             }
 
-            // Reset all slides
             for (let i = 0; i < totalSlides; i++) {
                 document.getElementById('slide' + i).classList.remove('active');
             }
 
-            // Show current slide
             const activeSlide = document.getElementById('slide' + currentSlide);
             activeSlide.classList.add('active');
 
-            // Animate progress bar
             const fill = document.getElementById('fill' + currentSlide);
             let width = 0;
             const interval = setInterval(() => {
@@ -143,12 +165,11 @@
                     currentSlide++;
                     runSlide();
                 } else {
-                    width += 1; // Control speed
+                    width += 1;
                     fill.style.width = width + '%';
                 }
             }, slideDuration / 100);
         }
     </script>
-
 </body>
 </html>
