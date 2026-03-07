@@ -637,7 +637,8 @@ if(greet) {
                 } 
                 
                 // 2. CHECK FOR NEXT DUE (DUE TODAY o Future bills)
-                if ((st === 'DUE' || st === 'PENDING' || st === 'UNPAID') && daysLateCalculated <= 0 && !nextDue) {
+               // Binago natin: Basta HINDI 'PAID', at HINDI pa overdue (daysLate <= 0)
+                if (st !== 'PAID' && daysLateCalculated <= 0 && !nextDue) {
                     nextDue = item;
                     nextDue.daysLeft = daysUntil;
                     nextDue.billNum = idx + 1;
