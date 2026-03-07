@@ -805,10 +805,14 @@ if(greet) {
             list.innerHTML = '<span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px;">REPAYMENT SCHEDULE</span>';
             if (data.schedule && Array.isArray(data.schedule)) {
                 data.schedule.forEach((item, idx) => {
-                    const st = (item.st || 'PENDING').toUpperCase();
-                    if (st === 'PAID') paidCount++; // <--- IDAGDAG ITONG LINE NA ITO
-                    const stClass = st === 'PAID' ? 'status-paid' : (st === 'OVERDUE' ? 'status-overdue' : 'status-unpaid');
-                    let displayAmount = (st === 'PAID') ? item.p_amount : (st === 'OVERDUE' ? item.total : item.p_amt);
+            const st = (item.st || 'PENDING').toUpperCase();
+            
+            // --- ITO ANG DAGDAG NA LINE ---
+            if (st === 'PAID') paidCount++; 
+            // ------------------------------
+
+            const stClass = st === 'PAID' ? 'status-paid' : (st === 'OVERDUE' ? 'status-overdue' : 'status-unpaid');
+            let displayAmount = (st === 'PAID') ? item.p_amount : (st === 'OVERDUE' ? item.total : item.p_amt);
 
                     const row = document.createElement('div');
                     row.className = 'bill-row';
