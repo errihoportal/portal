@@ -602,7 +602,7 @@ if(greet) {
         if(colorCont) colorCont.style.color = rColor;
         if(statusCont) statusCont.innerHTML = `<span style="font-size: 8px; font-weight: 800; color: ${rColor}; background: ${rBg}; padding: 2px 6px; border-radius: 10px;">${rText}</span>`;
 
-     // --- HERO CALCULATION LOGIC (FINAL FIXED VERSION) ---
+    // --- HERO CALCULATION LOGIC (REPAIRED) ---
         let overdueTotal = 0;
         let overdueLabels = [];
         let nextDue = null;
@@ -610,34 +610,43 @@ if(greet) {
         let activeGraceDays = 0; 
         
         const today = new Date();
-        today.setHours(0,0,0,0); // Start of today
+        today.setHours(0,0,0,0);
 
         if(data.schedule && Array.isArray(data.schedule)) {
             data.schedule.forEach((item, idx) => {
                 const st = (item.st || "").toUpperCase();
                 const dueDate = new Date(item.mo);
-                dueDate.setHours(0,0,0,0); // Start of due date
+                dueDate.setHours(0,0,0,0);
                 
-                // Kalkulahin ang agwat ng araw (Today minus Due Date)
                 const diffTime = today.getTime() - dueDate.getTime();
-                // Math.round para makuha ang saktong 1 day late kung kahapon ang due
                 const daysLateCalculated = Math.round(diffTime / (1000 * 60 * 60 * 24));
-                // Math.round din para sa countdown ng upcoming bills
                 const daysUntil = Math.round((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
                 
                 let itemGrace = parseInt(item.grace || 0);
 
-                // FORCE DETECTION: Kung hindi pa PAID at lumipas na ang Due Date (daysLateCalculated > 0)
-                if (st !== 'PAID' && (st === 'OVERDUE' || daysLateCalculated > 0)) {
+                // 1. CHECK FOR OVERDUE/GRACE (Kahit overdue, tuloy pa rin ang loop)
+                if (st !== 'PAID' && daysLateCalculated > 0) {
                     overdueTotal += parseFloat(item.total || 0);
                     overdueLabels.push("Bill " + (idx + 1));
                     
-                    // Kunin ang pinakamalalang "Late" na status
                     if (daysLateCalculated > maxDaysLate) {
                         maxDaysLate = daysLateCalculated;
                         activeGraceDays = itemGrace; 
                     }
                 } 
+                
+                // 2. CHECK FOR NEXT DUE (Dapat hiwalay na IF ito para makuha pa rin ang data)
+                // Ito ang kukuha ng "Due Today" o "Upcoming" kahit may overdue sa itaas
+                if ((st === 'DUE' || st === 'PENDING' || st === 'UNPAID') && daysLateCalculated <= 0) {
+                    if (!nextDue) { // Kunin lang ang pinaka-unang upcoming bill
+                        nextDue = item;
+                        nextDue.daysLeft = daysUntil;
+                        nextDue.billNum = idx + 1;
+                        nextDue.graceVal = itemGrace;
+                    }
+                }
+            });
+        } 
                 
                 // UPCOMING LOGIC (Dito papasok yung DUE TODAY o Future bills)
                 // Kailangan daysUntil >= 0 para hindi sumabog ang logic ng upcoming
