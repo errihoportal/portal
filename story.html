@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERRIHO Story - New Portal Launch</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        :root {
+            --primary: #27ae60;
+            --dark: #1a1a1a;
+            --light: #f4f7f6;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: #000;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Mobile Container */
+        .story-container {
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a1a1a 0%, #2c3e50 100%);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            color: white;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        /* Top Progress Bar */
+        .progress-bar {
+            display: flex;
+            padding: 15px 10px;
+            gap: 5px;
+            z-index: 10;
+        }
+        .progress-segment {
+            height: 3px;
+            background: rgba(255,255,255,0.3);
+            flex: 1;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .progress-inner {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            animation: progress 5s linear forwards;
+        }
+
+        /* Header Area */
+        .story-header {
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 10;
+        }
+        .logo-circle {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 5px;
+        }
+        .logo-circle img { width: 100%; object-fit: contain; }
+
+        /* Content Area */
+        .story-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .main-title {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            line-height: 1.2;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .highlight-text {
+            color: var(--primary);
+            background: rgba(255,255,255,1);
+            padding: 5px 15px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .description {
+            font-size: 18px;
+            line-height: 1.5;
+            color: #ddd;
+            margin-top: 20px;
+        }
+
+        .features-list {
+            text-align: left;
+            margin-top: 30px;
+            width: 100%;
+        }
+        .feature-item {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Footer / Swipe Up */
+        .story-footer {
+            padding: 40px 20px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .swipe-up-btn {
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 18px;
+            display: inline-block;
+            box-shadow: 0 10px 25px rgba(39, 174, 96, 0.4);
+            animation: bounceInUp 1s;
+        }
+
+        .swipe-icon {
+            display: block;
+            font-size: 24px;
+            margin-bottom: 5px;
+            animation: bounce 2s infinite;
+        }
+
+        /* Animations */
+        @keyframes progress {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+
+        .delay-1s { animation-delay: 0.5s; }
+        .delay-2s { animation-delay: 1.2s; }
+    </style>
+</head>
+<body>
+
+    <div class="story-container">
+        <div class="progress-bar">
+            <div class="progress-segment"><div class="progress-inner"></div></div>
+        </div>
+
+        <div class="story-header animate__animated animate__fadeIn">
+            <div class="logo-circle">
+                <img src="https://errihoportal.github.io/portal/images/logo.png" alt="Logo">
+            </div>
+            <div>
+                <div style="font-weight: 800; font-size: 14px;">ERRIHO PORTAL</div>
+                <div style="font-size: 10px; opacity: 0.7;">Official Announcement</div>
+            </div>
+        </div>
+
+        <div class="story-content">
+            <h1 class="main-title animate__animated animate__zoomIn">
+                Something Big is <br>
+                <span class="highlight-text">FINALLY HERE!</span>
+            </h1>
+
+            <p class="description animate__animated animate__fadeInUp delay-1s">
+                Managing your Flavi Deal is now <br> <strong>Faster. Easier. Better.</strong>
+            </p>
+
+            <div class="features-list animate__animated animate__fadeInUp delay-2s">
+                <div class="feature-item">
+                    <span>📊</span>
+                    <div><strong>Real-time Balance</strong></div>
+                </div>
+                <div class="feature-item">
+                    <span>🗓️</span>
+                    <div><strong>Due Date Tracker</strong></div>
+                </div>
+                <div class="feature-item">
+                    <span>💳</span>
+                    <div><strong>One-Tap Payments</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="story-footer">
+            <span class="swipe-icon">^</span>
+            <a href="https://errihoportal.github.io/portal" class="swipe-up-btn">
+                LOG IN TO PORTAL
+            </a>
+            <p style="font-size: 10px; margin-top: 15px; opacity: 0.5;">errihoportal.github.io/portal</p>
+        </div>
+    </div>
+
+</body>
+</html>
