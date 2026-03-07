@@ -788,7 +788,6 @@ if(greet) {
         document.getElementById('dispLoanType').innerText = data.loanType || "---";
         document.getElementById('dispPlan').innerText = data.loanPlan || "---";
         document.getElementById('dispRate').innerText = (parseFloat(data.intRate || 0) * 100) + "%";
-        document.getElementById('dispStatusCount').innerText = `${paidCount} of ${(data.schedule ? data.schedule.length : 0)} Paid`;
 
         document.getElementById('breakLoan').innerText = fmt(data.loanAmount);
         document.getElementById('breakInt').innerText = fmt(data.intAmount);
@@ -853,6 +852,14 @@ if(greet) {
                         </div>`;
                     list.appendChild(row);
                 });
+
+                // --- DITO MO ILAGAY ITO ---
+                const statusCountEl = document.getElementById('dispStatusCount');
+                if(statusCountEl) {
+                    statusCountEl.innerText = `${paidCount} of ${data.schedule.length} Paid`;
+                }
+                // --------------------------
+                
             }
         }
     } // End of populateData
