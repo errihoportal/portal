@@ -134,42 +134,46 @@
     </div>
 
     <script>
-        let currentSlide = 0;
-        const totalSlides = 4;
-        const slideDuration = 3500; // 3.5 seconds - perfect speed for reading
+    let currentSlide = 0;
+    const totalSlides = 4;
+    
+    // BINAGO: Ginawa nating 7000 (7 seconds) para hindi mabilis mawala ang message
+    const slideDuration = 7000; 
 
-        function startStory() {
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('bgMusic').play();
-            runSlide();
+    function startStory() {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('bgMusic').play();
+        runSlide();
+    }
+
+    function runSlide() {
+        if (currentSlide >= totalSlides) {
+            document.getElementById('storyFooter').classList.add('show');
+            return;
         }
 
-        function runSlide() {
-            if (currentSlide >= totalSlides) {
-                document.getElementById('storyFooter').classList.add('show');
-                return;
-            }
-
-            for (let i = 0; i < totalSlides; i++) {
-                document.getElementById('slide' + i).classList.remove('active');
-            }
-
-            const activeSlide = document.getElementById('slide' + currentSlide);
-            activeSlide.classList.add('active');
-
-            const fill = document.getElementById('fill' + currentSlide);
-            let width = 0;
-            const interval = setInterval(() => {
-                if (width >= 100) {
-                    clearInterval(interval);
-                    currentSlide++;
-                    runSlide();
-                } else {
-                    width += 1;
-                    fill.style.width = width + '%';
-                }
-            }, slideDuration / 100);
+        for (let i = 0; i < totalSlides; i++) {
+            document.getElementById('slide' + i).classList.remove('active');
         }
-    </script>
+
+        const activeSlide = document.getElementById('slide' + currentSlide);
+        activeSlide.classList.add('active');
+
+        const fill = document.getElementById('fill' + currentSlide);
+        let width = 0;
+        
+        // Ang bilis ng progress bar ay mag-a-adjust din base sa slideDuration
+        const interval = setInterval(() => {
+            if (width >= 100) {
+                clearInterval(interval);
+                currentSlide++;
+                runSlide();
+            } else {
+                width += 1;
+                fill.style.width = width + '%';
+            }
+        }, slideDuration / 100);
+    }
+</script>
 </body>
 </html>
