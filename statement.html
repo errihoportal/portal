@@ -624,7 +624,7 @@ if(greet) {
                 
                 let itemGrace = parseInt(item.grace || 0);
 
-                // 1. CHECK FOR OVERDUE/GRACE (Kahit overdue, tuloy pa rin ang loop)
+                // 1. CHECK FOR OVERDUE/GRACE
                 if (st !== 'PAID' && daysLateCalculated > 0) {
                     overdueTotal += parseFloat(item.total || 0);
                     overdueLabels.push("Bill " + (idx + 1));
@@ -635,21 +635,7 @@ if(greet) {
                     }
                 } 
                 
-                // 2. CHECK FOR NEXT DUE (Dapat hiwalay na IF ito para makuha pa rin ang data)
-                // Ito ang kukuha ng "Due Today" o "Upcoming" kahit may overdue sa itaas
-                if ((st === 'DUE' || st === 'PENDING' || st === 'UNPAID') && daysLateCalculated <= 0) {
-                    if (!nextDue) { // Kunin lang ang pinaka-unang upcoming bill
-                        nextDue = item;
-                        nextDue.daysLeft = daysUntil;
-                        nextDue.billNum = idx + 1;
-                        nextDue.graceVal = itemGrace;
-                    }
-                }
-            });
-        } 
-                
-                // UPCOMING LOGIC (Dito papasok yung DUE TODAY o Future bills)
-                // Kailangan daysUntil >= 0 para hindi sumabog ang logic ng upcoming
+                // 2. CHECK FOR NEXT DUE (DUE TODAY o Future bills)
                 if ((st === 'DUE' || st === 'PENDING' || st === 'UNPAID') && daysLateCalculated <= 0 && !nextDue) {
                     nextDue = item;
                     nextDue.daysLeft = daysUntil;
@@ -673,7 +659,6 @@ if(greet) {
 
         // 1. KUNG MAY OVERDUE
         if (overdueTotal > 0) {
-            // Check kung may upcoming bill (next 7 days) para isama sa total
             let combinedMessage = "";
             if (nextDue && nextDue.daysLeft <= 7) {
                 overdueTotal += parseFloat(nextDue.total || 0);
@@ -681,40 +666,33 @@ if(greet) {
                 combinedMessage = `<div style="margin-top:5px; font-size:10px; color:#ffeb3b; font-weight:700;">Includes Bill #${nextDue.billNum} (Due in ${nextDue.daysLeft} days)</div>`;
             }
 
-           if (activeGraceDays > 0 && maxDaysLate <= activeGraceDays) {
+            if (activeGraceDays > 0 && maxDaysLate <= activeGraceDays) {
                 // GRACE PERIOD MODE (Green/Teal)
                 hBox.style.background = "linear-gradient(135deg, #16a085, #2ecc71)";
                 hLabel.innerText = "✨ GRACE PERIOD ACTIVE"; 
                 hLabel.style.color = "#e0faf4";
                 
-                // Kalkulahin ang natitirang araw sa Grace Period
                 let remainingGrace = activeGraceDays - maxDaysLate;
-                let daysLeftCount = remainingGrace + 1; // current day inclusion
+                let daysLeftCount = remainingGrace + 1; 
                 
                 let graceText = "";
                 let warningIcon = "⏳";
 
-                // DYNAMIC WARNING LOGIC (10, 7, 5, 3, 1, 0)
                 if (daysLeftCount > 10) {
                     graceText = `${daysLeftCount} days remaining. Settle early to stay ahead.`;
                 } else {
                     switch (daysLeftCount) {
-                        case 10:
-                        case 9:
-                        case 8:
+                        case 10: case 9: case 8:
                             graceText = `10 days left. Please plan your payment soon.`;
                             break;
-                        case 7:
-                        case 6:
+                        case 7: case 6:
                             graceText = `7 days remaining. Avoid the rush, pay now.`;
                             break;
-                        case 5:
-                        case 4:
+                        case 5: case 4:
                             graceText = `5 days left! Penalties will apply very soon.`;
                             warningIcon = "⚠️";
                             break;
-                        case 3:
-                        case 2:
+                        case 3: case 2:
                             graceText = `Only 3 days left! Your protection is expiring.`;
                             warningIcon = "🚨";
                             break;
@@ -726,7 +704,7 @@ if(greet) {
                             if (daysLeftCount <= 0 || remainingGrace === 0) {
                                 graceText = `FINAL DAY! Protection expires at midnight tonight.`;
                                 warningIcon = "🔥";
-                                hBox.style.animation = "pulse-orange 1.5s infinite"; // Optional: dagdag pansin
+                                hBox.style.animation = "pulse-orange 1.5s infinite";
                             } else {
                                 graceText = `${daysLeftCount} days remaining. Settle before it ends.`;
                             }
@@ -738,6 +716,7 @@ if(greet) {
                         <div id="liveTimer" style="font-family:monospace; font-size:15px; font-weight:800; background:rgba(0,0,0,0.2); padding:5px; border-radius:5px; margin-bottom:8px;">ENDS IN: <span id="timerClock">--:--:--</span></div>
                         <span style="background:rgba(255,255,255,0.2); padding:3px 10px; border-radius:50px; font-weight:800; font-size:11px;">PROTECTED MODE</span>
                         <p style="font-size:11px; margin-top:8px; font-weight:600; line-height:1.3;">${warningIcon} ${graceText}</p>
+                        ${combinedMessage}
                     </div>`;
                 
                 setInterval(updateLiveCountdown, 1000);
@@ -757,8 +736,8 @@ if(greet) {
                     </div>`;
             }
             hAmount.innerText = fmt(overdueTotal);
-
-        } 
+        }
+        // ... Dito na magpapatuloy ang else if (nextDue) at fully settled logic mo.
         // 2. KUNG WALANG OVERDUE PERO MAY NEXT DUE (Blue Theme)
         else if (nextDue) {
             const d = nextDue.daysLeft;
