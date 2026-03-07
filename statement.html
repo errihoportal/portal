@@ -530,34 +530,34 @@
     const baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
     const fmt = (num) => "₱" + parseFloat(num || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-    window.onload = async () => {
-        // Kung walang data, huwag na ituloy ang pag-load ng page
-        if (!data) return;
+    window.addEventListener('load', async () => {
+    // 1. Simulan ang Auto-Logout Timer
+    resetTimer();
 
-        const main = document.getElementById('mainContent');
-        if (main) main.style.display = 'block';
-        
-        // 1. WELCOME MODAL LOGIC
-        if (localStorage.getItem('dontShowWelcome') !== 'true') {
-            const modal = document.getElementById('welcomePortalModal');
-            if (modal) modal.style.display = 'flex';
-        } else {
-            const modal = document.getElementById('welcomePortalModal');
-            if (modal) modal.style.display = 'none';
-        }
+    // 2. Kung walang data, stop na
+    if (!data) return;
 
-        // 2. Ipakita ang data
-        populateData();
+    const main = document.getElementById('mainContent');
+    if (main) main.style.display = 'block';
+    
+    // 3. Welcome Modal Logic
+    if (localStorage.getItem('dontShowWelcome') !== 'true') {
+        const modal = document.getElementById('welcomePortalModal');
+        if (modal) modal.style.display = 'flex';
+    }
 
-        // 3. I-set ang date sa "Updated as of Today"
-        const dateEl = document.getElementById('asOfDate');
-        if (dateEl) {
-            const today = new Date();
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            dateEl.innerText = "Updated as of Today: " + today.toLocaleDateString('en-US', options);
-            dateEl.style.color = "#aaa";
-        }
-    };
+    // 4. I-load ang Data
+    populateData();
+
+    // 5. Update Date
+    const dateEl = document.getElementById('asOfDate');
+    if (dateEl) {
+        const today = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        dateEl.innerText = "Updated as of Today: " + today.toLocaleDateString('en-US', options);
+        dateEl.style.color = "#aaa";
+    }
+});
 
    function populateData() {
         if(!data) {
@@ -607,7 +607,8 @@ if(greet) {
         let overdueLabels = [];
         let nextDue = null;
         let maxDaysLate = 0;
-        let activeGraceDays = 0; 
+        let activeGraceDays = 0;
+        let paidCount = 0; // Idagdag itong line na ito
         
         const today = new Date();
         today.setHours(0,0,0,0);
@@ -805,6 +806,7 @@ if(greet) {
             if (data.schedule && Array.isArray(data.schedule)) {
                 data.schedule.forEach((item, idx) => {
                     const st = (item.st || 'PENDING').toUpperCase();
+                    if (st === 'PAID') paidCount++; // <--- IDAGDAG ITONG LINE NA ITO
                     const stClass = st === 'PAID' ? 'status-paid' : (st === 'OVERDUE' ? 'status-overdue' : 'status-unpaid');
                     let displayAmount = (st === 'PAID') ? item.p_amount : (st === 'OVERDUE' ? item.total : item.p_amt);
 
