@@ -263,7 +263,7 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
             banner.innerText = "STATUS: VERIFYING";
             banner.className = "status-banner bg-verifying";
             activeSec.style.display = 'none';
-            dNote.innerText = "Checking your proof. Please wait for confirmation.";
+            dNote.innerText = "We are currently checking your proof. Wait for SMS/EMAIL confirmation.";
         } 
         else if (daysLate > 0) { 
             // OVERDUE SCENARIO
@@ -274,7 +274,7 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
                 graceArea.innerHTML = `
                     <div class="grace-period-box" style="background:#e0faf4; border-color:#16a085; color:#16a085;">
                         <div id="liveTimer" style="font-weight:bold; font-size:14px;">ENDS IN: <span id="timerClock">--:--:--</span></div>
-                        <small>🛡️ PROTECTED MODE: Penalties are temporarily waived.</small>
+                        <small>✨ Grace Period Applied: Late fees and interest are temporarily waived. Settle today to save!</small>
                     </div>`;
                 startLiveCountdown();
             } else {
@@ -287,7 +287,7 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
                         <div class="fee-item red"><span>Late Fee:</span> <span>+ ₱${data.lateFee}</span></div>
                         <div class="fee-item red"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}</span></div>
                     </div>`;
-                dNote.innerHTML = `<b style="color:var(--danger)">${daysLate} DAYS LATE:</b> Settle immediately to stop interest charges.`;
+                dNote.innerHTML = `<b style="color:var(--danger)">${daysLate} DAYS LATE:</b> Pay immediately to avoid additional daily interest.`;
             }
         } 
         else { 
