@@ -237,11 +237,28 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         // --- IMPROVED LOGIC ENGINE ---
 
         if (status === "paid") {
-            banner.innerText = "STATUS: FULLY SETTLED";
+            banner.innerText = "STATUS: PAID";
             banner.className = "status-banner bg-paid";
             activeSec.style.display = 'none';
-            dNote.innerHTML = "🎉 Payment settled. Thank you for your business!";
-        } 
+            
+            // Ibalik natin ang "TOTAL PAID" label at kulay
+            const totalLabel = document.getElementById('totalLabel');
+            const totalAmt = document.querySelector('.total-amount');
+            const copyBtn = document.getElementById('copyBtnWrapper');
+
+            if (totalLabel) {
+                totalLabel.innerText = "TOTAL PAID";
+                totalLabel.style.color = "var(--success)";
+            }
+            if (totalAmt) {
+                totalAmt.style.color = "var(--success)";
+            }
+            if (copyBtn) {
+                copyBtn.style.display = 'none'; // Itago ang copy button pag bayad na
+            }
+
+            dNote.innerHTML = "🎉 Payment settled. Thank you!";
+        }
         else if (status === "verifying") {
             banner.innerText = "STATUS: VERIFYING";
             banner.className = "status-banner bg-verifying";
@@ -296,7 +313,7 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         }
         
         // 2. UNIVERSAL AUTO-EXIT TIMER (Ilagay ito sa DULO ng renderData function)
-        let exitSecs = 180; // 1 Minute
+        let exitSecs = 250; // 1 Minute
         
         // Gumawa tayo ng maliit na text sa baba ng card para sa timer
         const timerDiv = document.createElement('div');
