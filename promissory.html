@@ -84,37 +84,45 @@
     </div>
 </div>
 <script>
-    // 1. DATA INITIALIZATION
-    const data = JSON.parse(localStorage.getItem('user_data'));
-    const INTERST_RATE = 0.15; // 15% annual interest
+    // 1. DATA INITIALIZATION (Dito natin kukunin ang sinave ng Login page)
+    const rawData = localStorage.getItem('erriho_user'); // Match ito sa index.html mo
+    const data = JSON.parse(rawData);
+    const INTERST_RATE = 0.15; 
+
+    // Debugging: Tingnan sa console kung may pumasok na data
+    console.log("User Data loaded:", data);
 
     if (data) {
-        document.getElementById('fullName').innerText = data.name;
-        document.getElementById('footerName').innerText = data.name.toUpperCase();
-        document.getElementById('unitName').innerText = data.productName || "Your Unit";
-        document.getElementById('amountNum').innerText = data.balance;
-        document.getElementById('amountNum2').innerText = data.balance;
+        // I-fill up ang HTML elements
+        document.getElementById('fullName').innerText = data.name || "N/A";
+        document.getElementById('footerName').innerText = (data.name || "N/A").toUpperCase();
+        
+        // Dito natin kukunin ang Unit Name (Siguraduhin na 'productName' ang column header sa Sheet)
+        document.getElementById('unitName').innerText = data.productName || "iPhone 16 128GB Pink";
+        
+        // Cleanup Balance para sa computation
+        let rawBal = data.balance ? data.balance.toString().replace(/[₱,]/g, '') : "0";
+        let cleanBalance = parseFloat(rawBal);
+
+        document.getElementById('amountNum').innerText = data.balance || "0.00";
+        document.getElementById('amountNum2').innerText = data.balance || "0.00";
+        
         document.getElementById('dateToday').innerText = new Date().toLocaleDateString('en-US', { 
             month: 'long', day: 'numeric', year: 'numeric' 
         });
         
-        // Convert number to words
-        document.getElementById('amountWords').innerText = convertAmountToWords(parseFloat(data.balance.replace(/,/g, '')));
+        document.getElementById('amountWords').innerText = convertAmountToWords(cleanBalance);
+    } else {
+        // Kung walang data, ibig sabihin hindi nag-login. Ibalik sa index.
+        alert("Session expired. Please login again.");
+        window.location.href = 'index.html';
     }
 
     function convertAmountToWords(amount) {
         return amount.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' }) + " ONLY";
     }
 
-    // 2. DEVICE INFO LOGIC (Android/iOS detection)
-    function getDeviceInfo() {
-        const ua = navigator.userAgent;
-        if (/android/i.test(ua)) return "Android Device";
-        if (/iPad|iPhone|iPod/.test(ua)) return "iOS Device";
-        return "Desktop/Web Browser";
-    }
-
-    // 3. AUTO-COMPUTATION LOGIC
+    // 2. AUTO-COMPUTATION LOGIC
     function updateComputation() {
         const promiseDateValue = document.getElementById('promiseDate').value;
         if (!promiseDateValue || !data) return;
@@ -123,7 +131,9 @@
         const today = new Date();
         today.setHours(0,0,0,0);
 
-        let baseBalance = parseFloat(data.balance.replace(/,/g, ''));
+        let rawBal = data.balance.toString().replace(/[₱,]/g, '');
+        let baseBalance = parseFloat(rawBal);
+        
         const diffTime = promiseDate.getTime() - today.getTime();
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
@@ -133,7 +143,10 @@
         }
 
         const totalNewAmount = baseBalance + additionalDailyInt;
-        const formattedAmount = totalNewAmount.toLocaleString('en-US', {minimumFractionDigits: 2});
+        const formattedAmount = totalNewAmount.toLocaleString('en-US', {
+            minimumFractionDigits: 2, 
+            maximumFractionDigits: 2
+        });
 
         document.getElementById('amountNum').innerText = formattedAmount;
         document.getElementById('amountNum2').innerText = formattedAmount;
@@ -142,7 +155,7 @@
 
     document.getElementById('promiseDate').addEventListener('change', updateComputation);
 
-    // 4. SIGNATURE LOGIC
+    // 3. SIGNATURE LOGIC
     const canvas = document.getElementById('sig-canvas');
     const ctx = canvas.getContext('2d');
     let drawing = false;
@@ -161,16 +174,16 @@
     function draw(e) {
         if (!drawing) return;
         const rect = canvas.getBoundingClientRect();
-        ctx.lineWidth = 2;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = '#000';
-        ctx.lineTo((e.clientX || e.touches[0].clientX) - rect.left, (e.clientY || e.touches[0].clientY) - rect.top);
+        ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#000';
+        const clientX = e.clientX || e.touches[0].clientX;
+        const clientY = e.clientY || e.touches[0].clientY;
+        ctx.lineTo(clientX - rect.left, clientY - rect.top);
         ctx.stroke();
     }
 
     function clearSig() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
-    // 5. SUBMIT TO EMAIL LOGIC (With Timestamp and Device Info)
+    // 4. SUBMIT TO EMAIL
     function submitLetter() {
         const addr = document.getElementById('addressInput').value;
         const pDate = document.getElementById('promiseDate').value;
@@ -182,27 +195,20 @@
         }
 
         const timestamp = new Date().toLocaleString();
-        const device = getDeviceInfo();
-        const subject = encodeURIComponent(`OFFICIAL PROMISSORY: ${data.name} (${data.accRef})`);
+        const subject = encodeURIComponent(`PROMISSORY NOTE: ${data.name} (${data.accRef})`);
         
         let bodyText = `PROMISSORY LETTER\n`;
         bodyText += `DATE: ${document.getElementById('dateToday').innerText}\n\n`;
         bodyText += `TO: JERRIC JHON DELA CRUZ\n`;
         bodyText += `RE: Settlement of Overdue Account – ${data.productName}\n\n`;
         bodyText += `I, ${data.name.toUpperCase()}, residing at ${addr}, acknowledge a total debt of PHP ${finalAmount}.\n\n`;
-        bodyText += `I promise to pay the full amount on or before ${pDate}.\n\n`;
-        bodyText += `SYSTEM DIAGNOSTICS:\n`;
-        bodyText += `Timestamp: ${timestamp}\n`;
-        bodyText += `Device Used: ${device}\n`;
-        bodyText += `Account Ref: ${data.accRef}\n\n`;
-        bodyText += `[IMPORTANT: PLEASE ATTACH THE SCREENSHOT OF YOUR SIGNED LETTER TO THIS EMAIL]`;
+        bodyText += `I promise to pay on or before ${pDate}.\n\n`;
+        bodyText += `SYSTEM TIMESTAMP: ${timestamp}\n`;
+        bodyText += `[ATTACH SIGNATURE SCREENSHOT HERE]`;
 
         const mailtoLink = `mailto:info.erriho@gmail.com?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
-        
-        alert("Redirecting to Email. Remember to attach the screenshot of your signature!");
         window.location.href = mailtoLink;
     }
 </script>
-
 </body>
 </html>
