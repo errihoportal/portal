@@ -181,24 +181,38 @@
 
     // 3. AUTO-COMPUTATION (Decimal Fix)
     function updateComputation() {
-    // ... (Keep your baseBalance and calculation logic here) ...
+    const promiseDateValue = document.getElementById('promiseDate').value;
+    if (!promiseDateValue || !data) return;
+
+    const promiseDate = new Date(promiseDateValue);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    // 1. Kunin ang Base Balance (Principal + Late Fee na existing na)
+    let currentBalance = parseFloat(data.balance.toString().replace(/[₱,]/g, '')) || 0;
     
-    // Halimbawa, ang total ay 104117.92
-    const total = baseBalance + additionalInt; 
+    // 2. Kunin ang Daily Interest rate (Dapat tugma ito sa 0.15 / 360 logic mo)
+    // Halimbawa: (Current Balance * 15%) / 360 days
+    let dailyIntRate = (currentBalance * 0.15) / 360;
+
+    // 3. Bilangin ang dagdag na araw mula ngayon hanggang sa Promise Date
+    const diffTime = promiseDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    // 4. Compute for Additional Interest (kung future date ang pinili)
+    let additionalInt = diffDays > 0 ? (dailyIntRate * diffDays) : 0;
     
-    // Formatting for Numbers: 104,117.92
-    const numFormatted = total.toLocaleString('en-US', {
+    let totalNewAmount = currentBalance + additionalInt;
+
+    // 5. I-display ang resulta
+    const formattedNum = totalNewAmount.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
 
-    // Display:
-    // Ito yung mahabang words (ONE HUNDRED FOUR THOUSAND...)
-    document.getElementById('amountWords').innerText = convertAmountToWords(total);
-    
-    // Ito yung number sa dulo (₱ 104,117.92)
-    document.getElementById('amountNum').innerText = "(₱ " + numFormatted + ")";
-    document.getElementById('amountNum2').innerText = numFormatted; 
+    document.getElementById('amountNum').innerText = "(₱ " + formattedNum + ")";
+    document.getElementById('amountNum2').innerText = formattedNum;
+    document.getElementById('amountWords').innerText = convertAmountToWords(totalNewAmount);
 }
     document.getElementById('promiseDate').addEventListener('change', updateComputation);
 
