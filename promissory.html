@@ -97,11 +97,11 @@
 
             <p>I am fully aware that my account is severely overdue and that the unit mentioned above is already subject to repossession under our signed Collateral Agreement.</p>
 
-            <p><strong>PROMISE TO PAY:</strong><br>
+           <p><strong>PROMISE TO PAY:</strong><br>
     I hereby promise and commit to settle the full amount of <strong>₱<span id="amountNum2">0.00</span></strong> 
-    on or before <span id="displayPromiseDate" style="font-weight: bold; border-bottom: 1px solid #000; padding: 0 5px;">________</span>.
+    on or before <span id="displayPromiseDate" style="font-weight: bold; border-bottom: 1px solid #000; padding: 0 5px; cursor: pointer;" onclick="document.getElementById('promiseDate').showPicker()">________</span>.
     
-    <input type="date" id="promiseDate" onchange="updateDateDisplay()" class="no-print" style="margin-left: 10px; font-family: inherit;">
+    <input type="date" id="promiseDate" onchange="updateDateDisplay()" class="no-print" style="opacity: 0; width: 0; height: 0; position: absolute;">
 </p>
             <p><strong>TERMS AND CONDITIONS:</strong></p>
             <ol>
@@ -183,16 +183,18 @@
 
     function updateComputation(isInitial = false) {
     let pDateVal = document.getElementById('promiseDate').value;
+    
+    // 1. Gawing current date kung initial, kung hindi, gamitin ang pinili ng user
     let promiseDate = isInitial ? new Date() : new Date(pDateVal);
     promiseDate.setHours(0,0,0,0);
     
     let totalOverall = 0;
     let tableHtml = "";
 
-    if (!data.schedule) return;
+    if (!data || !data.schedule) return;
 
     data.schedule.forEach(bill => {
-        // FILTER: Isama lang ang UNPAID
+        // FILTER: Isama lang ang UNPAID (Base sa App Script mapping mo)
         if (bill.p_date !== "---" && bill.p_date !== "" && bill.p_date !== null) return;
         if (bill.st === "PAID" || bill.st === "Paid") return;
 
@@ -203,42 +205,42 @@
         let lateFee = 0;
         let interest = 0;
 
-        // --- TAMA NA INTEREST COMPUTATION ---
+        // --- COMPUTATION logic ---
         if (promiseDate > dueDate && !isNaN(dueDate.getTime())) {
-            // 1. Late Fee: 10% ng Principal (Isang beses lang karaniwan)
+            // Late Fee: 10%
             lateFee = principal * 0.10; 
-
-            // 2. Interest: (Principal * 15% annual rate) * (Bilang ng araw na late / 360 days)
+            
+            // Interest: (Principal * 15%) * (Days Late / 360)
             const diffTime = promiseDate - dueDate;
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            // Formula: P * R * T
             interest = (principal * 0.15) * (diffDays / 360);
         }
 
+        // Subtotal per row (Eto yung i-round natin para 2 decimals lang)
         let subtotal = principal + lateFee + interest;
         totalOverall += subtotal;
 
-        // TABLE ROW: Pinilit nating maging 2 decimal places lang (.toLocaleString)
+        // Render Row - Pilitin ang 2 decimals lang sa display
         tableHtml += `
             <tr style="border-bottom:1px solid #eee;">
-                <td style="padding:8px;">${bill.mo}</td>
-                <td style="padding:8px;">₱${principal.toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                <td style="padding:8px;">₱${lateFee.toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                <td style="padding:8px;">₱${interest.toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                <td style="padding:8px; text-align:right;"><b>₱${subtotal.toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2})}</b></td>
+                <td style="padding:6px;">${bill.mo}</td>
+                <td style="padding:6px;">₱${principal.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+                <td style="padding:6px;">₱${lateFee.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+                <td style="padding:6px;">₱${interest.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+                <td style="padding:6px; text-align:right;"><b>₱${subtotal.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b></td>
             </tr>`;
     });
 
     // Update Display
-    document.getElementById('breakdownBody').innerHTML = tableHtml || "<tr><td colspan='5' align='center'>No unpaid bills found.</td></tr>";
+    document.getElementById('breakdownBody').innerHTML = tableHtml || "<tr><td colspan='5' align='center'>Walang utang na natitira.</td></tr>";
     
-    // I-format ang Total sa 2 decimals
-    const finalStr = totalOverall.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-    document.getElementById('projectedTotal').innerText = "₱ " + finalStr;
-    document.getElementById('amountNum').innerText = "(₱ " + finalStr + ")";
-    document.getElementById('amountNum2').innerText = finalStr;
+    // Final Formats
+    const formattedTotal = totalOverall.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    document.getElementById('projectedTotal').innerText = "₱ " + formattedTotal;
+    document.getElementById('amountNum').innerText = "(₱ " + formattedTotal + ")";
+    document.getElementById('amountNum2').innerText = formattedTotal;
     
+    // Amount to Words
     document.getElementById('amountWords').innerText = convertAmountToWords(totalOverall);
 }
     
@@ -347,14 +349,10 @@
     const displaySpan = document.getElementById('displayPromiseDate');
     
     if (dateInput.value) {
-        // I-format ang date para maging "March 15, 2026" imbes na "03/15/2026"
         const options = { month: 'long', day: 'numeric', year: 'numeric' };
         const formattedDate = new Date(dateInput.value).toLocaleDateString('en-US', options);
-        
         displaySpan.innerText = formattedDate;
-        
-        // Tawagin ang computation function para mag-update ang penalties
-        updateComputation();
+        updateComputation(); // Re-compute agad
     }
 }
 </script>
