@@ -161,31 +161,23 @@
     const baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
 
     window.onload = function() {
-        if (data) {
-            // Mapping base sa headers mo: "Full Name", "Item Name", "Account_No"
-            document.getElementById('fullName').innerText = data["Full Name"] || data.name || "N/A";
-            document.getElementById('footerName').innerText = (data["Full Name"] || "N/A").toUpperCase();
-            document.getElementById('unitName').innerText = data["Item Name"] || data.productName || "No Unit Info";
-            document.getElementById('dateToday').innerText = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    if (data) {
+        // Fill Basic Info
+        document.getElementById('fullName').innerText = data.name || "N/A";
+        document.getElementById('footerName').innerText = (data.name || "N/A").toUpperCase();
+        document.getElementById('unitName').innerText = data.productName || "No Unit Info";
+        
+        // SECURITY AUDIT (Safe Fallback)
+        document.getElementById('s-name').innerText = data.name || "N/A";
+        document.getElementById('s-acc').innerText = data.accRef || "N/A";
+        
+        // KUNG N/A ANG MOBILE/EMAIL, HINDI ITO MAG-E-ERROR, MAGIGING BLANKO LANG
+        document.getElementById('s-mobile').innerText = data.mobile || "---";
+        document.getElementById('s-email').innerText = data.email || "---";
 
-            // Security Audit mapping
-            document.getElementById('s-name').innerText = data["Full Name"] || "N/A";
-            document.getElementById('s-acc').innerText = data["Account_No"] || "N/A";
-            document.getElementById('s-mobile').innerText = data["PHONE"] || "N/A";
-            document.getElementById('s-email').innerText = data["EMAIL"] || "N/A";
-            
-            const datePicker = document.getElementById('promiseDate');
-            const today = new Date();
-            datePicker.value = today.toISOString().split('T')[0];
-
-            const maxDate = new Date();
-            maxDate.setDate(today.getDate() + 15);
-            datePicker.min = today.toISOString().split('T')[0];
-            datePicker.max = maxDate.toISOString().split('T')[0];
-            
-            updateComputation(); 
-        }
-    };
+        updateComputation(true); 
+    }
+};
 
     function updateComputation() {
         let pDateVal = document.getElementById('promiseDate').value;
