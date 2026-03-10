@@ -165,7 +165,7 @@
 
     window.onload = function() {
     if (data) {
-        // --- 0. IP ADDRESS FETCHER (DITO MO ILAGAY) ---
+        // --- 0. IP ADDRESS FETCHER ---
         fetch('https://api.ipify.org?format=json')
             .then(response => response.json())
             .then(ipData => {
@@ -180,10 +180,25 @@
         const options = { month: 'long', day: 'numeric', year: 'numeric' };
         document.getElementById('dateToday').innerText = today.toLocaleDateString('en-US', options);
 
-        // 2. Set Default Promise Date (Today + 3 Days for flexibility)
+        // --- 2. RESTRICTION: 15 DAYS ONLY ---
+        const dateInput = document.getElementById('promiseDate');
+        
+        // Min Date: Ngayon (YYYY-MM-DD)
+        const minDateStr = today.toISOString().split('T')[0];
+        
+        // Max Date: Today + 15 Days
+        const maxDate = new Date();
+        maxDate.setDate(today.getDate() + 15);
+        const maxDateStr = maxDate.toISOString().split('T')[0];
+
+        // I-apply ang lock sa calendar
+        dateInput.min = minDateStr;
+        dateInput.max = maxDateStr;
+
+        // Default value: Set to Today + 3 Days (o Today kung gusto mo)
         const defaultDate = new Date();
         defaultDate.setDate(today.getDate() + 3);
-        document.getElementById('promiseDate').value = defaultDate.toISOString().split('T')[0];
+        dateInput.value = defaultDate.toISOString().split('T')[0];
 
         // 3. User Info Mapping
         document.getElementById('fullName').innerText = data.name || "N/A";
@@ -339,16 +354,25 @@
 
     // --- SUBMIT TO DRIVE ---
     async function submitToDrive() {
-        const addr = document.getElementById('addressInput').value;
-        const pDate = document.getElementById('promiseDate').value;
-        
-        if(!addr || addr.length < 5) return alert("⚠️ Please enter a complete Billing Address.");
-        if(!pDate) return alert("⚠️ Please select a Promise Date.");
-        
-        const btn = document.getElementById('submitBtn');
-        btn.innerText = "UPLOADING..."; btn.disabled = true;
+    const pDateVal = document.getElementById('promiseDate').value;
+    const promiseDate = new Date(pDateVal);
+    const today = new Date();
+    today.setHours(0,0,0,0);
 
-        const letter = document.getElementById('promissory-note');
+    // Calculate difference in days
+    const diffTime = promiseDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    // CHECK: Kung lagpas sa 15 days
+    if (diffDays > 15) {
+        alert("⚠️ Restriction: You can only set a promise date within 15 days from today.");
+        return; // Hihinto ang submission dito
+    }
+    
+    if (diffDays < 0) {
+        alert("⚠️ Error: Promise date cannot be in the past.");
+        return;
+    }
         
         html2canvas(letter, { scale: 2, useCORS: true, logging: false }).then(canvas => {
             const base64Image = canvas.toDataURL("image/png");
