@@ -160,63 +160,72 @@
     const data = JSON.parse(rawData);
     const baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
 
-    // 1. INITIAL LOAD
     window.onload = function() {
         if (data) {
-            // Fill Basic Info
-            document.getElementById('fullName').innerText = data.name || "N/A";
-            document.getElementById('footerName').innerText = (data.name || "N/A").toUpperCase();
-            document.getElementById('unitName').innerText = data.productName || "No Unit Info";
+            // Mapping base sa headers mo: "Full Name", "Item Name", "Account_No"
+            document.getElementById('fullName').innerText = data["Full Name"] || data.name || "N/A";
+            document.getElementById('footerName').innerText = (data["Full Name"] || "N/A").toUpperCase();
+            document.getElementById('unitName').innerText = data["Item Name"] || data.productName || "No Unit Info";
             document.getElementById('dateToday').innerText = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
-            // Fill Security Audit (N/A Fix)
-            document.getElementById('s-name').innerText = data.name || "N/A";
-            document.getElementById('s-acc').innerText = data.accRef || "N/A";
-            document.getElementById('s-mobile').innerText = data.mobile || data.phone || "N/A"; // Sinubukan ang 'mobile' field
-            document.getElementById('s-email').innerText = data.email || "N/A";
+            // Security Audit mapping
+            document.getElementById('s-name').innerText = data["Full Name"] || "N/A";
+            document.getElementById('s-acc').innerText = data["Account_No"] || "N/A";
+            document.getElementById('s-mobile').innerText = data["PHONE"] || "N/A";
+            document.getElementById('s-email').innerText = data["EMAIL"] || "N/A";
             
-            // Set Date Picker Limits
             const datePicker = document.getElementById('promiseDate');
             const today = new Date();
+            datePicker.value = today.toISOString().split('T')[0];
+
             const maxDate = new Date();
             maxDate.setDate(today.getDate() + 15);
             datePicker.min = today.toISOString().split('T')[0];
             datePicker.max = maxDate.toISOString().split('T')[0];
             
-            // DEFAULT DISPLAY: I-trigger ang computation gamit ang date 'today'
-            updateComputation(true); 
+            updateComputation(); 
         }
     };
 
-    // 2. LIVE COMPUTATION LOGIC
-    function updateComputation(isInitial = false) {
+    function updateComputation() {
         let pDateVal = document.getElementById('promiseDate').value;
-        
-        // Kung unang load, gamitin ang petsa ngayon
-        let promiseDate = isInitial ? new Date() : new Date(pDateVal);
+        let promiseDate = pDateVal ? new Date(pDateVal) : new Date();
         promiseDate.setHours(0,0,0,0);
         
         let totalOverall = 0;
         let tableHtml = "";
 
-        // Siguraduhin na may schedule data
-        if (!data.schedule) return;
+        // Sa system mo, ang schedule ay karaniwang nasa data.schedule
+        const schedule = data.schedule || [];
+        
+        if (schedule.length === 0) {
+            document.getElementById('breakdownBody').innerHTML = "<tr><td colspan='5' align='center'>No unpaid bills found.</td></tr>";
+            return;
+        }
 
-        data.schedule.forEach(bill => {
-            // FILTER: Isama lang ang UNPAID (Walang payment date/status ay hindi Paid)
-            if (bill.p_date || bill.status === "Paid") return;
+        schedule.forEach(bill => {
+            // FILTER: "Status" header mo ay "Status" (Capital S)
+            // "Payment Date" header mo ay "Payment Date"
+            let status = bill["Status"] || "";
+            let pDate = bill["Payment Date"] || null;
+            
+            if (pDate || status.toLowerCase() === "paid") return;
 
-            // Kunin ang Bill Reference (Hindi Payment Ref)
-            let billRef = bill.bill_no || bill.ref || ("Bill-" + bill.mo); 
-            let principal = parseFloat(bill.p_amt.toString().replace(/[₱,]/g, '')) || 0;
-            let dueDate = new Date(bill.mo);
+            // Mapping amounts base sa headers mo: "Principal Amount" at "Due Date"
+            let rawAmt = bill["Principal Amount"] || 0;
+            let principal = parseFloat(rawAmt.toString().replace(/[₱,]/g, '')) || 0;
+            
+            let rawMo = bill["Due Date"] || null;
+            let dueDate = new Date(rawMo);
             dueDate.setHours(0,0,0,0);
+
+            // Bill Reference: Dahil walang Bill No, gamitin ang Due Date
+            let billRef = rawMo ? "Bill-" + rawMo : "Unscheduled";
 
             let lateFee = 0;
             let interest = 0;
 
-            // Compute fees kung ang Promise Date ay lagpas sa Due Date
-            if (promiseDate > dueDate) {
+            if (promiseDate > dueDate && !isNaN(dueDate.getTime())) {
                 lateFee = principal * 0.10;
                 const diffTime = promiseDate - dueDate;
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -226,26 +235,25 @@
             let subtotal = principal + lateFee + interest;
             totalOverall += subtotal;
 
-            // TABLE ROW (Fixed Decimals to 2 only)
             tableHtml += `
                 <tr style="border-bottom:1px solid #eee;">
                     <td style="padding:8px;">${billRef}</td>
-                    <td style="padding:8px;">₱${principal.toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                    <td style="padding:8px;">₱${lateFee.toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                    <td style="padding:8px;">₱${interest.toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                    <td style="padding:8px; text-align:right;"><b>₱${subtotal.toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2})}</b></td>
+                    <td style="padding:8px;">₱${principal.toLocaleString(undefined,{minimumFractionDigits:2})}</td>
+                    <td style="padding:8px;">₱${lateFee.toLocaleString(undefined,{minimumFractionDigits:2})}</td>
+                    <td style="padding:8px;">₱${interest.toLocaleString(undefined,{minimumFractionDigits:2})}</td>
+                    <td style="padding:8px; text-align:right;"><b>₱${subtotal.toLocaleString(undefined,{minimumFractionDigits:2})}</b></td>
                 </tr>`;
         });
 
-        // Update Display
-        document.getElementById('breakdownBody').innerHTML = tableHtml || "<tr><td colspan='5' align='center'>No unpaid bills found.</td></tr>";
+        document.getElementById('breakdownBody').innerHTML = tableHtml || "<tr><td colspan='5' align='center'>No outstanding balance.</td></tr>";
+        
         const finalStr = totalOverall.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
         document.getElementById('projectedTotal').innerText = "₱ " + finalStr;
         document.getElementById('amountNum').innerText = "(₱ " + finalStr + ")";
         document.getElementById('amountNum2').innerText = finalStr;
         document.getElementById('amountWords').innerText = convertAmountToWords(totalOverall);
     }
-
+    
     // IP Detection
     fetch('https://api.ipify.org?format=json')
         .then(res => res.json())
