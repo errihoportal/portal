@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promissory Letter</title>
+    <style>
+        body { font-family: 'Times New Roman', serif; background: #f4f4f4; padding: 20px; color: #333; }
+        .letter-paper { 
+            background: white; max-width: 800px; margin: 0 auto; padding: 50px; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); border-top: 5px solid #27ae60;
+        }
+        .header { text-align: center; margin-bottom: 30px; }
+        .date { text-align: right; margin-bottom: 20px; }
+        .content { line-height: 1.6; text-align: justify; }
+        .field { border-bottom: 1px solid #000; font-weight: bold; padding: 0 5px; }
+        .sig-container { margin-top: 40px; text-align: center; }
+        #sig-canvas { border: 1px dashed #ccc; background: #fafafa; cursor: crosshair; width: 100%; max-width: 400px; height: 150px; }
+        .actions { margin-top: 30px; text-align: center; display: flex; gap: 10px; justify-content: center; }
+        button { padding: 12px 25px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-submit { background: #27ae60; color: white; }
+        .btn-clear { background: #e74c3c; color: white; }
+        
+        @media (max-width: 600px) { .letter-paper { padding: 20px; } }
+    </style>
+</head>
+<body>
+
+<div class="letter-paper">
+    <div class="header">
+        <h2 style="margin:0;">PROMISSORY LETTER</h2>
+    </div>
+
+    <div class="date">DATE: <span id="dateToday"></span></div>
+
+    <div class="content">
+        <p>TO: <strong>JERRIC JHON DELA CRUZ</strong><br>
+        RE: Settlement of Overdue Account – <span id="unitName" class="field">Loading...</span></p>
+
+        <p>I, <span id="fullName" class="field">Loading...</span>, with current billing address at 
+        <input type="text" id="addressInput" placeholder="Enter your full address" style="width: 300px; border:none; border-bottom: 1px solid #000; font-family: inherit; font-size: inherit; font-weight: bold;">, 
+        hereby acknowledge my outstanding debt to JERRIC JHON DELA CRUZ amounting to 
+        <span id="amountWords" style="text-transform: uppercase; font-weight: bold; border-bottom: 1px solid #000;">---</span> 
+        (₱<span id="amountNum" style="font-weight: bold; border-bottom: 1px solid #000;">0.00</span>).</p>
+
+        <p>I am fully aware that my account is severely overdue and that the unit mentioned above is na na-subject to repossession under our signed Collateral Agreement.</p>
+
+        <p><strong>PROMISE TO PAY:</strong><br>
+        I hereby promise and commit to settle the full amount of ₱<span id="amountNum2">0.00</span> on or before 
+        <input type="date" id="promiseDate" style="font-family: inherit; font-weight: bold; border: 1px solid #ccc; padding: 2px;">.</p>
+
+        <p><strong>TERMS AND CONDITIONS:</strong></p>
+        <ol>
+            <li><strong>Full Settlement:</strong> I understand that this is the final extension granted to me.</li>
+            <li><strong>Voluntary Surrender:</strong> If I fail to settle the full amount by the said date, I hereby agree to voluntarily surrender the unit to ERRIHO PERSONAL FINANCE without the need for further legal demand.</li>
+            <li><strong>Execution of Collateral:</strong> I acknowledge the company’s right to proceed with the 30-day redemption period, and subsequent resale/liquidation of the unit to cover my total debt.</li>
+        </ol>
+
+        <p>By signing this letter, I signify my understanding of these terms and my commitment to fulfill my financial obligation.</p>
+    </div>
+
+    <div class="sig-container">
+        <canvas id="sig-canvas"></canvas>
+        <div style="margin-top: 5px;">
+            <strong><span id="footerName">USER NAME</span></strong><br>
+            (Signature over Printed Name)
+        </div>
+    </div>
+
+    <div class="actions">
+        <button class="btn-clear" onclick="clearSig()">Clear Signature</button>
+        <button class="btn-submit" onclick="submitLetter()">Submit Promissory Note</button>
+    </div>
+</div>
+
+<script>
+    // 1. LOAD DATA FROM LOCALSTORAGE
+    const data = JSON.parse(localStorage.getItem('user_data'));
+    
+    if (data) {
+        document.getElementById('fullName').innerText = data.name;
+        document.getElementById('footerName').innerText = data.name.toUpperCase();
+        document.getElementById('unitName').innerText = data.productName || "Your Unit";
+        document.getElementById('amountNum').innerText = data.balance;
+        document.getElementById('amountNum2').innerText = data.balance;
+        document.getElementById('dateToday').innerText = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        
+        // Convert number to words (Simple Version)
+        document.getElementById('amountWords').innerText = convertAmountToWords(parseFloat(data.balance.replace(/,/g, '')));
+    }
+
+    function convertAmountToWords(amount) {
+        // Ito ay placeholder muna, pwede nating gawing mas complex
+        return amount.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' }) + " ONLY";
+    }
+
+    // 2. SIGNATURE LOGIC
+    const canvas = document.getElementById('sig-canvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    canvas.addEventListener('mousedown', () => drawing = true);
+    canvas.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
+    canvas.addEventListener('mousemove', draw);
+
+    // Touch support for mobile
+    canvas.addEventListener('touchstart', (e) => { drawing = true; e.preventDefault(); });
+    canvas.addEventListener('touchend', () => { drawing = false; ctx.beginPath(); });
+    canvas.addEventListener('touchmove', (e) => {
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        draw({ clientX: touch.clientX, clientY: touch.clientY });
+    });
+
+    function draw(e) {
+        if (!drawing) return;
+        const rect = canvas.getBoundingClientRect();
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = '#000';
+        ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+        ctx.stroke();
+    }
+
+    function clearSig() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+    function submitLetter() {
+        const addr = document.getElementById('addressInput').value;
+        const pDate = document.getElementById('promiseDate').value;
+        
+        if(!addr || !pDate) {
+            alert("Please fill up the Address and Promise Date.");
+            return;
+        }
+        
+        alert("Sending to System... (Ito ang isusunod nating ikokonek sa Google Sheets mo)");
+        // Dito natin ilalagay ang google.script.run sa susunod
+    }
+</script>
+
+</body>
+</html>
