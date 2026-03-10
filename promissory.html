@@ -45,6 +45,13 @@
 
     .content { font-size: 14px; text-align: justify; line-height: 1.4; }
     #sig-canvas { border: 1px dashed #ccc; cursor: crosshair; width: 300px; height: 100px; background: #fafafa; }
+
+    #addressInput {
+    text-transform: uppercase; /* Ginagawang All Caps ang display habang nagtatype */
+}
+::placeholder {
+    text-transform: none; /* Para manatiling normal ang "Enter your full address" na text */
+}
 </style>
 </head>
 <body>
@@ -91,7 +98,10 @@
             RE: Settlement of Overdue Account – <span id="unitName" style="font-weight:bold; border-bottom:1px solid #000;">---</span></p>
 
             <p>I, <span id="fullName" style="font-weight:bold; border-bottom:1px solid #000;">Loading...</span>, with current billing address at 
-            <input type="text" id="addressInput" placeholder="Enter your full address" style="width: 300px; border:none; border-bottom: 1px solid #000; font-family: inherit; font-size: inherit; font-weight: bold;">, 
+            <input type="text" id="addressInput" 
+       placeholder="Enter your full address" 
+       oninput="this.value = this.value.toUpperCase()" 
+       style="width: 300px; border:none; border-bottom: 1px solid #000; font-family: inherit; font-size: inherit; font-weight: bold; text-transform: uppercase;"> 
             hereby acknowledge my outstanding debt to JERRIC JHON DELA CRUZ amounting to <span id="amountWords" style="font-weight:bold; text-transform:uppercase; border-bottom:1px solid #000;">---</span> 
             <span id="amountNum" style="font-weight:bold;">(₱0.00)</span>.</p>
 
@@ -171,9 +181,7 @@
             .then(ipData => {
                 document.getElementById('s-ip').innerText = ipData.ip;
             })
-            .catch(err => {
-                document.getElementById('s-ip').innerText = "Unavailable";
-            });
+            .catch(() => { document.getElementById('s-ip').innerText = "Unavailable"; });
 
         // 1. Set Header Date
         const today = new Date();
@@ -182,25 +190,23 @@
 
         // --- 2. RESTRICTION: 15 DAYS ONLY ---
         const dateInput = document.getElementById('promiseDate');
-        
-        // Min Date: Ngayon (YYYY-MM-DD)
         const minDateStr = today.toISOString().split('T')[0];
         
-        // Max Date: Today + 15 Days
         const maxDate = new Date();
-        maxDate.setDate(today.getDate() + 15);
+        maxDate.setDate(today.getDate() + 15); // +15 days limit
         const maxDateStr = maxDate.toISOString().split('T')[0];
 
-        // I-apply ang lock sa calendar
         dateInput.min = minDateStr;
         dateInput.max = maxDateStr;
+        dateInput.value = minDateStr; // Default to today
 
-        // Default value: Set to Today + 3 Days (o Today kung gusto mo)
-        const defaultDate = new Date();
-        defaultDate.setDate(today.getDate() + 3);
-        dateInput.value = defaultDate.toISOString().split('T')[0];
+        // --- 3. ADDRESS AUTO-CAPITALIZE ---
+        const addrInput = document.getElementById('addressInput');
+        addrInput.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
 
-        // 3. User Info Mapping
+        // 4. User Info Mapping
         document.getElementById('fullName').innerText = data.name || "N/A";
         document.getElementById('footerName').innerText = (data.name || "N/A").toUpperCase();
         document.getElementById('unitName').innerText = data.productName || "No Unit Info";
@@ -212,13 +218,14 @@
         document.getElementById('s-email').innerText = data.email || "---";
         document.getElementById('s-date').innerText = today.toLocaleString();
         
-        // 4. Run Initial Computation
+        // 5. Initial Run
         updateComputation();
     } else {
-        alert("No user data found. Please login again.");
+        alert("No user data found.");
         window.location.href = "index.html";
     }
 };
+    
     function updateComputation() {
     let pDateVal = document.getElementById('promiseDate').value;
     if (!pDateVal) return;
