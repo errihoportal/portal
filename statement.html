@@ -863,6 +863,21 @@ if(greet) {
                 
             }
         }
+
+       // --- 3. PROMISSORY BUTTON LOGIC (Ligtas na pwesto) ---
+        if (data.actionType === "PROMISSORY") {
+            const hSubCont = document.getElementById('heroSubContainer');
+            if (hSubCont) {
+                hSubCont.innerHTML += `
+                    <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 10px;">
+                        <button onclick="window.location.href='promissory.html'" 
+                                style="width: 100%; background: #ffffff; color: #1a1a1a; border: none; padding: 10px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            ✍️ SUBMIT PROMISSORY NOTE
+                        </button>
+                    </div>
+                `;
+            }
+        }
     } // End of populateData
 
     function closeWelcomeModal() {
