@@ -188,25 +188,29 @@
         const options = { month: 'long', day: 'numeric', year: 'numeric' };
         document.getElementById('dateToday').innerText = today.toLocaleDateString('en-US', options);
 
-        // --- 2. RESTRICTION: 15 DAYS ONLY ---
+        // --- 2. RESTRICTION: NO BACK-DATE & MAX 15 DAYS ---
         const dateInput = document.getElementById('promiseDate');
-        const minDateStr = today.toISOString().split('T')[0];
+        
+        // I-format ang "Today" para sa 'min' attribute
+        const minDateStr = today.toISOString().split('T')[0]; 
         
         const maxDate = new Date();
-        maxDate.setDate(today.getDate() + 15); // +15 days limit
+        maxDate.setDate(today.getDate() + 15); // Lock hanggang 15 days lang
         const maxDateStr = maxDate.toISOString().split('T')[0];
 
-        dateInput.min = minDateStr;
-        dateInput.max = maxDateStr;
-        dateInput.value = minDateStr; // Default to today
+        dateInput.min = minDateStr; // Bawal i-back date (kahapon)
+        dateInput.max = maxDateStr; // Bawal lumampas ng 15 days
+        dateInput.value = minDateStr; // Default display is Today
 
         // --- 3. ADDRESS AUTO-CAPITALIZE ---
         const addrInput = document.getElementById('addressInput');
-        addrInput.addEventListener('input', function() {
-            this.value = this.value.toUpperCase();
-        });
+        if(addrInput) {
+            addrInput.addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+        }
 
-        // 4. User Info Mapping
+        // 4. User Info Mapping (Siguraduhing tama ang mga ID sa HTML mo)
         document.getElementById('fullName').innerText = data.name || "N/A";
         document.getElementById('footerName').innerText = (data.name || "N/A").toUpperCase();
         document.getElementById('unitName').innerText = data.productName || "No Unit Info";
@@ -216,7 +220,11 @@
         document.getElementById('s-acc').innerText = data.accRef || "---";
         document.getElementById('s-mobile').innerText = data.mobile || "---";
         document.getElementById('s-email').innerText = data.email || "---";
-        document.getElementById('s-date').innerText = today.toLocaleString();
+        
+        // Gamitin ang s-date kung ito ang nasa HTML mo
+        if(document.getElementById('s-date')) {
+            document.getElementById('s-date').innerText = today.toLocaleString();
+        }
         
         // 5. Initial Run
         updateComputation();
@@ -360,56 +368,67 @@
     function clearSig() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
     // --- SUBMIT TO DRIVE ---
-    async function submitToDrive() {
+   async function submitToDrive() {
+    const addr = document.getElementById('addressInput').value;
     const pDateVal = document.getElementById('promiseDate').value;
-    const promiseDate = new Date(pDateVal);
-    const today = new Date();
-    today.setHours(0,0,0,0);
-
-    // Calculate difference in days
-    const diffTime = promiseDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    // CHECK: Kung lagpas sa 15 days
-    if (diffDays > 15) {
-        alert("⚠️ Restriction: You can only set a promise date within 15 days from today.");
-        return; // Hihinto ang submission dito
-    }
     
-    if (diffDays < 0) {
-        alert("⚠️ Error: Promise date cannot be in the past.");
+    // VALIDATION
+    if (!addr || addr.length < 5) {
+        alert("⚠️ Please enter your FULL ADDRESS.");
         return;
     }
-        
-        html2canvas(letter, { scale: 2, useCORS: true, logging: false }).then(canvas => {
-            const base64Image = canvas.toDataURL("image/png");
-
-            fetch(baseUrl, {
-                method: "POST",
-                mode: "no-cors", // Use no-cors if experiencing redirect issues
-                body: JSON.stringify({
-                    action: "promissory",
-                    image: base64Image,
-                    filename: `PN_${data.accRef}_${data.name}.png`
-                })
-            })
-            .then(() => {
-                // Since no-cors doesn't return response, we assume success or handle via redirect
-                alert("✅ Promissory Note Sent Successfully!");
-                // Trigger download for user copy
-                const link = document.createElement('a');
-                link.download = `ERRIHO_PN_${data.name}.png`;
-                link.href = base64Image;
-                link.click();
-                window.location.href = "statement.html";
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Connection Error. Please try again.");
-            })
-            .finally(() => { btn.innerText = "Submit Promissory Note"; btn.disabled = false; });
-        });
+    if (!pDateVal) {
+        alert("⚠️ Please select a PROMISE DATE.");
+        return;
     }
+
+    const btn = document.getElementById('submitBtn');
+    btn.innerText = "PROCESSING..."; 
+    btn.disabled = true;
+
+    // Kunin ang element na gustong i-picture
+    const letter = document.getElementById('promissory-note');
+
+    // Siguraduhin na naka-update ang IP bago i-capture
+    document.getElementById('s-date').innerText = new Date().toLocaleString();
+
+    html2canvas(letter, { 
+        scale: 2, 
+        useCORS: true,
+        backgroundColor: "#ffffff" 
+    }).then(canvas => {
+        const base64Image = canvas.toDataURL("image/png");
+
+        fetch(baseUrl, {
+            method: "POST",
+            mode: "no-cors", // Gamitin ito para maiwasan ang CORS error sa Apps Script
+            body: JSON.stringify({
+                action: "promissory",
+                image: base64Image,
+                filename: `PN_${data.accRef}_${data.name}.png`
+            })
+        })
+        .then(() => {
+            alert("✅ SUCCESS: Promissory Note Submitted!");
+            
+            // DOWNLOAD A COPY FOR THE USER
+            const link = document.createElement('a');
+            link.download = `ERRIHO_PN_${data.name}.png`;
+            link.href = base64Image;
+            link.click();
+
+            window.location.href = "statement.html";
+        })
+        .catch(err => {
+            console.error(err);
+            alert("❌ Error submitting. Please check your connection.");
+        })
+        .finally(() => {
+            btn.innerText = "Submit Promissory Note";
+            btn.disabled = false;
+        });
+    });
+}
 </script>
 </body>
 </html>
