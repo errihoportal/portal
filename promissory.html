@@ -138,44 +138,68 @@
 
     // 2. FORMAL AMOUNT TO WORDS (Pesos and Centavos)
     function convertAmountToWords(amount) {
-        const parts = amount.toFixed(2).split(".");
-        const pesos = parseInt(parts[0]);
-        const centavos = parts[1];
-        
-        // Gagamit tayo ng Intl.NumberFormat para sa formal currency look
-        let currencyFormat = new Intl.NumberFormat('en-PH', {
-            style: 'currency',
-            currency: 'PHP',
-        }).format(amount);
+    const ones = ['', 'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE'];
+    const teens = ['TEN', 'ELEVEN', 'TWELVE', 'THIRTEEN', 'FOURTEEN', 'FIFTEEN', 'SIXTEEN', 'SEVENTEEN', 'EIGHTEEN', 'NINETEEN'];
+    const tens = ['', '', 'TWENTY', 'THIRTY', 'FORTY', 'FIFTY', 'SIXTY', 'SEVENTY', 'EIGHTY', 'NINETY'];
 
-        // Gagawin nating: "ONE THOUSAND PESOS AND 50/100 ONLY"
-        // Dahil ang JS ay walang built-in "Number to English Words", 
-        // pinaka-safe at formal sa banking ang format na ito:
-        return currencyFormat.replace("PHP", "").trim() + " PESOS AND " + centavos + "/100 ONLY";
+    function convertGroup(n) {
+        let res = "";
+        if (n >= 100) {
+            res += ones[Math.floor(n / 100)] + " HUNDRED ";
+            n %= 100;
+        }
+        if (n >= 10 && n <= 19) {
+            res += teens[n - 10] + " ";
+        } else if (n >= 20 || (n > 0 && n < 10)) {
+            res += tens[Math.floor(n / 10)] + (n % 10 !== 0 && n >= 20 ? "-" : "") + ones[n % 10] + " ";
+        }
+        return res;
     }
+
+    if (amount === 0) return "ZERO PESOS";
+
+    let [whole, decimal] = amount.toFixed(2).split(".");
+    let num = parseInt(whole);
+    let words = "";
+
+    if (num >= 1000000) {
+        words += convertGroup(Math.floor(num / 1000000)) + "MILLION ";
+        num %= 1000000;
+    }
+    if (num >= 1000) {
+        words += convertGroup(Math.floor(num / 1000)) + "THOUSAND ";
+        num %= 1000;
+    }
+    words += convertGroup(num);
+
+    let centavosText = (parseInt(decimal) > 0) 
+        ? " AND " + convertGroup(parseInt(decimal)).trim() + " CENTAVOS" 
+        : "";
+
+    return "₱ " + words.trim() + " PESOS" + centavosText + " ONLY";
+}
 
     // 3. AUTO-COMPUTATION (Decimal Fix)
     function updateComputation() {
-        const promiseDateValue = document.getElementById('promiseDate').value;
-        if (!promiseDateValue || !data) return;
+    // ... (Keep your baseBalance and calculation logic here) ...
+    
+    // Halimbawa, ang total ay 104117.92
+    const total = baseBalance + additionalInt; 
+    
+    // Formatting for Numbers: 104,117.92
+    const numFormatted = total.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
 
-        const promiseDate = new Date(promiseDateValue);
-        const today = new Date();
-        today.setHours(0,0,0,0);
-
-        let baseBalance = getCleanNumber(data.balance);
-        const diffDays = Math.ceil((promiseDate - today) / (1000 * 60 * 60 * 24));
-
-        let additionalInt = diffDays > 0 ? (baseBalance * INTERST_RATE) * (diffDays / 360) : 0;
-        let total = baseBalance + additionalInt;
-
-        // I-update ang lahat ng 2 decimal places lang
-        const finalStr = total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('amountNum').innerText = finalStr;
-        document.getElementById('amountNum2').innerText = finalStr;
-        document.getElementById('amountWords').innerText = convertAmountToWords(total);
-    }
-
+    // Display:
+    // Ito yung mahabang words (ONE HUNDRED FOUR THOUSAND...)
+    document.getElementById('amountWords').innerText = convertAmountToWords(total);
+    
+    // Ito yung number sa dulo (₱ 104,117.92)
+    document.getElementById('amountNum').innerText = "(₱ " + numFormatted + ")";
+    document.getElementById('amountNum2').innerText = numFormatted; 
+}
     document.getElementById('promiseDate').addEventListener('change', updateComputation);
 
     // 4. SIGNATURE CANVAS LOGIC
