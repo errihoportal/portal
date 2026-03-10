@@ -34,13 +34,12 @@
 
     <div class="content">
         <p>TO: <strong>JERRIC JHON DELA CRUZ</strong><br>
-        RE: Settlement of Overdue Account – <span id="unitName" class="field">Loading...</span></p>
+        RE: Settlement of Overdue Account – <span id="unitName" style="font-weight:bold; border-bottom:1px solid #000;">---</span><br>
 
         <p>I, <span id="fullName" class="field">Loading...</span>, with current billing address at 
         <input type="text" id="addressInput" placeholder="Enter your full address" style="width: 300px; border:none; border-bottom: 1px solid #000; font-family: inherit; font-size: inherit; font-weight: bold;">, 
-        hereby acknowledge my outstanding debt to JERRIC JHON DELA CRUZ amounting to 
-        <span id="amountWords" style="text-transform: uppercase; font-weight: bold; border-bottom: 1px solid #000;">---</span> 
-        (₱<span id="amountNum" style="font-weight: bold; border-bottom: 1px solid #000;">0.00</span>).</p>
+        hereby acknowledge my outstanding debt to JERRIC JHON DELA CRUZ amounting to <span id="amountWords" style="font-weight:bold; text-transform:uppercase;">---</span> 
+(₱<span id="amountNum" style="font-weight:bold;">0.00</span>)
 
         <p>I am fully aware that my account is severely overdue and that the unit mentioned above is na na-subject to repossession under our signed Collateral Agreement.</p>
 
@@ -73,27 +72,65 @@
 </div>
 
 <script>
-    // 1. LOAD DATA FROM LOCALSTORAGE
+    // 1. DATA INITIALIZATION
     const data = JSON.parse(localStorage.getItem('user_data'));
-    
+    const INTERST_RATE = 0.15; // 15% annual interest
+
     if (data) {
         document.getElementById('fullName').innerText = data.name;
         document.getElementById('footerName').innerText = data.name.toUpperCase();
         document.getElementById('unitName').innerText = data.productName || "Your Unit";
         document.getElementById('amountNum').innerText = data.balance;
         document.getElementById('amountNum2').innerText = data.balance;
-        document.getElementById('dateToday').innerText = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        document.getElementById('dateToday').innerText = new Date().toLocaleDateString('en-US', { 
+            month: 'long', day: 'numeric', year: 'numeric' 
+        });
         
-        // Convert number to words (Simple Version)
+        // Convert number to words
         document.getElementById('amountWords').innerText = convertAmountToWords(parseFloat(data.balance.replace(/,/g, '')));
     }
 
     function convertAmountToWords(amount) {
-        // Ito ay placeholder muna, pwede nating gawing mas complex
         return amount.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' }) + " ONLY";
     }
 
-    // 2. SIGNATURE LOGIC
+    // 2. DEVICE INFO LOGIC (Android/iOS detection)
+    function getDeviceInfo() {
+        const ua = navigator.userAgent;
+        if (/android/i.test(ua)) return "Android Device";
+        if (/iPad|iPhone|iPod/.test(ua)) return "iOS Device";
+        return "Desktop/Web Browser";
+    }
+
+    // 3. AUTO-COMPUTATION LOGIC
+    function updateComputation() {
+        const promiseDateValue = document.getElementById('promiseDate').value;
+        if (!promiseDateValue || !data) return;
+
+        const promiseDate = new Date(promiseDateValue);
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        let baseBalance = parseFloat(data.balance.replace(/,/g, ''));
+        const diffTime = promiseDate.getTime() - today.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        let additionalDailyInt = 0;
+        if (diffDays > 0) {
+            additionalDailyInt = (baseBalance * INTERST_RATE) * (diffDays / 360);
+        }
+
+        const totalNewAmount = baseBalance + additionalDailyInt;
+        const formattedAmount = totalNewAmount.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+        document.getElementById('amountNum').innerText = formattedAmount;
+        document.getElementById('amountNum2').innerText = formattedAmount;
+        document.getElementById('amountWords').innerText = convertAmountToWords(totalNewAmount);
+    }
+
+    document.getElementById('promiseDate').addEventListener('change', updateComputation);
+
+    // 4. SIGNATURE LOGIC
     const canvas = document.getElementById('sig-canvas');
     const ctx = canvas.getContext('2d');
     let drawing = false;
@@ -101,8 +138,6 @@
     canvas.addEventListener('mousedown', () => drawing = true);
     canvas.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
     canvas.addEventListener('mousemove', draw);
-
-    // Touch support for mobile
     canvas.addEventListener('touchstart', (e) => { drawing = true; e.preventDefault(); });
     canvas.addEventListener('touchend', () => { drawing = false; ctx.beginPath(); });
     canvas.addEventListener('touchmove', (e) => {
@@ -117,80 +152,44 @@
         ctx.lineWidth = 2;
         ctx.lineCap = 'round';
         ctx.strokeStyle = '#000';
-        ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+        ctx.lineTo((e.clientX || e.touches[0].clientX) - rect.left, (e.clientY || e.touches[0].clientY) - rect.top);
         ctx.stroke();
     }
 
     function clearSig() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
-   function submitLetter() {
-    const addr = document.getElementById('addressInput').value;
-    const pDate = document.getElementById('promiseDate').value;
-    const finalAmount = document.getElementById('amountNum').innerText;
-    
-    if(!addr || !pDate) {
-        alert("⚠️ Please fill up the Address and Promise Date.");
-        return;
+    // 5. SUBMIT TO EMAIL LOGIC (With Timestamp and Device Info)
+    function submitLetter() {
+        const addr = document.getElementById('addressInput').value;
+        const pDate = document.getElementById('promiseDate').value;
+        const finalAmount = document.getElementById('amountNum').innerText;
+        
+        if(!addr || !pDate) {
+            alert("⚠️ Please fill up the Address and Promise Date.");
+            return;
+        }
+
+        const timestamp = new Date().toLocaleString();
+        const device = getDeviceInfo();
+        const subject = encodeURIComponent(`OFFICIAL PROMISSORY: ${data.name} (${data.accRef})`);
+        
+        let bodyText = `PROMISSORY LETTER\n`;
+        bodyText += `DATE: ${document.getElementById('dateToday').innerText}\n\n`;
+        bodyText += `TO: JERRIC JHON DELA CRUZ\n`;
+        bodyText += `RE: Settlement of Overdue Account – ${data.productName}\n\n`;
+        bodyText += `I, ${data.name.toUpperCase()}, residing at ${addr}, acknowledge a total debt of PHP ${finalAmount}.\n\n`;
+        bodyText += `I promise to pay the full amount on or before ${pDate}.\n\n`;
+        bodyText += `SYSTEM DIAGNOSTICS:\n`;
+        bodyText += `Timestamp: ${timestamp}\n`;
+        bodyText += `Device Used: ${device}\n`;
+        bodyText += `Account Ref: ${data.accRef}\n\n`;
+        bodyText += `[IMPORTANT: PLEASE ATTACH THE SCREENSHOT OF YOUR SIGNED LETTER TO THIS EMAIL]`;
+
+        const mailtoLink = `mailto:info.erriho@gmail.com?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
+        
+        alert("Redirecting to Email. Remember to attach the screenshot of your signature!");
+        window.location.href = mailtoLink;
     }
-
-    // Confirmation Note
-    alert("REMINDER: Please use your REGISTERED EMAIL ADDRESS to send this promissory note.");
-
-    const subject = encodeURIComponent(`PROMISSORY NOTE: ${data.name} - ${data.accRef}`);
-    
-    // Email Body Formatting
-    let bodyText = `PROMISSORY LETTER\n`;
-    bodyText += `DATE: ${document.getElementById('dateToday').innerText}\n\n`;
-    bodyText += `TO: JERRIC JHON DELA CRUZ\n`;
-    bodyText += `RE: Settlement of Overdue Account – ${data.productName}\n\n`;
-    bodyText += `I, ${data.name.toUpperCase()}, residing at ${addr}, acknowledge a total debt of PHP ${finalAmount}.\n\n`;
-    bodyText += `I promise to pay the full amount on or before ${pDate}.\n\n`;
-    bodyText += `TERMS: I understand that failure to pay by the said date will result in the voluntary surrender of the unit.\n\n`;
-    bodyText += `SENT VIA ERRIHO PORTAL SIGNED DOCUMENT`;
-
-    const mailtoLink = `mailto:info.erriho@gmail.com?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
-    
-    // Bubukas ang Gmail/Mail app
-    window.location.href = mailtoLink;
-}
-
-    // --- Dagdag na Logic para sa Computation ---
-const INTERST_RATE = 0.15; // 15% annual interest
-const LATE_FEE_RATE = 0.10; // 10% penalty
-
-function updateComputation() {
-    const promiseDateValue = document.getElementById('promiseDate').value;
-    if (!promiseDateValue) return;
-
-    const promiseDate = new Date(promiseDateValue);
-    const today = new Date();
-    today.setHours(0,0,0,0);
-
-    // Kunin ang base balance (tanggalin ang commas)
-    let baseBalance = parseFloat(data.balance.replace(/,/g, ''));
-    
-    // Alamin kung ilang araw ang idadagdag (mula ngayon hanggang sa promise date)
-    const diffTime = promiseDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    let additionalDailyInt = 0;
-    if (diffDays > 0) {
-        // Formula: (Principal * 15%) * (Days / 360)
-        additionalDailyInt = (baseBalance * INTERST_RATE) * (diffDays / 360);
-    }
-
-    const totalNewAmount = baseBalance + additionalDailyInt;
-
-    // I-update ang mga display sa letter
-    document.getElementById('amountNum').innerText = totalNewAmount.toLocaleString('en-US', {minimumFractionDigits: 2});
-    document.getElementById('amountNum2').innerText = totalNewAmount.toLocaleString('en-US', {minimumFractionDigits: 2});
-    document.getElementById('amountWords').innerText = convertAmountToWords(totalNewAmount);
-}
-
-// Makinig sa pagbabago ng date
-document.getElementById('promiseDate').addEventListener('change', updateComputation);
-
-    
 </script>
 
 </body>
