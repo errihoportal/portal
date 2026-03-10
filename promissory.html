@@ -240,7 +240,7 @@
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
             
             // Interest = Principal * 0.15 * (Bilang ng araw mula Due Date hanggang Promise Date / 360)
-            interest = (principal * 0.15) * (diffDays / 360);
+            interest = (principal * 0.15) * (diffDays / 30);
         }
 
         let subtotal = principal + lateFee + interest;
