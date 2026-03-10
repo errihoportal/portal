@@ -55,22 +55,23 @@
 
 #promissory-note {
     width: 8.5in;
-    min-height: 14in; /* Legal Size Height */
-    padding: 0.75in;
+    height: 14in; /* Fixed Legal Height */
+    padding: 0.8in;
     margin: 0 auto;
     background: white;
     box-sizing: border-box;
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Para gumana ang auto-margin sa footer */
+    position: relative;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Preview look only */
 }
 
 .document-footer {
-    margin-top: auto; /* Itutulak nito ang footer sa pinaka-baba ng page */
-    font-size: 10px;
-    color: #666;
-    border-top: 1px solid #ccc;
-    padding-top: 10px;
+    margin-top: auto; /* Itutulak ang footer sa pinakababa ng page */
     text-align: center;
+    font-size: 11px;
+    color: #555;
+    padding-bottom: 20px;
 }
 </style>
 </head>
@@ -186,6 +187,17 @@
         </button>
     </div>
 
+    <div class="document-footer">
+    <hr style="border: 0; border-top: 1px solid #ccc; margin-bottom: 10px;">
+    <p style="margin: 0; font-style: italic;">
+        This document is electronically generated and digitally signed. 
+        Issued via ERRIHO Secure System on <span id="s-date-footer"></span>.
+    </p>
+    <p style="margin: 5px 0 0 0; font-weight: bold; color: #333;">
+        OFFICIAL PROMISSORY NOTE - CONFIDENTIAL
+    </p>
+</div>
+
 </body>
 <script>
     const rawData = localStorage.getItem('erriho_user');
@@ -251,6 +263,14 @@
         if(document.getElementById('s-date')) {
             document.getElementById('s-date').innerText = today.toLocaleString();
         }
+        // Idagdag ito sa loob ng window.onload (Step 4 sa luma mong code)
+const nowStr = today.toLocaleString();
+if(document.getElementById('s-date')) {
+    document.getElementById('s-date').innerText = nowStr;
+}
+if(document.getElementById('s-date-footer')) {
+    document.getElementById('s-date-footer').innerText = nowStr;
+}
         
         // 5. Initial Run
         updateComputation();
