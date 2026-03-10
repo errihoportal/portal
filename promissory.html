@@ -119,8 +119,18 @@
     }
 
     function convertAmountToWords(amount) {
-        return amount.toLocaleString('en-PH', { style: 'currency', currency: 'PHP' }) + " ONLY";
-    }
+    const amountStr = amount.toFixed(2); // Siguradong 2 decimal places
+    const [pesos, centavos] = amountStr.split('.');
+    
+    // Simpleng formatter para sa currency style
+    let words = new Intl.NumberFormat('en-PH', {
+        style: 'currency',
+        currency: 'PHP',
+    }).format(amount);
+
+    // Para mas formal ang dating sa letter:
+    return words.replace("PHP", "").trim() + " PESOS AND " + centavos + "/100 ONLY";
+}
 
     // 2. AUTO-COMPUTATION LOGIC
     function updateComputation() {
@@ -143,15 +153,17 @@
         }
 
         const totalNewAmount = baseBalance + additionalDailyInt;
-        const formattedAmount = totalNewAmount.toLocaleString('en-US', {
-            minimumFractionDigits: 2, 
-            maximumFractionDigits: 2
-        });
+    
+    // FIX: Gamitin ang toFixed(2) para 2 decimal places lang
+    const formattedAmount = totalNewAmount.toLocaleString('en-US', {
+        minimumFractionDigits: 2, 
+        maximumFractionDigits: 2
+    });
 
-        document.getElementById('amountNum').innerText = formattedAmount;
-        document.getElementById('amountNum2').innerText = formattedAmount;
-        document.getElementById('amountWords').innerText = convertAmountToWords(totalNewAmount);
-    }
+    document.getElementById('amountNum').innerText = formattedAmount;
+    document.getElementById('amountNum2').innerText = formattedAmount;
+    document.getElementById('amountWords').innerText = convertAmountToWords(totalNewAmount);
+}
 
     document.getElementById('promiseDate').addEventListener('change', updateComputation);
 
@@ -185,30 +197,33 @@
 
     // 4. SUBMIT TO EMAIL
     function submitLetter() {
-        const addr = document.getElementById('addressInput').value;
-        const pDate = document.getElementById('promiseDate').value;
-        const finalAmount = document.getElementById('amountNum').innerText;
-        
-        if(!addr || !pDate) {
-            alert("⚠️ Please fill up the Address and Promise Date.");
-            return;
-        }
-
-        const timestamp = new Date().toLocaleString();
-        const subject = encodeURIComponent(`PROMISSORY NOTE: ${data.name} (${data.accRef})`);
-        
-        let bodyText = `PROMISSORY LETTER\n`;
-        bodyText += `DATE: ${document.getElementById('dateToday').innerText}\n\n`;
-        bodyText += `TO: JERRIC JHON DELA CRUZ\n`;
-        bodyText += `RE: Settlement of Overdue Account – ${data.productName}\n\n`;
-        bodyText += `I, ${data.name.toUpperCase()}, residing at ${addr}, acknowledge a total debt of PHP ${finalAmount}.\n\n`;
-        bodyText += `I promise to pay on or before ${pDate}.\n\n`;
-        bodyText += `SYSTEM TIMESTAMP: ${timestamp}\n`;
-        bodyText += `[ATTACH SIGNATURE SCREENSHOT HERE]`;
-
-        const mailtoLink = `mailto:info.erriho@gmail.com?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
-        window.location.href = mailtoLink;
+    const addr = document.getElementById('addressInput').value;
+    const pDate = document.getElementById('promiseDate').value;
+    
+    if(!addr || !pDate) {
+        alert("⚠️ Pakisulat ang Address at Promise Date.");
+        return;
     }
+
+    // 1. Itatago natin ang buttons para hindi kasama sa PDF
+    document.querySelector('.actions').style.display = 'none';
+    document.querySelector('a[href="index.html"]').style.display = 'none';
+
+    // 2. Trigger Print (Dito nila ise-save as PDF)
+    alert("STEP 1: Save this document as PDF.\nSTEP 2: Attach the PDF to the email that will open next.");
+    window.print();
+
+    // 3. Ibalik ang buttons pagkatapos mag-print
+    document.querySelector('.actions').style.display = 'flex';
+    document.querySelector('a[href="index.html"]').style.display = 'block';
+
+    // 4. Saka buksan ang Email App
+    const timestamp = new Date().toLocaleString();
+    const subject = encodeURIComponent(`SIGNED PROMISSORY NOTE: ${data.name}`);
+    let bodyText = `Good day,\n\nPlease find attached the signed Promissory Note for my account.\n\nAccount: ${data.accRef}\nTimestamp: ${timestamp}`;
+    
+    window.location.href = `mailto:info.erriho@gmail.com?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
+}
 </script>
 </body>
 </html>
