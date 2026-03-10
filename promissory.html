@@ -182,37 +182,53 @@
     // 3. AUTO-COMPUTATION (Decimal Fix)
     function updateComputation() {
     const promiseDateValue = document.getElementById('promiseDate').value;
-    if (!promiseDateValue || !data) return;
+    if (!promiseDateValue || !data || !data.schedule) return;
 
     const promiseDate = new Date(promiseDateValue);
-    const today = new Date();
-    today.setHours(0,0,0,0);
-
-    // 1. Kunin ang Base Balance (Principal + Late Fee na existing na)
-    let currentBalance = parseFloat(data.balance.toString().replace(/[₱,]/g, '')) || 0;
+    promiseDate.setHours(0,0,0,0);
     
-    // 2. Kunin ang Daily Interest rate (Dapat tugma ito sa 0.15 / 360 logic mo)
-    // Halimbawa: (Current Balance * 15%) / 360 days
-    let dailyIntRate = (currentBalance * 0.15) / 360;
+    let totalOverall = 0;
+    const INTERST_RATE = 0.15; // 15% annual
 
-    // 3. Bilangin ang dagdag na araw mula ngayon hanggang sa Promise Date
-    const diffTime = promiseDate - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    // I-loop natin ang bawat bill sa schedule ng user
+    data.schedule.forEach(bill => {
+        // 1. Kunin ang base amount ng bill (Principal + Interest)
+        let principalAmt = parseFloat(bill.p_amt.toString().replace(/[₱,]/g, '')) || 0;
+        let dueDate = new Date(bill.mo); // Ang 'mo' ang due date sa system mo
+        dueDate.setHours(0,0,0,0);
 
-    // 4. Compute for Additional Interest (kung future date ang pinili)
-    let additionalInt = diffDays > 0 ? (dailyIntRate * diffDays) : 0;
-    
-    let totalNewAmount = currentBalance + additionalInt;
+        let billTotal = principalAmt;
 
-    // 5. I-display ang resulta
-    const formattedNum = totalNewAmount.toLocaleString('en-US', {
+        // 2. CHECK KUNG OVERDUE NA SA PROMISE DATE
+        if (promiseDate > dueDate) {
+            // A. Compute Late Payment Fee (10%)
+            let lateFee = principalAmt * 0.10;
+            billTotal += lateFee;
+
+            // B. Compute Daily Interest (15% annual)
+            // Bilangin ang araw mula Due Date hanggang Promise Date
+            const diffTime = promiseDate - dueDate;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays > 0) {
+                let dailyInt = (principalAmt * INTERST_RATE) * (diffDays / 360);
+                billTotal += dailyInt;
+            }
+        }
+        
+        // Ipagplus-plus ang lahat ng bills
+        totalOverall += billTotal;
+    });
+
+    // 3. I-DISPLAY ANG RESULTA (2 Decimal Places)
+    const finalFormatted = totalOverall.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
 
-    document.getElementById('amountNum').innerText = "(₱ " + formattedNum + ")";
-    document.getElementById('amountNum2').innerText = formattedNum;
-    document.getElementById('amountWords').innerText = convertAmountToWords(totalNewAmount);
+    document.getElementById('amountNum').innerText = "(₱ " + finalFormatted + ")";
+    document.getElementById('amountNum2').innerText = finalFormatted;
+    document.getElementById('amountWords').innerText = convertAmountToWords(totalOverall);
 }
     document.getElementById('promiseDate').addEventListener('change', updateComputation);
 
