@@ -49,64 +49,110 @@
 </head>
 <body>
 
-<div style="max-width: 800px; margin: 0 auto 15px auto;">
-    <a href="index.html" style="text-decoration: none; color: #666; font-size: 14px; font-weight: bold; font-family: sans-serif;">
-        ❮ Back to Dashboard
-    </a>
-</div>
-
-<div class="letter-paper">
-    <div class="header">
-        <h2 style="margin:0;">PROMISSORY LETTER</h2>
+    <div style="max-width: 800px; margin: 0 auto 15px auto;">
+        <a href="index.html" style="text-decoration: none; color: #666; font-size: 14px; font-weight: bold; font-family: sans-serif;">
+            ❮ Back to Dashboard
+        </a>
     </div>
 
-    <div class="date">DATE: <span id="dateToday"></span></div>
-
-    <div class="content">
-        <p>TO: <strong>JERRIC JHON DELA CRUZ</strong><br>
-        RE: Settlement of Overdue Account – <span id="unitName" style="font-weight:bold; border-bottom:1px solid #000;">---</span></p>
-
-        <p>I, <span id="fullName" style="font-weight:bold; border-bottom:1px solid #000;">Loading...</span>, with current billing address at 
-        <input type="text" id="addressInput" placeholder="Enter your full address" style="width: 300px; border:none; border-bottom: 1px solid #000; font-family: inherit; font-size: inherit; font-weight: bold;">, 
-        hereby acknowledge my outstanding debt to JERRIC JHON DELA CRUZ amounting to <span id="amountWords" style="font-weight:bold; text-transform:uppercase; border-bottom:1px solid #000;">---</span> 
-        (₱<span id="amountNum" style="font-weight:bold; border-bottom:1px solid #000;">0.00</span>).</p>
-
-        <p>I am fully aware that my account is severely overdue and that the unit mentioned above is already subject to repossession under our signed Collateral Agreement.</p>
-
-        <p><strong>PROMISE TO PAY:</strong><br>
-        I hereby promise and commit to settle the full amount of <strong>₱<span id="amountNum2">0.00</span></strong> on or before 
-        <input type="date" id="promiseDate" style="font-family: inherit; font-weight: bold; border: 1px solid #ccc; padding: 2px; border-radius: 5px;">.</p>
-
-        <p><strong>TERMS AND CONDITIONS:</strong></p>
-        <ol>
-            <li><strong>Full Settlement:</strong> I understand that this is the final extension granted to me.</li>
-            <li><strong>Voluntary Surrender:</strong> If I fail to settle the full amount by the said date, I hereby agree to voluntarily surrender the unit mentioned above to ERRIHO PERSONAL FINANCE without the need for further legal demand.</li>
-            <li><strong>Execution of Collateral:</strong> I acknowledge the company’s right to proceed with the 30-day redemption period, and subsequent resale/liquidation of the unit to cover my total debt.</li>
-        </ol>
-
-        <p>By signing this letter, I signify my understanding of these terms and my commitment to fulfill my financial obligation.</p>
-    </div>
-
-    <div class="sig-container" style="margin-top: 40px; text-align: center;">
-        <canvas id="sig-canvas" style="border: 1px dashed #ccc; background: #fafafa; cursor: crosshair; width: 100%; max-width: 400px; height: 150px; border-radius: 10px;"></canvas>
-        <div style="margin-top: 10px;">
-            <div style="border-bottom: 1px solid #000; display: inline-block; min-width: 250px;">
-                <strong><span id="footerName">USER NAME</span></strong>
-            </div>
-            <br>
-            <span style="font-size: 12px;">(Signature over Printed Name)</span>
+    <div id="summary-section" style="max-width:800px; margin:0 auto 20px auto; padding:20px; background:#fff3cd; border:1px solid #ffeeba; border-radius:8px; font-family: sans-serif;">
+        <h3 style="margin-top:0; color: #856404;">📊 Real-time Computation Breakdown</h3>
+        <p style="font-size:13px; color:#856404; line-height: 1.4;">
+            <i>"I understand that setting a promise date beyond the due date will automatically incur a 10% Late Payment Fee and a 15% Annual Interest Charge per day of delay."</i>
+        </p>
+        <table style="width:100%; font-size:12px; border-collapse:collapse; margin-top: 10px;">
+            <thead>
+                <tr style="border-bottom:2px solid #ffeeba; text-align: left;">
+                    <th style="padding: 8px;">Bill Ref</th>
+                    <th style="padding: 8px;">Principal</th>
+                    <th style="padding: 8px;">Late Fee (10%)</th>
+                    <th style="padding: 8px;">Interest</th>
+                    <th style="padding: 8px; text-align: right;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody id="breakdownBody">
+                </tbody>
+        </table>
+        <div style="text-align:right; margin-top:15px; font-weight:bold; font-size:18px; color: #856404; border-top: 1px solid #ffeeba; padding-top: 10px;">
+            Projected Total: <span id="projectedTotal">₱ 0.00</span>
         </div>
     </div>
 
-    <div class="actions" style="margin-top: 40px; text-align: center; display: flex; gap: 10px; justify-content: center;">
+    <div class="letter-paper" id="promissory-note" style="background: white; width: 100%; max-width: 800px; margin: 0 auto; padding: 40px; box-shadow: 0 0 10px rgba(0,0,0,0.1); position: relative; box-sizing: border-box;">
+        
+        <div class="header" style="text-align: center; margin-bottom: 20px;">
+            <h2 style="margin:0;">PROMISSORY LETTER</h2>
+        </div>
+
+        <div class="date" style="text-align: right; margin-bottom: 20px;">DATE: <span id="dateToday"></span></div>
+
+        <div class="content" style="text-align: justify; line-height: 1.6;">
+            <p>TO: <strong>JERRIC JHON DELA CRUZ</strong><br>
+            RE: Settlement of Overdue Account – <span id="unitName" style="font-weight:bold; border-bottom:1px solid #000;">---</span></p>
+
+            <p>I, <span id="fullName" style="font-weight:bold; border-bottom:1px solid #000;">Loading...</span>, with current billing address at 
+            <input type="text" id="addressInput" placeholder="Enter your full address" style="width: 300px; border:none; border-bottom: 1px solid #000; font-family: inherit; font-size: inherit; font-weight: bold;">, 
+            hereby acknowledge my outstanding debt to JERRIC JHON DELA CRUZ amounting to <span id="amountWords" style="font-weight:bold; text-transform:uppercase; border-bottom:1px solid #000;">---</span> 
+            <span id="amountNum" style="font-weight:bold;">(₱0.00)</span>.</p>
+
+            <p>I am fully aware that my account is severely overdue and that the unit mentioned above is already subject to repossession under our signed Collateral Agreement.</p>
+
+            <p><strong>PROMISE TO PAY:</strong><br>
+            I hereby promise and commit to settle the full amount of <strong>₱<span id="amountNum2">0.00</span></strong> on or before 
+            <input type="date" id="promiseDate" onchange="updateComputation()" style="font-family: inherit; font-weight: bold; border: 1px solid #ccc; padding: 2px; border-radius: 5px;">.</p>
+
+            <p><strong>TERMS AND CONDITIONS:</strong></p>
+            <ol>
+                <li><strong>Full Settlement:</strong> I understand that this is the final extension granted to me.</li>
+                <li><strong>Voluntary Surrender:</strong> If I fail to settle the full amount by the said date, I hereby agree to voluntarily surrender the unit mentioned above to ERRIHO PERSONAL FINANCE without the need for further legal demand.</li>
+                <li><strong>Execution of Collateral:</strong> I acknowledge the company’s right to proceed with the 30-day redemption period, and subsequent resale/liquidation of the unit to cover my total debt.</li>
+            </ol>
+
+            <p>By signing this letter, I signify my understanding of these terms and my commitment to fulfill my financial obligation.</p>
+        </div>
+
+        <div class="sig-container" style="margin-top: 40px; text-align: center;">
+            <canvas id="sig-canvas" style="border: 1px dashed #ccc; background: #fafafa; cursor: crosshair; width: 100%; max-width: 400px; height: 150px; border-radius: 10px;"></canvas>
+            <div style="margin-top: 10px;">
+                <div style="border-bottom: 1px solid #000; display: inline-block; min-width: 250px;">
+                    <strong><span id="footerName">USER NAME</span></strong>
+                </div>
+                <br>
+                <span style="font-size: 12px;">(Signature over Printed Name)</span>
+            </div>
+        </div>
+
+        <div id="security-info" style="margin-top:40px; padding-top:15px; border-top:1px dashed #ccc; font-size:10px; color:#7f8c8d; text-align:left; line-height:1.4; font-family: sans-serif;">
+            <table style="width:100%;">
+                <tr>
+                    <td><strong>Signer Name:</strong> <span id="s-name">---</span></td>
+                    <td><strong>Client Account #:</strong> <span id="s-acc">---</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Signed on:</strong> <span id="s-date">---</span></td>
+                    <td><strong>IP Address:</strong> <span id="s-ip">Detecting...</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Verified Mobile:</strong> <span id="s-mobile">---</span></td>
+                    <td><strong>Verified Email:</strong> <span id="s-email">---</span></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><strong>Signing Reason:</strong> Formal Acknowledgement of Debt and Promise to Pay</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="actions" style="margin-top: 30px; margin-bottom: 50px; text-align: center; display: flex; gap: 10px; justify-content: center;">
         <button class="btn-clear" onclick="clearSig()" style="background: #95a5a6; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
             Clear Signature
         </button>
-        <button class="btn-submit" onclick="submitLetter()" style="background: #27ae60; color: white; padding: 12px 30px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(39,174,96,0.3);">
+        <button id="submitBtn" class="btn-submit" onclick="submitToDrive()" style="background: #27ae60; color: white; padding: 12px 30px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(39,174,96,0.3);">
             Submit Promissory Note
         </button>
     </div>
-</div>
+
+</body>
 <script>
     // 1. INITIAL DATA & CLEANING
     const rawData = localStorage.getItem('erriho_user');
