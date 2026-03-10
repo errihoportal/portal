@@ -372,9 +372,9 @@
     const addr = document.getElementById('addressInput').value;
     const pDateVal = document.getElementById('promiseDate').value;
     
-    // VALIDATION
-    if (!addr || addr.length < 5) {
-        alert("⚠️ Please enter your FULL ADDRESS.");
+    // 1. VALIDATION: Check kung may laman ang Address at Date
+    if (!addr || addr.trim().length < 5) {
+        alert("⚠️ Please enter your FULL ADDRESS (All Caps).");
         return;
     }
     if (!pDateVal) {
@@ -383,47 +383,59 @@
     }
 
     const btn = document.getElementById('submitBtn');
-    btn.innerText = "PROCESSING..."; 
+    btn.innerText = "UPLOADING... PLEASE WAIT"; 
     btn.disabled = true;
 
-    // Kunin ang element na gustong i-picture
+    // 2. Update the "Signed Date" on the letter before capturing
+    const now = new Date();
+    if(document.getElementById('s-date')) {
+        document.getElementById('s-date').innerText = now.toLocaleString();
+    }
+
     const letter = document.getElementById('promissory-note');
 
-    // Siguraduhin na naka-update ang IP bago i-capture
-    document.getElementById('s-date').innerText = new Date().toLocaleString();
-
+    // 3. CAPTURE THE LETTER AS IMAGE
     html2canvas(letter, { 
         scale: 2, 
         useCORS: true,
-        backgroundColor: "#ffffff" 
+        backgroundColor: "#ffffff",
+        logging: false // Para hindi madumi ang console
     }).then(canvas => {
         const base64Image = canvas.toDataURL("image/png");
 
+        // Prepare the data to send
+        const payload = {
+            action: "promissory",
+            image: base64Image,
+            filename: `PN_${data.accRef}_${data.name}.png`
+        };
+
+        // 4. SEND TO GOOGLE APPS SCRIPT
         fetch(baseUrl, {
             method: "POST",
-            mode: "no-cors", // Gamitin ito para maiwasan ang CORS error sa Apps Script
-            body: JSON.stringify({
-                action: "promissory",
-                image: base64Image,
-                filename: `PN_${data.accRef}_${data.name}.png`
-            })
+            mode: "no-cors", // Necessary for many Google Script setups
+            headers: { "Content-Type": "text/plain" }, // 'text/plain' helps avoid CORS preflight
+            body: JSON.stringify(payload)
         })
         .then(() => {
-            alert("✅ SUCCESS: Promissory Note Submitted!");
+            // NOTE: With 'no-cors', we won't get a 'success' response, 
+            // so we assume it went through if no network error occurred.
+            alert("✅ SUBMITTED SUCCESSFULLY!\n\nYour Promissory Note has been sent to our system.");
             
-            // DOWNLOAD A COPY FOR THE USER
+            // 5. DOWNLOAD A COPY FOR THE CLIENT
             const link = document.createElement('a');
             link.download = `ERRIHO_PN_${data.name}.png`;
             link.href = base64Image;
             link.click();
 
-            window.location.href = "statement.html";
+            // 6. REDIRECT
+            setTimeout(() => {
+                window.location.href = "statement.html";
+            }, 1000);
         })
         .catch(err => {
-            console.error(err);
-            alert("❌ Error submitting. Please check your connection.");
-        })
-        .finally(() => {
+            console.error("Upload Error:", err);
+            alert("❌ Network Error: Please check your internet and try again.");
             btn.innerText = "Submit Promissory Note";
             btn.disabled = false;
         });
