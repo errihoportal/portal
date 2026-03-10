@@ -101,56 +101,53 @@
     </div>
 </div>
 <script>
-    // 1. DATA INITIALIZATION (Dito natin kukunin ang sinave ng Login page)
-    const rawData = localStorage.getItem('erriho_user'); // Match ito sa index.html mo
+    // 1. INITIAL DATA & CLEANING
+    const rawData = localStorage.getItem('erriho_user');
     const data = JSON.parse(rawData);
-    const INTERST_RATE = 0.15; 
+    const INTERST_RATE = 0.15;
 
-    // Debugging: Tingnan sa console kung may pumasok na data
-    console.log("User Data loaded:", data);
+    // Helper function para sa malinis na number
+    function getCleanNumber(val) {
+        if (!val) return 0;
+        return parseFloat(val.toString().replace(/[₱,]/g, '')) || 0;
+    }
 
     if (data) {
-        // I-fill up ang HTML elements
         document.getElementById('fullName').innerText = data.name || "N/A";
         document.getElementById('footerName').innerText = (data.name || "N/A").toUpperCase();
+        document.getElementById('unitName').innerText = data.productName || "No Unit Info";
         
-        // Dito natin kukunin ang Unit Name (Siguraduhin na 'productName' ang column header sa Sheet)
-        document.getElementById('unitName').innerText = data.productName || "iPhone 16 128GB Pink";
+        let baseAmount = getCleanNumber(data.balance);
         
-        // Cleanup Balance para sa computation
-        let rawBal = data.balance ? data.balance.toString().replace(/[₱,]/g, '') : "0";
-        let cleanBalance = parseFloat(rawBal);
-
-        document.getElementById('amountNum').innerText = data.balance || "0.00";
-        document.getElementById('amountNum2').innerText = data.balance || "0.00";
+        // Initial Display (2 decimal places lang)
+        document.getElementById('amountNum').innerText = baseAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('amountNum2').innerText = baseAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('amountWords').innerText = convertAmountToWords(baseAmount);
         
         document.getElementById('dateToday').innerText = new Date().toLocaleDateString('en-US', { 
             month: 'long', day: 'numeric', year: 'numeric' 
         });
-        
-        document.getElementById('amountWords').innerText = convertAmountToWords(cleanBalance);
-    } else {
-        // Kung walang data, ibig sabihin hindi nag-login. Ibalik sa index.
-        alert("Session expired. Please login again.");
-        window.location.href = 'index.html';
     }
 
+    // 2. FORMAL AMOUNT TO WORDS (Pesos and Centavos)
     function convertAmountToWords(amount) {
-    // Dahil mahirap i-code ang full "Numbers to Words" (one, two, three) sa pure JS nang walang library, 
-    // gagamit tayo ng standard Formal Banking format:
-    const formatter = new Intl.NumberFormat('en-PH', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
-    
-    const parts = amount.toFixed(2).split(".");
-    const centavos = parts[1];
-    
-    // Ang amountNum ay may formatting na, kaya words + formatted number ang ibabalik natin
-    return "THE SUM OF " + amount.toLocaleString('en-PH', {style: 'currency', currency: 'PHP'}) + " ONLY";
-}
+        const parts = amount.toFixed(2).split(".");
+        const pesos = parseInt(parts[0]);
+        const centavos = parts[1];
+        
+        // Gagamit tayo ng Intl.NumberFormat para sa formal currency look
+        let currencyFormat = new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP',
+        }).format(amount);
 
-    // 2. AUTO-COMPUTATION LOGIC
+        // Gagawin nating: "ONE THOUSAND PESOS AND 50/100 ONLY"
+        // Dahil ang JS ay walang built-in "Number to English Words", 
+        // pinaka-safe at formal sa banking ang format na ito:
+        return currencyFormat.replace("PHP", "").trim() + " PESOS AND " + centavos + "/100 ONLY";
+    }
+
+    // 3. AUTO-COMPUTATION (Decimal Fix)
     function updateComputation() {
         const promiseDateValue = document.getElementById('promiseDate').value;
         if (!promiseDateValue || !data) return;
@@ -159,89 +156,90 @@
         const today = new Date();
         today.setHours(0,0,0,0);
 
-        let rawBal = data.balance.toString().replace(/[₱,]/g, '');
-        let baseBalance = parseFloat(rawBal);
-        
-        const diffTime = promiseDate.getTime() - today.getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        let baseBalance = getCleanNumber(data.balance);
+        const diffDays = Math.ceil((promiseDate - today) / (1000 * 60 * 60 * 24));
 
-        let additionalDailyInt = 0;
-        if (diffDays > 0) {
-            additionalDailyInt = (baseBalance * INTERST_RATE) * (diffDays / 360);
-        }
+        let additionalInt = diffDays > 0 ? (baseBalance * INTERST_RATE) * (diffDays / 360) : 0;
+        let total = baseBalance + additionalInt;
 
-        const totalNewAmount = baseBalance + additionalDailyInt;
-    
-    // FIX: Gamitin ang toFixed(2) para 2 decimal places lang
-    const formattedAmount = totalNewAmount.toLocaleString('en-US', {
-        minimumFractionDigits: 2, 
-        maximumFractionDigits: 2
-    });
-
-    document.getElementById('amountNum').innerText = formattedAmount;
-    document.getElementById('amountNum2').innerText = formattedAmount;
-    document.getElementById('amountWords').innerText = convertAmountToWords(totalNewAmount);
-}
+        // I-update ang lahat ng 2 decimal places lang
+        const finalStr = total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('amountNum').innerText = finalStr;
+        document.getElementById('amountNum2').innerText = finalStr;
+        document.getElementById('amountWords').innerText = convertAmountToWords(total);
+    }
 
     document.getElementById('promiseDate').addEventListener('change', updateComputation);
 
-    // 3. SIGNATURE LOGIC
+    // 4. SIGNATURE CANVAS LOGIC
     const canvas = document.getElementById('sig-canvas');
     const ctx = canvas.getContext('2d');
     let drawing = false;
 
+    // Mobile & Desktop support
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left,
+            y: (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top
+        };
+    }
+
     canvas.addEventListener('mousedown', () => drawing = true);
-    canvas.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
-    canvas.addEventListener('mousemove', draw);
+    window.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
+    canvas.addEventListener('mousemove', (e) => {
+        if (!drawing) return;
+        const pos = getPos(e);
+        ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.lineTo(pos.x, pos.y); ctx.stroke();
+    });
+
     canvas.addEventListener('touchstart', (e) => { drawing = true; e.preventDefault(); });
     canvas.addEventListener('touchend', () => { drawing = false; ctx.beginPath(); });
     canvas.addEventListener('touchmove', (e) => {
-        const touch = e.touches[0];
-        const rect = canvas.getBoundingClientRect();
-        draw({ clientX: touch.clientX, clientY: touch.clientY });
-    });
-
-    function draw(e) {
         if (!drawing) return;
-        const rect = canvas.getBoundingClientRect();
-        ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#000';
-        const clientX = e.clientX || e.touches[0].clientX;
-        const clientY = e.clientY || e.touches[0].clientY;
-        ctx.lineTo(clientX - rect.left, clientY - rect.top);
-        ctx.stroke();
-    }
+        const pos = getPos(e);
+        ctx.lineWidth = 2; ctx.lineTo(pos.x, pos.y); ctx.stroke();
+    });
 
     function clearSig() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
-    // 4. SUBMIT TO EMAIL
-    function submitLetter() {
-    const addr = document.getElementById('addressInput').value;
-    const pDate = document.getElementById('promiseDate').value;
-    
-    if(!addr || !pDate) {
-        alert("⚠️ Pakisulat ang Address at Promise Date.");
-        return;
+    // 5. DEVICE INFO
+    function getDeviceInfo() {
+        const ua = navigator.userAgent;
+        if (/android/i.test(ua)) return "Android Device";
+        if (/iPad|iPhone|iPod/.test(ua)) return "iOS Device";
+        return "Web Browser";
     }
 
-    // Isama ang Timestamp sa letter bago i-print
-    const now = new Date();
-    const timestamp = now.toLocaleString();
-    const tsDiv = document.createElement("div");
-    tsDiv.innerHTML = `<p style="font-size:10px; color:gray; text-align:center; margin-top:20px;">
-        Digital Timestamp: ${timestamp} | Device ID: ${getDeviceInfo()}</p>`;
-    document.querySelector('.letter-paper').appendChild(tsDiv);
+    // 6. SUBMIT BUTTON (Print + Email)
+    function submitLetter() {
+        const addr = document.getElementById('addressInput').value;
+        const pDate = document.getElementById('promiseDate').value;
+        
+        if(!addr || !pDate) {
+            alert("⚠️ Pakisulat ang Address at Promise Date.");
+            return;
+        }
 
-    // 1. Alert Instruction
-    alert("INSTRUCTIONS:\n1. Print Preview will open.\n2. Select 'Save as PDF'.\n3. After saving, the email app will open. Attach the PDF there.");
+        // Magdagdag ng Timestamp sa dulo bago i-print
+        const timestamp = new Date().toLocaleString();
+        const infoTag = document.createElement("div");
+        infoTag.style.fontSize = "10px";
+        infoTag.style.color = "gray";
+        infoTag.style.textAlign = "center";
+        infoTag.style.marginTop = "30px";
+        infoTag.innerHTML = `Digital Signature Timestamp: ${timestamp} | Device: ${getDeviceInfo()}`;
+        document.querySelector('.letter-paper').appendChild(infoTag);
 
-    // 2. Open Print (Dahil sa @media print, kusa nang mawawala ang buttons sa PDF)
-    window.print();
+        // Trigger Print
+        alert("INSTRUCTION:\n1. Save as PDF ang lalabas.\n2. Pagkatapos ma-save, i-attach ang PDF sa email.");
+        window.print();
 
-    // 3. Email trigger
-    const subject = encodeURIComponent(`SIGNED PROMISSORY NOTE - ${data.name}`);
-    const body = encodeURIComponent(`Good day,\n\nI am submitting my signed promissory note (attached PDF) for my account.\n\nAccount: ${data.accRef}\nTimestamp: ${timestamp}`);
-    window.location.href = `mailto:info.erriho@gmail.com?subject=${subject}&body=${body}`;
-}
+        // Open Email
+        const subject = encodeURIComponent(`SIGNED PROMISSORY NOTE: ${data.name}`);
+        const body = encodeURIComponent(`Good day,\n\nI am submitting my signed promissory note (see attached PDF).\n\nAccount: ${data.accRef}\nTimestamp: ${timestamp}`);
+        window.location.href = `mailto:info.erriho@gmail.com?subject=${subject}&body=${body}`;
+    }
 </script>
 </body>
 </html>
