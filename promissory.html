@@ -3,6 +3,8 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Promissory Letter</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
     /* Pang-display sa screen */
     body { font-family: 'Times New Roman', serif; background: #f4f4f4; padding: 10px; color: #333; }
@@ -217,39 +219,58 @@
     }
 
     // 6. SUBMIT BUTTON (Print + Email)
-    async function submitLetter() {
+   async function submitLetter() {
     const addr = document.getElementById('addressInput').value;
     const pDate = document.getElementById('promiseDate').value;
     
     if(!addr || !pDate) {
-        alert("⚠️ Fill up Address and Promise Date.");
+        alert("⚠️ Please fill up the Address and Promise Date.");
         return;
     }
 
-    // 1. Itago ang buttons para hindi kasama sa screenshot
-    const actions = document.querySelector('.actions');
-    const backLink = document.querySelector('.back-link');
-    actions.style.display = 'none';
-    if(backLink) backLink.style.display = 'none';
+    const btn = document.querySelector('.btn-submit');
+    btn.innerText = "UPLOADING TO DRIVE...";
+    btn.disabled = true;
 
-    // 2. Kunan ng "Screenshot" ang letter
-    const letter = document.querySelector('.letter-paper');
+    // 1. Itago ang buttons para malinis ang picture
+    document.querySelector('.actions').style.display = 'none';
+    if(document.querySelector('.back-link')) document.querySelector('.back-link').style.display = 'none';
+
+    // 2. Kunan ng Screenshot ang Letter
+    const letterElement = document.querySelector('.letter-paper');
     
-    html2canvas(letter, { scale: 2 }).then(canvas => {
-        // 3. I-download ang image sa phone ng user
-        const link = document.createElement('a');
-        link.download = `Promissory_${data.name}.png`;
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-
-        // 4. Ibalik ang buttons
-        actions.style.display = 'flex';
-        if(backLink) backLink.style.display = 'block';
-
-        alert("Letter saved to your gallery/downloads. Please send this to ERRIHO Messenger.");
+    html2canvas(letterElement, { scale: 2 }).then(canvas => {
+        const base64Image = canvas.toDataURL("image/png");
         
-        // Option: I-redirect sila sa Messenger mo
-        window.location.href = "https://m.me/errihopersonalfinance";
+        // 3. I-send ang data sa Apps Script
+        fetch(baseUrl, { // Gamitin ang baseUrl ng Apps Script mo
+            method: "POST",
+            body: JSON.stringify({
+                image: base64Image,
+                filename: `Promissory_${data.name}_${data.accRef}.png`,
+                accRef: data.accRef
+            })
+        })
+        .then(res => res.json())
+        .then(response => {
+            if(response.status === "success") {
+                alert("✅ Letter successfully submitted to ERRIHO Records!");
+                window.location.href = "statement.html"; // Ibalik sa dashboard
+            } else {
+                alert("❌ Upload failed. Please try again.");
+                console.log(response.message);
+            }
+        })
+        .catch(err => {
+            alert("Error connecting to server.");
+            console.error(err);
+        })
+        .finally(() => {
+            // Ibalik ang display ng buttons kung mag-fail
+            document.querySelector('.actions').style.display = 'flex';
+            btn.innerText = "Submit Promissory Note";
+            btn.disabled = false;
+        });
     });
 }
 </script>
