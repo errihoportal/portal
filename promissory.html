@@ -191,17 +191,23 @@
         // --- 2. RESTRICTION: NO BACK-DATE & MAX 15 DAYS ---
         const dateInput = document.getElementById('promiseDate');
         
-        // I-format ang "Today" para sa 'min' attribute
-        const minDateStr = today.toISOString().split('T')[0]; 
+        // Accurate Local Date (YYYY-MM-DD)
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const minDateStr = `${year}-${month}-${day}`;
         
         const maxDate = new Date();
-        maxDate.setDate(today.getDate() + 15); // Lock hanggang 15 days lang
-        const maxDateStr = maxDate.toISOString().split('T')[0];
+        maxDate.setDate(today.getDate() + 15);
+        
+        const maxYear = maxDate.getFullYear();
+        const maxMonth = String(maxDate.getMonth() + 1).padStart(2, '0');
+        const maxDay = String(maxDate.getDate()).padStart(2, '0');
+        const maxDateStr = `${maxYear}-${maxMonth}-${maxDay}`;
 
-        dateInput.min = minDateStr; // Bawal i-back date (kahapon)
-        dateInput.max = maxDateStr; // Bawal lumampas ng 15 days
-        dateInput.value = minDateStr; // Default display is Today
-
+        dateInput.min = minDateStr; // Lock: Kahapon pababa ay disabled
+        dateInput.max = maxDateStr; // Lock: Lagpas 15 days ay disabled
+        dateInput.value = minDateStr; // Default: Today
         // --- 3. ADDRESS AUTO-CAPITALIZE ---
         const addrInput = document.getElementById('addressInput');
         if(addrInput) {
@@ -369,10 +375,18 @@
 
     // --- SUBMIT TO DRIVE ---
    async function submitToDrive() {
+    // 1. Kunin ang values
     const addr = document.getElementById('addressInput').value;
     const pDateVal = document.getElementById('promiseDate').value;
-    
-    // 1. VALIDATION: Check kung may laman ang Address at Date
+    const selectedDate = new Date(pDateVal);
+    const todayCheck = new Date();
+    todayCheck.setHours(0,0,0,0);
+
+    // 2. VALIDATIONS
+    if (selectedDate < todayCheck) {
+        alert("❌ Error: Back-dating is not allowed.");
+        return;
+    }
     if (!addr || addr.trim().length < 5) {
         alert("⚠️ Please enter your FULL ADDRESS (All Caps).");
         return;
@@ -382,60 +396,57 @@
         return;
     }
 
+    // 3. UI Updates
     const btn = document.getElementById('submitBtn');
     btn.innerText = "UPLOADING... PLEASE WAIT"; 
     btn.disabled = true;
 
-    // 2. Update the "Signed Date" on the letter before capturing
-    const now = new Date();
+    // Update the "Signed Date" on the letter before capturing
     if(document.getElementById('s-date')) {
-        document.getElementById('s-date').innerText = now.toLocaleString();
+        document.getElementById('s-date').innerText = new Date().toLocaleString();
     }
 
     const letter = document.getElementById('promissory-note');
 
-    // 3. CAPTURE THE LETTER AS IMAGE
+    // 4. CAPTURE & UPLOAD
     html2canvas(letter, { 
         scale: 2, 
         useCORS: true,
         backgroundColor: "#ffffff",
-        logging: false // Para hindi madumi ang console
+        logging: false 
     }).then(canvas => {
         const base64Image = canvas.toDataURL("image/png");
 
-        // Prepare the data to send
         const payload = {
             action: "promissory",
             image: base64Image,
             filename: `PN_${data.accRef}_${data.name}.png`
         };
 
-        // 4. SEND TO GOOGLE APPS SCRIPT
         fetch(baseUrl, {
             method: "POST",
-            mode: "no-cors", // Necessary for many Google Script setups
-            headers: { "Content-Type": "text/plain" }, // 'text/plain' helps avoid CORS preflight
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain" },
             body: JSON.stringify(payload)
         })
         .then(() => {
-            // NOTE: With 'no-cors', we won't get a 'success' response, 
-            // so we assume it went through if no network error occurred.
-            alert("✅ SUBMITTED SUCCESSFULLY!\n\nYour Promissory Note has been sent to our system.");
+            alert("✅ SUBMITTED SUCCESSFULLY!\n\nYour Promissory Note has been submitted and a copy is being downloaded to your device.");
             
-            // 5. DOWNLOAD A COPY FOR THE CLIENT
+            // DOWNLOAD LOGIC (Ito ang auto-save)
             const link = document.createElement('a');
             link.download = `ERRIHO_PN_${data.name}.png`;
             link.href = base64Image;
+            document.body.appendChild(link); // Minsan kailangan ito sa Firefox
             link.click();
+            document.body.removeChild(link);
 
-            // 6. REDIRECT
             setTimeout(() => {
                 window.location.href = "statement.html";
-            }, 1000);
+            }, 1500);
         })
         .catch(err => {
             console.error("Upload Error:", err);
-            alert("❌ Network Error: Please check your internet and try again.");
+            alert("❌ Network Error. Please try again.");
             btn.innerText = "Submit Promissory Note";
             btn.disabled = false;
         });
