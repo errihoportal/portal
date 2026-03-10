@@ -4,24 +4,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Promissory Letter</title>
     <style>
-        body { font-family: 'Times New Roman', serif; background: #f4f4f4; padding: 20px; color: #333; }
-        .letter-paper { 
-            background: white; max-width: 800px; margin: 0 auto; padding: 50px; 
-            box-shadow: 0 0 10px rgba(0,0,0,0.1); border-top: 5px solid #27ae60;
-        }
-        .header { text-align: center; margin-bottom: 30px; }
-        .date { text-align: right; margin-bottom: 20px; }
-        .content { line-height: 1.6; text-align: justify; }
-        .field { border-bottom: 1px solid #000; font-weight: bold; padding: 0 5px; }
-        .sig-container { margin-top: 40px; text-align: center; }
-        #sig-canvas { border: 1px dashed #ccc; background: #fafafa; cursor: crosshair; width: 100%; max-width: 400px; height: 150px; }
-        .actions { margin-top: 30px; text-align: center; display: flex; gap: 10px; justify-content: center; }
-        button { padding: 12px 25px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; }
-        .btn-submit { background: #27ae60; color: white; }
-        .btn-clear { background: #e74c3c; color: white; }
-        
-        @media (max-width: 600px) { .letter-paper { padding: 20px; } }
-    </style>
+    body { font-family: 'Times New Roman', serif; background: #f4f4f4; padding: 20px; color: #333; }
+    .letter-paper { 
+        background: white; max-width: 800px; margin: 0 auto; padding: 50px; 
+        box-shadow: 0 0 10px rgba(0,0,0,0.1); border-top: 5px solid #27ae60;
+        position: relative; overflow: hidden;
+    }
+    
+    /* Watermark Style */
+    .letter-paper::before {
+        content: "OFFICIAL DOCUMENT";
+        position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%, -50%) rotate(-45deg);
+        font-size: 60px; color: rgba(0, 0, 0, 0.03);
+        white-space: nowrap; pointer-events: none;
+    }
+
+    .header { text-align: center; margin-bottom: 30px; }
+    .date { text-align: right; margin-bottom: 20px; }
+    .content { line-height: 1.6; text-align: justify; }
+    .sig-container { margin-top: 50px; text-align: center; }
+    #sig-canvas { border: 1px dashed #ccc; background: #fafafa; width: 100%; max-width: 400px; height: 120px; }
+
+    /* PARA SA PRINTING: Itatago ang hindi kailangan */
+    @media print {
+        body { background: white; padding: 0; }
+        .letter-paper { box-shadow: none; border: none; padding: 20px; width: 100%; }
+        .actions, .back-link, .pwa-badge { display: none !important; } /* Tago ang buttons at link */
+        #sig-canvas { border: none; background: transparent; } /* Malinis na signature */
+    }
+
+    .actions { margin-top: 30px; text-align: center; display: flex; gap: 10px; justify-content: center; }
+    button { padding: 12px 25px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; }
+    .btn-submit { background: #27ae60; color: white; }
+    .btn-clear { background: #e74c3c; color: white; }
+</style>
 </head>
 <body>
 
@@ -119,17 +136,18 @@
     }
 
     function convertAmountToWords(amount) {
-    const amountStr = amount.toFixed(2); // Siguradong 2 decimal places
-    const [pesos, centavos] = amountStr.split('.');
+    // Dahil mahirap i-code ang full "Numbers to Words" (one, two, three) sa pure JS nang walang library, 
+    // gagamit tayo ng standard Formal Banking format:
+    const formatter = new Intl.NumberFormat('en-PH', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
     
-    // Simpleng formatter para sa currency style
-    let words = new Intl.NumberFormat('en-PH', {
-        style: 'currency',
-        currency: 'PHP',
-    }).format(amount);
-
-    // Para mas formal ang dating sa letter:
-    return words.replace("PHP", "").trim() + " PESOS AND " + centavos + "/100 ONLY";
+    const parts = amount.toFixed(2).split(".");
+    const centavos = parts[1];
+    
+    // Ang amountNum ay may formatting na, kaya words + formatted number ang ibabalik natin
+    return "THE SUM OF " + amount.toLocaleString('en-PH', {style: 'currency', currency: 'PHP'}) + " ONLY";
 }
 
     // 2. AUTO-COMPUTATION LOGIC
@@ -205,24 +223,24 @@
         return;
     }
 
-    // 1. Itatago natin ang buttons para hindi kasama sa PDF
-    document.querySelector('.actions').style.display = 'none';
-    document.querySelector('a[href="index.html"]').style.display = 'none';
+    // Isama ang Timestamp sa letter bago i-print
+    const now = new Date();
+    const timestamp = now.toLocaleString();
+    const tsDiv = document.createElement("div");
+    tsDiv.innerHTML = `<p style="font-size:10px; color:gray; text-align:center; margin-top:20px;">
+        Digital Timestamp: ${timestamp} | Device ID: ${getDeviceInfo()}</p>`;
+    document.querySelector('.letter-paper').appendChild(tsDiv);
 
-    // 2. Trigger Print (Dito nila ise-save as PDF)
-    alert("STEP 1: Save this document as PDF.\nSTEP 2: Attach the PDF to the email that will open next.");
+    // 1. Alert Instruction
+    alert("INSTRUCTIONS:\n1. Print Preview will open.\n2. Select 'Save as PDF'.\n3. After saving, the email app will open. Attach the PDF there.");
+
+    // 2. Open Print (Dahil sa @media print, kusa nang mawawala ang buttons sa PDF)
     window.print();
 
-    // 3. Ibalik ang buttons pagkatapos mag-print
-    document.querySelector('.actions').style.display = 'flex';
-    document.querySelector('a[href="index.html"]').style.display = 'block';
-
-    // 4. Saka buksan ang Email App
-    const timestamp = new Date().toLocaleString();
-    const subject = encodeURIComponent(`SIGNED PROMISSORY NOTE: ${data.name}`);
-    let bodyText = `Good day,\n\nPlease find attached the signed Promissory Note for my account.\n\nAccount: ${data.accRef}\nTimestamp: ${timestamp}`;
-    
-    window.location.href = `mailto:info.erriho@gmail.com?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
+    // 3. Email trigger
+    const subject = encodeURIComponent(`SIGNED PROMISSORY NOTE - ${data.name}`);
+    const body = encodeURIComponent(`Good day,\n\nI am submitting my signed promissory note (attached PDF) for my account.\n\nAccount: ${data.accRef}\nTimestamp: ${timestamp}`);
+    window.location.href = `mailto:info.erriho@gmail.com?subject=${subject}&body=${body}`;
 }
 </script>
 </body>
