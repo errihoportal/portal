@@ -123,18 +123,74 @@
 
     function clearSig() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
-    function submitLetter() {
-        const addr = document.getElementById('addressInput').value;
-        const pDate = document.getElementById('promiseDate').value;
-        
-        if(!addr || !pDate) {
-            alert("Please fill up the Address and Promise Date.");
-            return;
-        }
-        
-        alert("Sending to System... (Ito ang isusunod nating ikokonek sa Google Sheets mo)");
-        // Dito natin ilalagay ang google.script.run sa susunod
+   function submitLetter() {
+    const addr = document.getElementById('addressInput').value;
+    const pDate = document.getElementById('promiseDate').value;
+    const finalAmount = document.getElementById('amountNum').innerText;
+    
+    if(!addr || !pDate) {
+        alert("⚠️ Please fill up the Address and Promise Date.");
+        return;
     }
+
+    // Confirmation Note
+    alert("REMINDER: Please use your REGISTERED EMAIL ADDRESS to send this promissory note.");
+
+    const subject = encodeURIComponent(`PROMISSORY NOTE: ${data.name} - ${data.accRef}`);
+    
+    // Email Body Formatting
+    let bodyText = `PROMISSORY LETTER\n`;
+    bodyText += `DATE: ${document.getElementById('dateToday').innerText}\n\n`;
+    bodyText += `TO: JERRIC JHON DELA CRUZ\n`;
+    bodyText += `RE: Settlement of Overdue Account – ${data.productName}\n\n`;
+    bodyText += `I, ${data.name.toUpperCase()}, residing at ${addr}, acknowledge a total debt of PHP ${finalAmount}.\n\n`;
+    bodyText += `I promise to pay the full amount on or before ${pDate}.\n\n`;
+    bodyText += `TERMS: I understand that failure to pay by the said date will result in the voluntary surrender of the unit.\n\n`;
+    bodyText += `SENT VIA ERRIHO PORTAL SIGNED DOCUMENT`;
+
+    const mailtoLink = `mailto:info.erriho@gmail.com?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
+    
+    // Bubukas ang Gmail/Mail app
+    window.location.href = mailtoLink;
+}
+
+    // --- Dagdag na Logic para sa Computation ---
+const INTERST_RATE = 0.15; // 15% annual interest
+const LATE_FEE_RATE = 0.10; // 10% penalty
+
+function updateComputation() {
+    const promiseDateValue = document.getElementById('promiseDate').value;
+    if (!promiseDateValue) return;
+
+    const promiseDate = new Date(promiseDateValue);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    // Kunin ang base balance (tanggalin ang commas)
+    let baseBalance = parseFloat(data.balance.replace(/,/g, ''));
+    
+    // Alamin kung ilang araw ang idadagdag (mula ngayon hanggang sa promise date)
+    const diffTime = promiseDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    let additionalDailyInt = 0;
+    if (diffDays > 0) {
+        // Formula: (Principal * 15%) * (Days / 360)
+        additionalDailyInt = (baseBalance * INTERST_RATE) * (diffDays / 360);
+    }
+
+    const totalNewAmount = baseBalance + additionalDailyInt;
+
+    // I-update ang mga display sa letter
+    document.getElementById('amountNum').innerText = totalNewAmount.toLocaleString('en-US', {minimumFractionDigits: 2});
+    document.getElementById('amountNum2').innerText = totalNewAmount.toLocaleString('en-US', {minimumFractionDigits: 2});
+    document.getElementById('amountWords').innerText = convertAmountToWords(totalNewAmount);
+}
+
+// Makinig sa pagbabago ng date
+document.getElementById('promiseDate').addEventListener('change', updateComputation);
+
+    
 </script>
 
 </body>
