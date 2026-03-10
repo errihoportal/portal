@@ -205,7 +205,7 @@
             if (bill.p_date || bill.status === "Paid") return;
 
             // Kunin ang Bill Reference (Hindi Payment Ref)
-            let billRef = bill.bill_no || bill.ref || "N/A"; 
+            let billRef = bill.bill_no || bill.ref || ("Bill-" + bill.mo); 
             let principal = parseFloat(bill.p_amt.toString().replace(/[₱,]/g, '')) || 0;
             let dueDate = new Date(bill.mo);
             dueDate.setHours(0,0,0,0);
