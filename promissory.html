@@ -273,6 +273,41 @@
         });
     });
 }
+
+async function submitToDrive() {
+    const addr = document.getElementById('addressInput').value;
+    const pDate = document.getElementById('promiseDate').value;
+    if(!addr || !pDate) return alert("Please fill address and date.");
+
+    const btn = document.getElementById('submitBtn');
+    btn.innerText = "UPLOADING..."; btn.disabled = true;
+
+    document.getElementById('timestamp').innerText = "Digital Entry: " + new Date().toLocaleString();
+
+    const letterElement = document.getElementById('promissory-note');
+    
+    html2canvas(letterElement, { scale: 2 }).then(canvas => {
+        const base64Image = canvas.toDataURL("image/png");
+
+        fetch(baseUrl, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "promissory", // ITO ANG MAGSASABI SA SCRIPT KUNG ANONG GAGAWIN
+                image: base64Image,
+                filename: `Promissory_${data.name}.png`
+            })
+        })
+        .then(res => res.json())
+        .then(res => {
+            if(res.status === "success") {
+                alert("✅ Submitted Successfully to Drive!");
+                window.location.href = "statement.html";
+            } else { alert("Error: " + res.message); }
+        })
+        .catch(err => alert("Connection Error. Check Apps Script URL."))
+        .finally(() => { btn.innerText = "Submit to ERRIHO"; btn.disabled = false; });
+    });
+}
 </script>
 </body>
 </html>
