@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Promissory Letter</title>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
     /* Pang-display sa screen */
     body { font-family: 'Times New Roman', serif; background: #f4f4f4; padding: 10px; color: #333; }
@@ -51,6 +51,26 @@
 }
 ::placeholder {
     text-transform: none; /* Para manatiling normal ang "Enter your full address" na text */
+}
+
+#promissory-note {
+    width: 8.5in;
+    min-height: 14in; /* Legal Size Height */
+    padding: 0.75in;
+    margin: 0 auto;
+    background: white;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.document-footer {
+    margin-top: auto; /* Itutulak nito ang footer sa pinaka-baba ng page */
+    font-size: 10px;
+    color: #666;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+    text-align: center;
 }
 </style>
 </head>
@@ -375,14 +395,12 @@
 
     // --- SUBMIT TO DRIVE ---
    async function submitToDrive() {
-    // 1. Kunin ang values
     const addr = document.getElementById('addressInput').value;
     const pDateVal = document.getElementById('promiseDate').value;
     const selectedDate = new Date(pDateVal);
     const todayCheck = new Date();
     todayCheck.setHours(0,0,0,0);
 
-    // 2. VALIDATIONS
     if (selectedDate < todayCheck) {
         alert("❌ Error: Back-dating is not allowed.");
         return;
@@ -391,38 +409,49 @@
         alert("⚠️ Please enter your FULL ADDRESS (All Caps).");
         return;
     }
-    if (!pDateVal) {
-        alert("⚠️ Please select a PROMISE DATE.");
-        return;
-    }
 
-    // 3. UI Updates
     const btn = document.getElementById('submitBtn');
-    btn.innerText = "UPLOADING... PLEASE WAIT"; 
+    btn.innerText = "GENERATING PDF..."; 
     btn.disabled = true;
 
-    // Update the "Signed Date" on the letter before capturing
+    // Update Security Date
     if(document.getElementById('s-date')) {
         document.getElementById('s-date').innerText = new Date().toLocaleString();
     }
 
     const letter = document.getElementById('promissory-note');
 
-    // 4. CAPTURE & UPLOAD
+    // CAPTURE AS CANVAS
     html2canvas(letter, { 
         scale: 2, 
         useCORS: true,
-        backgroundColor: "#ffffff",
-        logging: false 
+        backgroundColor: "#ffffff" 
     }).then(canvas => {
-        const base64Image = canvas.toDataURL("image/png");
+        const imgData = canvas.toDataURL("image/png");
+        
+        // --- START PDF GENERATION (LEGAL SIZE) ---
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "in",
+            format: "legal" // 8.5" x 14"
+        });
+
+        const imgWidth = 8.5; 
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        
+        // Convert PDF to Base64 to send to Google Drive
+        const pdfBase64 = pdf.output('datauristring').split(',')[1]; 
 
         const payload = {
             action: "promissory",
-            image: base64Image,
-            filename: `PN_${data.accRef}_${data.name}.png`
+            image: pdfBase64, // Kahit 'image' ang key, PDF data na ang laman nito
+            filename: `PN_${data.accRef}_${data.name}.pdf` // Palitan ng .pdf extension
         };
 
+        // SEND TO DRIVE
         fetch(baseUrl, {
             method: "POST",
             mode: "no-cors",
@@ -430,22 +459,17 @@
             body: JSON.stringify(payload)
         })
         .then(() => {
-            alert("✅ SUBMITTED SUCCESSFULLY!\n\nYour Promissory Note has been submitted and a copy is being downloaded to your device.");
+            alert("✅ SUBMITTED SUCCESSFULLY!\n\nYour formal Promissory Note (PDF) has been saved.");
             
-            // DOWNLOAD LOGIC (Ito ang auto-save)
-            const link = document.createElement('a');
-            link.download = `ERRIHO_PN_${data.name}.png`;
-            link.href = base64Image;
-            document.body.appendChild(link); // Minsan kailangan ito sa Firefox
-            link.click();
-            document.body.removeChild(link);
+            // AUTO-DOWNLOAD PDF
+            pdf.save(`ERRIHO_PN_${data.name}.pdf`);
 
             setTimeout(() => {
                 window.location.href = "statement.html";
             }, 1500);
         })
         .catch(err => {
-            console.error("Upload Error:", err);
+            console.error(err);
             alert("❌ Network Error. Please try again.");
             btn.innerText = "Submit Promissory Note";
             btn.disabled = false;
