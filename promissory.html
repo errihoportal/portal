@@ -98,9 +98,11 @@
             <p>I am fully aware that my account is severely overdue and that the unit mentioned above is already subject to repossession under our signed Collateral Agreement.</p>
 
             <p><strong>PROMISE TO PAY:</strong><br>
-            I hereby promise and commit to settle the full amount of <strong>₱<span id="amountNum2">0.00</span></strong> on or before 
-            <input type="date" id="promiseDate" onchange="updateComputation()" style="font-family: inherit; font-weight: bold; border: 1px solid #ccc; padding: 2px; border-radius: 5px;">.</p>
-
+    I hereby promise and commit to settle the full amount of <strong>₱<span id="amountNum2">0.00</span></strong> 
+    on or before <span id="displayPromiseDate" style="font-weight: bold; border-bottom: 1px solid #000; padding: 0 5px;">________</span>.
+    
+    <input type="date" id="promiseDate" onchange="updateDateDisplay()" class="no-print" style="margin-left: 10px; font-family: inherit;">
+</p>
             <p><strong>TERMS AND CONDITIONS:</strong></p>
             <ol>
                 <li><strong>Full Settlement:</strong> I understand that this is the final extension granted to me.</li>
@@ -179,72 +181,69 @@
     }
 };
 
-    function updateComputation() {
-        let pDateVal = document.getElementById('promiseDate').value;
-        let promiseDate = pDateVal ? new Date(pDateVal) : new Date();
-        promiseDate.setHours(0,0,0,0);
-        
-        let totalOverall = 0;
-        let tableHtml = "";
+    function updateComputation(isInitial = false) {
+    let pDateVal = document.getElementById('promiseDate').value;
+    
+    // 1. Gawing "As of Today" ang computation
+    let promiseDate = isInitial ? new Date() : new Date(pDateVal);
+    promiseDate.setHours(0,0,0,0);
+    
+    let totalOverall = 0;
+    let tableHtml = "";
 
-        // Sa system mo, ang schedule ay karaniwang nasa data.schedule
-        const schedule = data.schedule || [];
+    if (!data.schedule || data.schedule.length === 0) {
+        document.getElementById('breakdownBody').innerHTML = "<tr><td colspan='5' align='center'>Walang Unpaid Bills na mahanap.</td></tr>";
+        return;
+    }
+
+    data.schedule.forEach(bill => {
+        // FILTER: Isama lang ang UNPAID (Status sa Column AF)
+        // Sa App Script mo: "st": loginData[i][31]
+        if (bill.p_date !== "---" || bill.st === "PAID" || bill.st === "Paid") return;
+
+        // Kunin ang Principal Amount (Column V)
+        let principal = parseFloat(bill.p_amt.toString().replace(/[₱,]/g, '')) || 0;
         
-        if (schedule.length === 0) {
-            document.getElementById('breakdownBody').innerHTML = "<tr><td colspan='5' align='center'>No unpaid bills found.</td></tr>";
-            return;
+        // Kunin ang Due Date (Column W)
+        let dueDate = new Date(bill.mo); 
+        dueDate.setHours(0,0,0,0);
+
+        let lateFee = 0;
+        let interest = 0;
+
+        // 2. LIVE COMPUTATION: Kung lagpas na sa Due Date ang Promise Date
+        if (promiseDate > dueDate && !isNaN(dueDate.getTime())) {
+            lateFee = principal * 0.10; // 10% Penalty
+            const diffTime = promiseDate - dueDate;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            interest = (principal * 0.15) * (diffDays / 360); // 15% Annual Interest
         }
 
-        schedule.forEach(bill => {
-            // FILTER: "Status" header mo ay "Status" (Capital S)
-            // "Payment Date" header mo ay "Payment Date"
-            let status = bill["Status"] || "";
-            let pDate = bill["Payment Date"] || null;
-            
-            if (pDate || status.toLowerCase() === "paid") return;
+        let subtotal = principal + lateFee + interest;
+        totalOverall += subtotal;
 
-            // Mapping amounts base sa headers mo: "Principal Amount" at "Due Date"
-            let rawAmt = bill["Principal Amount"] || 0;
-            let principal = parseFloat(rawAmt.toString().replace(/[₱,]/g, '')) || 0;
-            
-            let rawMo = bill["Due Date"] || null;
-            let dueDate = new Date(rawMo);
-            dueDate.setHours(0,0,0,0);
+        // I-render ang Row
+        tableHtml += `
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:8px;">${bill.mo}</td>
+                <td style="padding:8px;">₱${principal.toLocaleString(undefined,{minimumFractionDigits:2})}</td>
+                <td style="padding:8px;">₱${lateFee.toLocaleString(undefined,{minimumFractionDigits:2})}</td>
+                <td style="padding:8px;">₱${interest.toLocaleString(undefined,{minimumFractionDigits:2})}</td>
+                <td style="padding:8px; text-align:right;"><b>₱${subtotal.toLocaleString(undefined,{minimumFractionDigits:2})}</b></td>
+            </tr>`;
+    });
 
-            // Bill Reference: Dahil walang Bill No, gamitin ang Due Date
-            let billRef = rawMo ? "Bill-" + rawMo : "Unscheduled";
-
-            let lateFee = 0;
-            let interest = 0;
-
-            if (promiseDate > dueDate && !isNaN(dueDate.getTime())) {
-                lateFee = principal * 0.10;
-                const diffTime = promiseDate - dueDate;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                interest = (principal * 0.15) * (diffDays / 360);
-            }
-
-            let subtotal = principal + lateFee + interest;
-            totalOverall += subtotal;
-
-            tableHtml += `
-                <tr style="border-bottom:1px solid #eee;">
-                    <td style="padding:8px;">${billRef}</td>
-                    <td style="padding:8px;">₱${principal.toLocaleString(undefined,{minimumFractionDigits:2})}</td>
-                    <td style="padding:8px;">₱${lateFee.toLocaleString(undefined,{minimumFractionDigits:2})}</td>
-                    <td style="padding:8px;">₱${interest.toLocaleString(undefined,{minimumFractionDigits:2})}</td>
-                    <td style="padding:8px; text-align:right;"><b>₱${subtotal.toLocaleString(undefined,{minimumFractionDigits:2})}</b></td>
-                </tr>`;
-        });
-
-        document.getElementById('breakdownBody').innerHTML = tableHtml || "<tr><td colspan='5' align='center'>No outstanding balance.</td></tr>";
-        
-        const finalStr = totalOverall.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-        document.getElementById('projectedTotal').innerText = "₱ " + finalStr;
-        document.getElementById('amountNum').innerText = "(₱ " + finalStr + ")";
-        document.getElementById('amountNum2').innerText = finalStr;
-        document.getElementById('amountWords').innerText = convertAmountToWords(totalOverall);
-    }
+    // 3. UPDATE DISPLAY: Lahat ng totals
+    document.getElementById('breakdownBody').innerHTML = tableHtml;
+    
+    const finalStr = totalOverall.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+    document.getElementById('projectedTotal').innerText = "₱ " + finalStr;
+    document.getElementById('amountNum').innerText = "(₱ " + finalStr + ")";
+    document.getElementById('amountNum2').innerText = finalStr;
+    
+    // I-update ang "Amount in Words"
+    document.getElementById('amountWords').innerText = convertAmountToWords(totalOverall);
+}
     
     // IP Detection
     fetch('https://api.ipify.org?format=json')
@@ -345,6 +344,22 @@
             .finally(() => { btn.innerText = "Submit Promissory Note"; btn.disabled = false; });
         });
     }
+
+    function updateDateDisplay() {
+    const dateInput = document.getElementById('promiseDate');
+    const displaySpan = document.getElementById('displayPromiseDate');
+    
+    if (dateInput.value) {
+        // I-format ang date para maging "March 15, 2026" imbes na "03/15/2026"
+        const options = { month: 'long', day: 'numeric', year: 'numeric' };
+        const formattedDate = new Date(dateInput.value).toLocaleDateString('en-US', options);
+        
+        displaySpan.innerText = formattedDate;
+        
+        // Tawagin ang computation function para mag-update ang penalties
+        updateComputation();
+    }
+}
 </script>
 </body>
 </html>
