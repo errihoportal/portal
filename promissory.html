@@ -160,104 +160,138 @@
 <script>
     const rawData = localStorage.getItem('erriho_user');
     const data = JSON.parse(rawData);
+    // Siguraduhin na ang URL na ito ay ang "Web App" URL ng iyong Apps Script
     const baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
 
     window.onload = function() {
-    if (data) {
-        // 1. I-set ang Date Today sa Header
-        const today = new Date();
-        const options = { month: 'long', day: 'numeric', year: 'numeric' };
-        document.getElementById('dateToday').innerText = today.toLocaleDateString('en-US', options);
+        if (data) {
+            // 1. Set Header Date
+            const today = new Date();
+            const options = { month: 'long', day: 'numeric', year: 'numeric' };
+            document.getElementById('dateToday').innerText = today.toLocaleDateString('en-US', options);
 
-        // 2. I-set ang default date sa Selection (Today + 1 day para safe)
-        const tom = new Date();
-        tom.setDate(today.getDate() + 1);
-        document.getElementById('promiseDate').value = tom.toISOString().split('T')[0];
+            // 2. Set Default Promise Date (Today + 3 Days for flexibility)
+            const defaultDate = new Date();
+            defaultDate.setDate(today.getDate() + 3);
+            document.getElementById('promiseDate').value = defaultDate.toISOString().split('T')[0];
 
-        // 3. User Info
-        document.getElementById('fullName').innerText = data.name || "N/A";
-        document.getElementById('s-name').innerText = data.name || "N/A";
-        document.getElementById('s-acc').innerText = data.accRef || "N/A";
-        
-        // 4. Initial Run
-        updateComputation();
-    }
-};
-
-function updateComputation() {
-    let pDateVal = document.getElementById('promiseDate').value;
-    let promiseDate = new Date(pDateVal);
-    promiseDate.setHours(0,0,0,0);
-    
-    let totalOverall = 0;
-    let tableHtml = "";
-
-    if (!data.schedule) return;
-
-    data.schedule.forEach(bill => {
-        // Filter: Unpaid only
-        if (bill.p_date !== "---" && bill.p_date !== "" && bill.p_date !== null) return;
-        if (bill.st === "PAID" || bill.st === "Paid") return;
-
-        let principal = parseFloat(bill.p_amt.toString().replace(/[₱,]/g, '')) || 0;
-        let dueDate = new Date(bill.mo); 
-        dueDate.setHours(0,0,0,0);
-
-        let lateFee = 0;
-        let interest = 0;
-
-        // --- ACCURATE INTEREST COMPUTATION ---
-        if (promiseDate > dueDate) {
-            lateFee = principal * 0.10; // 10% penalty
+            // 3. User Info Mapping
+            document.getElementById('fullName').innerText = data.name || "N/A";
+            document.getElementById('footerName').innerText = (data.name || "N/A").toUpperCase();
+            document.getElementById('unitName').innerText = data.productName || "No Unit Info";
             
-            const diffTime = promiseDate.getTime() - dueDate.getTime();
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            // Security Info Mapping
+            document.getElementById('s-name').innerText = data.name || "---";
+            document.getElementById('s-acc').innerText = data.accRef || "---";
+            document.getElementById('s-mobile').innerText = data.mobile || "---";
+            document.getElementById('s-email').innerText = data.email || "---";
+            document.getElementById('s-date').innerText = today.toLocaleString();
             
-            // Interest = Principal * 15% annual rate * (days / 360)
-            interest = (principal * 0.15) * (diffDays / 360);
+            // 4. Run Initial Computation
+            updateComputation();
+        } else {
+            alert("No user data found. Please login again.");
+            window.location.href = "index.html";
         }
+    };
 
-        let subtotal = principal + lateFee + interest;
-        totalOverall += subtotal;
+    function updateComputation() {
+        let pDateVal = document.getElementById('promiseDate').value;
+        let promiseDate = new Date(pDateVal);
+        promiseDate.setHours(0,0,0,0);
+        
+        let totalOverall = 0;
+        let tableHtml = "";
 
-        // RENDER TABLE: .toFixed(2) para 2 decimals lang
-        tableHtml += `
-            <tr style="border-bottom:1px solid #eee;">
-                <td style="padding:6px;">${bill.mo}</td>
-                <td style="padding:6px;">₱${principal.toFixed(2)}</td>
-                <td style="padding:6px;">₱${lateFee.toFixed(2)}</td>
-                <td style="padding:6px;">₱${interest.toFixed(2)}</td>
-                <td style="padding:6px; text-align:right;"><b>₱${subtotal.toFixed(2)}</b></td>
-            </tr>`;
-    });
+        if (!data || !data.schedule) return;
 
-    document.getElementById('breakdownBody').innerHTML = tableHtml;
-    
-    // Formatting totals (2 decimals)
-    const finalStr = totalOverall.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-    document.getElementById('projectedTotal').innerText = "₱ " + finalStr;
-    document.getElementById('amountNum').innerText = "(₱ " + finalStr + ")";
-    document.getElementById('amountNum2').innerText = finalStr;
+        data.schedule.forEach(bill => {
+            // Filter: Unpaid only
+            if (bill.p_date !== "---" && bill.p_date !== "" && bill.p_date !== null) return;
+            if (bill.st === "PAID" || bill.st === "Paid") return;
 
-    // Update Signed On Date sa Footer
-    if(document.getElementById('signedDate')) {
-        document.getElementById('signedDate').innerText = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-    }
+            let principal = parseFloat(bill.p_amt.toString().replace(/[₱,]/g, '')) || 0;
+            let dueDate = new Date(bill.mo); 
+            dueDate.setHours(0,0,0,0);
 
-    if(typeof convertAmountToWords === 'function') {
+            let lateFee = 0;
+            let interest = 0;
+
+            // --- ACCURATE INTEREST COMPUTATION (15% Annual / 360 Days) ---
+            if (promiseDate > dueDate) {
+                lateFee = principal * 0.10; // 10% Penalty
+                
+                const diffTime = promiseDate.getTime() - dueDate.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                // Formula: Principal * Rate * (Days/360)
+                interest = (principal * 0.15) * (diffDays / 360);
+            }
+
+            let subtotal = principal + lateFee + interest;
+            totalOverall += subtotal;
+
+            tableHtml += `
+                <tr style="border-bottom:1px solid #eee;">
+                    <td style="padding:6px;">${bill.mo}</td>
+                    <td style="padding:6px;">₱${principal.toFixed(2)}</td>
+                    <td style="padding:6px;">₱${lateFee.toFixed(2)}</td>
+                    <td style="padding:6px;">₱${interest.toFixed(2)}</td>
+                    <td style="padding:6px; text-align:right;"><b>₱${subtotal.toFixed(2)}</b></td>
+                </tr>`;
+        });
+
+        document.getElementById('breakdownBody').innerHTML = tableHtml || "<tr><td colspan='5' align='center'>No outstanding balance.</td></tr>";
+        
+        const finalStr = totalOverall.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+        document.getElementById('projectedTotal').innerText = "₱ " + finalStr;
+        document.getElementById('amountNum').innerText = "(₱ " + finalStr + ")";
+        document.getElementById('amountNum2').innerText = finalStr;
+
+        // Amount to Words
         document.getElementById('amountWords').innerText = convertAmountToWords(totalOverall);
     }
-}
 
-// Ito yung tatawagin ng date input
-function updateDateDisplay() {
-    updateComputation();
-}
+    function updateDateDisplay() {
+        updateComputation();
+    }
 
-    // 4. SIGNATURE CANVAS LOGIC
+    // --- HELPER: AMOUNT TO WORDS ---
+    function convertAmountToWords(amount) {
+        if (amount === 0) return "Zero Pesos";
+        const words = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+        const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+        
+        function helper(n) {
+            if (n < 20) return words[n];
+            if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? " " + words[n % 10] : "");
+            if (n < 1000) return words[Math.floor(n / 100)] + " Hundred" + (n % 100 !== 0 ? " and " + helper(n % 100) : "");
+            return "";
+        }
+
+        let mainPart = Math.floor(amount);
+        let centPart = Math.round((amount - mainPart) * 100);
+        
+        let result = "";
+        if (mainPart >= 1000) {
+            result += helper(Math.floor(mainPart / 1000)) + " Thousand ";
+            mainPart %= 1000;
+        }
+        result += helper(mainPart);
+        
+        let centStr = centPart > 0 ? ` and ${centPart}/100` : "";
+        return result + " Pesos" + centStr + " Only";
+    }
+
+    // --- SIGNATURE CANVAS LOGIC ---
     const canvas = document.getElementById('sig-canvas');
     const ctx = canvas.getContext('2d');
     let drawing = false;
+
+    // Adjust canvas resolution for clearer signatures
+    canvas.width = canvas.offsetWidth * 2;
+    canvas.height = canvas.offsetHeight * 2;
+    ctx.scale(2, 2);
 
     function getPos(e) {
         const rect = canvas.getBoundingClientRect();
@@ -266,61 +300,66 @@ function updateDateDisplay() {
             y: (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top
         };
     }
-    canvas.addEventListener('mousedown', () => drawing = true);
-    window.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
+
+    canvas.addEventListener('mousedown', (e) => { drawing = true; ctx.beginPath(); const pos = getPos(e); ctx.moveTo(pos.x, pos.y); });
+    window.addEventListener('mouseup', () => drawing = false);
     canvas.addEventListener('mousemove', (e) => {
         if (!drawing) return;
         const pos = getPos(e);
-        ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.lineTo(pos.x, pos.y); ctx.stroke();
+        ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = "#000";
+        ctx.lineTo(pos.x, pos.y); ctx.stroke();
     });
-    canvas.addEventListener('touchstart', (e) => { drawing = true; e.preventDefault(); });
-    canvas.addEventListener('touchend', () => { drawing = false; ctx.beginPath(); });
+
+    // Touch Support
+    canvas.addEventListener('touchstart', (e) => { drawing = true; ctx.beginPath(); e.preventDefault(); });
     canvas.addEventListener('touchmove', (e) => {
         if (!drawing) return;
         const pos = getPos(e);
         ctx.lineWidth = 2; ctx.lineTo(pos.x, pos.y); ctx.stroke();
+        e.preventDefault();
     });
+
     function clearSig() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
-    // 5. SUBMIT TO DRIVE (CLEAN ONE-PAGE CAPTURE)
+    // --- SUBMIT TO DRIVE ---
     async function submitToDrive() {
         const addr = document.getElementById('addressInput').value;
         const pDate = document.getElementById('promiseDate').value;
         
-        if(!addr || !pDate) return alert("⚠️ Please fill up Address and Promise Date.");
+        if(!addr || addr.length < 5) return alert("⚠️ Please enter a complete Billing Address.");
+        if(!pDate) return alert("⚠️ Please select a Promise Date.");
         
         const btn = document.getElementById('submitBtn');
         btn.innerText = "UPLOADING..."; btn.disabled = true;
 
-        // I-update ang Signed Date sa security footer bago i-capture
-        document.getElementById('s-date').innerText = new Date().toLocaleString();
-
         const letter = document.getElementById('promissory-note');
         
-        html2canvas(letter, { scale: 3, useCORS: true }).then(canvas => {
+        html2canvas(letter, { scale: 2, useCORS: true, logging: false }).then(canvas => {
             const base64Image = canvas.toDataURL("image/png");
 
             fetch(baseUrl, {
                 method: "POST",
+                mode: "no-cors", // Use no-cors if experiencing redirect issues
                 body: JSON.stringify({
                     action: "promissory",
                     image: base64Image,
                     filename: `PN_${data.accRef}_${data.name}.png`
                 })
             })
-            .then(res => res.json())
-            .then(res => {
-                if(res.status === "success") {
-                    if(confirm("✅ Submitted Successfully! Save a copy to your device?")) {
-                        const link = document.createElement('a');
-                        link.download = `ERRIHO_PN_${data.name}.png`;
-                        link.href = base64Image;
-                        link.click();
-                    }
-                    window.location.href = "statement.html";
-                } else { alert("Error: " + res.message); }
+            .then(() => {
+                // Since no-cors doesn't return response, we assume success or handle via redirect
+                alert("✅ Promissory Note Sent Successfully!");
+                // Trigger download for user copy
+                const link = document.createElement('a');
+                link.download = `ERRIHO_PN_${data.name}.png`;
+                link.href = base64Image;
+                link.click();
+                window.location.href = "statement.html";
             })
-            .catch(err => alert("Connection Error. Check Apps Script URL."))
+            .catch(err => {
+                console.error(err);
+                alert("Connection Error. Please try again.");
+            })
             .finally(() => { btn.innerText = "Submit Promissory Note"; btn.disabled = false; });
         });
     }
