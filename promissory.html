@@ -297,7 +297,7 @@
             const minDateStr = `${year}-${month}-${day}`;
             
             const maxDate = new Date();
-            maxDate.setDate(today.getDate() + 20); // Ginawa nating 20 days
+            maxDate.setDate(today.getDate() + 20); // 20 days limit
             
             const maxDateStr = `${maxDate.getFullYear()}-${String(maxDate.getMonth() + 1).padStart(2, '0')}-${String(maxDate.getDate()).padStart(2, '0')}`;
 
@@ -450,7 +450,7 @@
             return;
         }
 
-        // 2. I-define ang mga kailangang variables (Dito ang error kanina)
+        // 2. I-define ang mga kailangang variables (Mahalaga ito para hindi mag-error)
         const btn = document.getElementById('submitBtn');
         const letter = document.getElementById('promissory-note');
         const originalWidth = letter.style.width;
@@ -459,15 +459,16 @@
         btn.innerText = "⏳ Submitting...";
         btn.disabled = true;
 
-        // 4. I-set ang width para sa maayos na PDF capture
+        // 4. I-set ang width para sa maayos na PDF capture (Legal Size Alignment)
         letter.style.width = "816px"; 
 
         html2canvas(letter, { scale: 3, useCORS: true, windowWidth: 816 }).then(canvas => {
-            letter.style.width = originalWidth; // Ibalik sa dati ang display
+            letter.style.width = originalWidth; // Ibalik sa dati ang display ng UI
+            
             const imgData = canvas.toDataURL("image/jpeg", 0.9); 
             const { jsPDF } = window.jspdf;
             
-            // Portrait, Inches, Legal Size
+            // Portrait, Inches, Legal Size (8.5 x 14)
             const pdf = new jsPDF({ orientation: "portrait", unit: "in", format: "legal" });
             pdf.addImage(imgData, 'JPEG', 0, 0, 8.5, 14);
             const pdfBase64 = pdf.output('datauristring').split(',')[1];
