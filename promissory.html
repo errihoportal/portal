@@ -184,14 +184,17 @@
         <p>TO: <strong>JERRIC JHON DELA CRUZ</strong><br>
         RE: Settlement of Overdue Account – <span id="unitName" style="font-weight:bold; border-bottom:1px solid #000; display: inline-block; padding: 0 5px;">---</span></p>
 
-        <p>
-            I, <span id="fullName" style="font-weight:bold; border-bottom:1px solid #000; display: inline-block; padding: 0 5px;">Loading...</span>, 
-            with current billing address at 
-            <input type="text" id="addressInput" 
-                   placeholder="Enter your full address" 
-                   oninput="this.size = Math.max(this.value.length, 25); this.value = this.value.toUpperCase()" 
-                   style="border:none; border-bottom: 1px solid #000; font-family: inherit; font-size: inherit; font-weight: bold; text-transform: uppercase; outline: none; padding: 0 5px; width: auto;" size="25"> 
-            hereby acknowledge my outstanding debt to JERRIC JHON DELA CRUZ amounting to 
+        <p style="line-height: 1.8;">
+    I, <span id="fullName" style="font-weight:bold; border-bottom:1px solid #000; display: inline-block; padding: 0 5px;">Loading...</span>, 
+    with current billing address at 
+    <span id="addressInput" 
+          contenteditable="true" 
+          role="textbox"
+          oninput="this.innerText = this.innerText.toUpperCase();"
+          style="border-bottom: 1px solid #000; font-weight: bold; min-width: 250px; display: inline; outline: none; padding: 0 5px; text-transform: uppercase;">
+          [ENTER FULL ADDRESS HERE]
+    </span> 
+    hereby acknowledge my outstanding debt to JERRIC JHON DELA CRUZ amounting to 
     <span id="amountWords" style="font-weight:bold; text-transform:uppercase;">---</span> 
     <span id="amountNum" style="font-weight:bold;">(₱0.00)</span>.
 </p>
