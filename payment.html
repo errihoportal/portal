@@ -158,19 +158,20 @@
         <p style="font-size: 13px; font-weight: 600; color: var(--dark); margin-bottom: 15px;">SELECT PAYMENT METHOD:</p>
 
         <div class="option-item">
-            <div class="option-header" onclick="toggleOption('qrph-content')">
+        <div class="option-header" onclick="toggleOption('qrph-content')">
     <div style="display: flex; flex-direction: column; align-items: flex-start;">
-        <span style="font-size: 14px;">🤳 QRPH <span class="fee-badge bg-free" style="font-size: 9px; vertical-align: middle;">ZERO FEES</span></span>
+        <div style="display: flex; align-items: center; gap: 5px;">
+            <span style="font-size: 14px;">🤳</span>
+            <img src="images/qrph.png" style="height:50px; width: auto; vertical-align: middle;" alt="QRPH">
+            <span class="fee-badge bg-free" style="font-size: 9px;">ZERO FEES</span>
+        </div>
+        
         <small style="font-size: 10px; color: #7f8c8d; font-weight: 400; margin-top: 2px;">
             (Scan via GCash, Maya, or any Bank App)
         </small>
-    
-        <div style="text-align: center; margin-top: 15px; opacity: 0.8;">
-    <img src="images/qrph.png" style="height: 30px; width: auto;" alt="QRPH Logo">
     </div>
+    <span>▼</span>
 </div>
-<span>▼</span>
-    </div>
             <div id="qrph-content" class="option-content">
                 <img src="images/qrphdesign.png" style="width: 100%; max-width: 200px; margin-bottom: 10px;">
                 <br>
