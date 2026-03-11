@@ -87,11 +87,11 @@
     }
 
     #pdf-sig-image {
-        max-height: 70px; /* Mas maliit na para balance sa 11.5px font */
-        width: auto;
-        display: block;
-        margin: 0 auto;
-    }
+    max-height: 100px; /* Nilakihan ko para mas malinaw ang pirma */
+    width: auto;
+    display: block;
+    margin: 0 auto -15px auto; /* Binigyan ng negative margin sa ilalim para lumapit sa line */
+}
 
     #pdf-security-section {
         margin-top: 20px;
@@ -275,7 +275,7 @@
     <li><strong>Execution of Collateral:</strong> I acknowledge the absolute right of JERRIC JHON DELA CRUZ to proceed with the 30-day redemption period, and subsequent resale or liquidation of the unit to cover my total outstanding debt, including all accrued interest and penalties.</li>
 </ol>
 
-    <div style="margin-top: 50px; text-align: center;">
+    <div style="margin-top: 70px; text-align: center;">
         <img id="pdf-sig-image" style="max-height: 80px; width: auto;"><br>
 <div style="border-top: 1px solid black; display: inline-block; min-width: 200px; margin-top: -10px;">
     <strong><span id="pdf-footer-name"></span></strong>
