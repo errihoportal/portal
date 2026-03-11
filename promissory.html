@@ -189,11 +189,9 @@
     with current billing address at 
     <span id="addressInput" 
           contenteditable="true" 
-          role="textbox"
-          oninput="this.innerText = this.innerText.toUpperCase();"
-          style="border-bottom: 1px solid #000; font-weight: bold; min-width: 250px; display: inline; outline: none; padding: 0 5px; text-transform: uppercase;">
-          [ENTER FULL ADDRESS HERE]
-    </span> 
+          onfocus="if(this.innerText.trim() == '[ENTER FULL ADDRESS HERE]') this.innerText = '';" 
+          onblur="if(this.innerText.trim() == '') this.innerText = '[ENTER FULL ADDRESS HERE]';"
+          style="border-bottom: 1px solid #000; font-weight: bold; min-width: 200px; display: inline; outline: none; padding: 0 5px; text-transform: uppercase; white-space: pre-wrap;">[ENTER FULL ADDRESS HERE]</span> 
     hereby acknowledge my outstanding debt to JERRIC JHON DELA CRUZ amounting to 
     <span id="amountWords" style="font-weight:bold; text-transform:uppercase;">---</span> 
     <span id="amountNum" style="font-weight:bold;">(₱0.00)</span>.
