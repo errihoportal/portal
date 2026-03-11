@@ -460,95 +460,97 @@
 
     // --- SUBMIT TO DRIVE ---
     async function submitToDrive() {
-        const addrElement = document.getElementById('addressInput');
-        const addr = addrElement.innerText.trim();
-        const promiseDateInput = document.getElementById('promiseDate');
-        
-        // --- DATE VALIDATION LOGIC ---
-        const selectedDate = new Date(promiseDateInput.value);
-        selectedDate.setHours(0, 0, 0, 0); // I-reset ang oras para date lang ang ikumpara
-        
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+    const addrElement = document.getElementById('addressInput');
+    const addr = addrElement.innerText.trim();
+    const promiseDateInput = document.getElementById('promiseDate');
+    
+    // --- DATE VALIDATION LOGIC ---
+    const selectedDate = new Date(promiseDateInput.value);
+    selectedDate.setHours(0, 0, 0, 0);
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-        const maxDate = new Date();
-        maxDate.setDate(today.getDate() + 20);
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 20);
 
-        // 1. Harang sa Address
-        if (!addr || addr === "" || addr === "[ENTER FULL ADDRESS HERE]" || addr.length < 5) {
-            alert("⚠️ Please enter your ACTUAL FULL ADDRESS.");
-            addrElement.focus();
-            return;
-        }
-
-        // 2. Harang sa Back-date (Bawal ang kahapon o nakalipas)
-        if (selectedDate < today) {
-            alert("⚠️ Back-dating is NOT allowed. Please select today or a future date.");
-            return;
-        }
-
-        // 3. Harang sa lampas 20 days
-        if (selectedDate > maxDate) {
-            alert("⚠️ Maximum extension is only 20 days from today.");
-            return;
-        }
-
-        const btn = document.getElementById('submitBtn');
-        const letter = document.getElementById('promissory-note');
-
-        btn.innerText = "⏳ Submitting ...";
-        btn.disabled = true;
-
-        // --- MOBILE LOOK (CRYSTAL CLEAR) ---
-        const actualWidth = letter.scrollWidth;
-        const actualHeight = letter.scrollHeight;
-
-        html2canvas(letter, { 
-            scale: 4, 
-            useCORS: true,
-            logging: false,
-            backgroundColor: "#ffffff",
-            width: actualWidth,
-            height: actualHeight,
-            windowWidth: actualWidth 
-        }).then(canvas => {
-            const imgData = canvas.toDataURL("image/jpeg", 1.0); 
-            const { jsPDF } = window.jspdf;
-            
-            const pdfWidth = 8.5; 
-            const pdfHeight = (actualHeight * pdfWidth) / actualWidth;
-
-            const pdf = new jsPDF({ 
-                orientation: "portrait", 
-                unit: "in", 
-                format: [pdfWidth, pdfHeight] 
-            });
-
-            // Ginamit ang 'NONE' sa compression para saktong linaw at walang putol
-            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'NONE');
-            const pdfBase64 = pdf.output('datauristring').split(',')[1];
-
-            const payload = {
-                action: "promissory",
-                image: pdfBase64, 
-                filename: `PN_${data.accRef}_${data.name}.pdf`,
-                email: data.email,
-                name: data.name
-            };
-
-            fetch(baseUrl, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
-            .then(() => {
-                alert("✅ SUBMITTED SUCCESSFULLY!");
-                setTimeout(() => { window.location.href = "statement.html"; }, 1500);
-            })
-            .catch((err) => {
-                console.error(err);
-                alert("❌ Error submitting.");
-                btn.innerText = "Submit Promissory Note";
-                btn.disabled = false;
-            });
-        });
+    if (!addr || addr === "" || addr === "[ENTER FULL ADDRESS HERE]" || addr.length < 5) {
+        alert("⚠️ Please enter your ACTUAL FULL ADDRESS.");
+        addrElement.focus();
+        return;
     }
+
+    if (selectedDate < today) {
+        alert("⚠️ Back-dating is NOT allowed. Please select today or a future date.");
+        return;
+    }
+
+    if (selectedDate > maxDate) {
+        alert("⚠️ Maximum extension is only 20 days from today.");
+        return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    const letter = document.getElementById('promissory-note');
+
+    btn.innerText = "⏳ Submitting please wait...";
+    btn.disabled = true;
+
+    // --- SCREENSHOT LOGIC (NO CUTTING) ---
+    // Kinukuha ang saktong sukat ng element base sa mobile screen
+    const rect = letter.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+
+    html2canvas(letter, { 
+        scale: 3, // Sapat na ang 3 para malinaw pero hindi sobrang bigat
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+        width: width,
+        height: height,
+        x: 0,
+        y: 0,
+        scrollX: 0,
+        scrollY: -window.scrollY // Sinisiguro na hindi mapuputol kung naka-scroll ang user
+    }).then(canvas => {
+        const imgData = canvas.toDataURL("image/jpeg", 1.0); 
+        const { jsPDF } = window.jspdf;
+        
+        // Kinakalibrate ang PDF sa ratio ng Mobile screen
+        const pdfWidth = 8.5; 
+        const pdfHeight = (height * pdfWidth) / width;
+
+        const pdf = new jsPDF({ 
+            orientation: "portrait", 
+            unit: "in", 
+            format: [pdfWidth, pdfHeight] 
+        });
+
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'NONE');
+        const pdfBase64 = pdf.output('datauristring').split(',')[1];
+
+        const payload = {
+            action: "promissory",
+            image: pdfBase64, 
+            filename: `PN_${data.accRef}_${data.name}.pdf`,
+            email: data.email,
+            name: data.name
+        };
+
+        fetch(baseUrl, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+        .then(() => {
+            alert("✅ SUBMITTED SUCCESSFULLY!");
+            setTimeout(() => { window.location.href = "statement.html"; }, 1500);
+        })
+        .catch((err) => {
+            console.error(err);
+            alert("❌ Error submitting.");
+            btn.innerText = "Submit Promissory Note";
+            btn.disabled = false;
+        });
+    });
+}
 </script>
 </body>
 </html>
