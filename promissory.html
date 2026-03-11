@@ -16,18 +16,18 @@
     }
     
     #promissory-note {
-        background: white; 
-        width: 8.5in; 
-        min-height: 13in; 
-        margin: 0 auto; 
-        padding: 0.8in 1in; 
-        box-shadow: 0 0 10px rgba(0,0,0,0.1); 
-        position: relative;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        line-height: 1.8; 
-    }
+    background: white; 
+    width: 8.5in; /* Fixed width */
+    height: 13in; /* Fixed height para sa Long Bond Paper */
+    margin: 0 auto; 
+    padding: 0.8in 1in; 
+    box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.8; 
+}
 
     #promissory-note::after {
         content: "ERRIHO OFFICIAL";
@@ -494,38 +494,30 @@
     btn.innerText = "⏳ Submitting...";
     btn.disabled = true;
 
-    // --- EXACT MOBILE CAPTURE ---
-    html2canvas(letter, { 
-        scale: 3, // Ito ang pampalinaw (3x resolution)
-        useCORS: true,
-        logging: false,
-        // Hahayaan nating html2canvas ang kumuha ng natural width/height ng element
-    }).then(canvas => {
-        const imgData = canvas.toDataURL("image/jpeg", 1.0); 
-        const { jsPDF } = window.jspdf;
-        
-        // --- ANG LOGIC PARA HINDI MASIRA ANG ITSURA ---
-        // Kinukuha ang pixels at ginagawang Inches (96 pixels = 1 inch)
-        const imgWidth = canvas.width / (3 * 96); 
-        const imgHeight = canvas.height / (3 * 96);
+   // --- EXACT LEGAL SIZE CAPTURE ---
+html2canvas(letter, { 
+    scale: 2, // Sapat na ang 2 para sa malinaw na text pero hindi sobrang bigat na file
+    useCORS: true,
+    logging: false,
+    width: 816,  // 8.5 inches * 96 dpi
+    height: 1248 // 13 inches * 96 dpi
+}).then(canvas => {
+    const imgData = canvas.toDataURL("image/jpeg", 0.9); // 0.9 quality para optimize ang size
+    const { jsPDF } = window.jspdf;
+    
+    // FORCE LEGAL SIZE: 8.5in x 13in
+    const pdf = new jsPDF({ 
+        orientation: "portrait", 
+        unit: "in", 
+        format: [8.5, 13] // Ito ang fixed Long Bond Paper size
+    });
 
-        // Ang PDF paper size ay mag-aadjust sa laki ng mobile view mo
-        const pdf = new jsPDF({ 
-            orientation: imgWidth > imgHeight ? "landscape" : "portrait", 
-            unit: "in", 
-            format: [imgWidth, imgHeight] 
-        });
-
-        pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
-        const pdfBase64 = pdf.output('datauristring').split(',')[1];
-
-        const payload = {
-            action: "promissory",
-            image: pdfBase64, 
-            filename: `PN_${data.accRef}_${data.name}.pdf`,
-            email: data.email,
-            name: data.name
-        };
+    // I-fit ang image sa buong page
+    pdf.addImage(imgData, 'JPEG', 0, 0, 8.5, 13);
+    
+    const pdfBase64 = pdf.output('datauristring').split(',')[1];
+    
+    // ... rest of your fetch code ...
 
         fetch(baseUrl, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
         .then(() => {
