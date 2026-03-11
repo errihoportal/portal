@@ -231,53 +231,40 @@
     </div>
 </div>
 
-        <div id="card-content" class="option-content">
-    <div class="bank-details">
-        <div style="background: #fff5f5; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--danger);">
-            <p style="margin: 0; font-size: 11px; color: #c0392b; line-height: 1.4;">
-                <b>⚠️ Card Payment Notice:</b> Card transactions are processed via <b>GCash for Business</b> terminals at our authorized Hubs. 
-                A <b>3.20% Convenience Fee</b> is applied by the payment provider. This fee does not go to Erriho.
-            </p>
-        </div>
-
-        <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; font-size: 13px; margin-bottom: 15px;">
-            <div class="fee-item"><span>Bill Amount:</span> <span id="cardBaseAmount">₱0.00</span></div>
-            <div class="fee-item"><span>Convenience Fee (3.20%):</span> <span id="cardFeeAmount">₱0.00</span></div>
-            <hr style="border:0; border-top:1px solid #ddd; margin: 5px 0;">
-            <div class="fee-item" style="font-weight: bold; color: var(--dark);">
-                <span>Total to Swipe:</span> <span id="cardTotalAmount">₱0.00</span>
+      <div class="option-item">
+                <div class="option-header" onclick="toggleOption('card-content')">
+                    <span>💳 CREDIT / DEBIT CARD <span class="fee-badge bg-with-fee">WITH FEES</span></span>
+                    <span>▼</span>
+                </div>
+                <div id="card-content" class="option-content">
+                    <div class="bank-details" style="text-align: left;">
+                        <div style="background: #fff5f5; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--danger);">
+                            <p style="margin: 0; font-size: 11px; color: #c0392b; line-height: 1.4;">
+                                <b>⚠️ Card Payment Notice:</b> 3.20% Processing Fee applies via <b>GCash for Business</b> at our Hubs.
+                            </p>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; font-size: 13px; margin-bottom: 15px;">
+                            <div class="fee-item" style="display:flex; justify-content:space-between;"><span>Bill Amount:</span> <span id="cardBaseAmount">₱0.00</span></div>
+                            <div class="fee-item" style="display:flex; justify-content:space-between;"><span>Fee (3.20%):</span> <span id="cardFeeAmount">₱0.00</span></div>
+                            <hr style="border:0; border-top:1px solid #ddd; margin: 5px 0;">
+                            <div class="fee-item" style="display:flex; justify-content:space-between; font-weight: bold;">
+                                <span>Total to Swipe:</span> <span id="cardTotalAmount">₱0.00</span>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px;">
+                            <b style="color: var(--primary);">📍 AUTHORIZED HUBS:</b><br>
+                            • Butuan Hub: <b>Jerric Jhon Dela Cruz</b> (09123456789)<br>
+                            <span style="color:#95a5a6;">• Caloocan / Masbate: Coming Soon</span>
+                        </div>
+                        <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
+                        <label style="display: flex; gap: 8px; font-size: 11px; cursor: pointer;">
+                            <input type="checkbox" id="feeAgree">
+                            <span>I agree to the 3.20% processing fee. Receipt via GCash Business email.</span>
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div style="font-size: 12px; line-height: 1.6;">
-            <b style="color: var(--primary);">📍 AUTHORIZED HUBS:</b><br>
-            
-            <div style="margin-top: 8px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-                <b>• Butuan Hub (Main)</b><br>
-                Address: [Insert Street, Brgy, Butuan City]<br>
-                Person-in-charge: <b>Jerric Jhon Dela Cruz</b><br>
-                Contact: 09123456789
-            </div>
-
-            <div style="margin-top: 8px; color: #95a5a6;">
-                <i>• Caloocan Hub - (Coming Soon)</i><br>
-                <i>• Masbate Hub - (Coming Soon)</i>
-            </div>
-        </div>
-
-        <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
-
-        <label style="display: flex; gap: 8px; font-size: 11px; cursor: pointer; align-items: flex-start; margin-bottom: 10px;">
-            <input type="checkbox" id="feeAgree" style="margin-top: 3px;">
-            <span>I agree to the 3.20% processing fee. I understand that the official receipt for this fee will be sent by <b>GCash for Business</b> to my email after the transaction.</span>
-        </label>
-
-        <div style="text-align: center; margin-top: 10px;">
-            <img src="https://getlogovector.com/wp-content/uploads/2021/01/gcash-logo-vector.png" style="height: 15px; opacity: 0.7;">
-            <span style="font-size: 9px; color: #bdc3c7; display: block;">Powered by GCash for Business</span>
-        </div>
-    </div>
-</div>
 
     <div id="instrModal">
         <div class="modal-content">
