@@ -738,41 +738,43 @@ function toggleOption(id) {
     const allOptions = document.querySelectorAll('.option-item');
     const targetContent = document.getElementById(id);
     const selectedOption = targetContent.closest('.option-item');
-    const arrow = selectedOption.querySelector('span:last-child');
     
-    // Check kung kasalukuyang nakabukas ang clinick
+    // Hanapin ang arrow span sa loob ng header ng piniling option
+    const arrow = selectedOption.querySelector('.option-header span:last-child');
+    
     const isOpening = targetContent.style.display !== 'block';
 
     if (isOpening) {
-        // 1. Itago ang lahat ng IBANG option-item boxes
+        // 1. Itago ang lahat ng ibang options
         allOptions.forEach(option => {
             if (option !== selectedOption) {
                 option.style.display = 'none';
             }
         });
 
-        // 2. Ipakita ang content ng pinili
+        // 2. Ipakita ang details
         targetContent.style.display = 'block';
         
-        // 3. Palitan ang arrow sa UP
-        if (arrow) arrow.innerText = '▲';
-        
-        // 4. Siguraduhin na naka-display 'block' ang napiling item
-        selectedOption.style.display = 'block';
+        // 3. GAWING UP ANG ARROW
+        if (arrow) {
+            arrow.innerHTML = '▲'; 
+        }
 
     } else {
-        // PAG NAKABUKAS NA AT CLINICK ULIT (CLOSING)
+        // PAG ISASARA NA
         
-        // 1. Ipakita ulit ang lahat ng options sa listahan
+        // 1. Ipakita ulit lahat ng options
         allOptions.forEach(option => {
             option.style.display = 'block';
         });
 
-        // 2. Itago ang content ng clinick
+        // 2. Itago ang details
         targetContent.style.display = 'none';
         
-        // 3. Ibalik ang arrow sa DOWN
-        if (arrow) arrow.innerText = '▼';
+        // 3. IBALIK SA DOWN ANG ARROW
+        if (arrow) {
+            arrow.innerHTML = '▼';
+        }
     }
 }
 
