@@ -172,18 +172,49 @@
         </div>
 
         <div class="option-item">
-            <div class="option-header" onclick="toggleOption('bank-content')">
-                <span>🏦 BANK DEPOSIT / TRANSFER <span class="fee-badge bg-free">ZERO FEES</span></span>
-                <span>▼</span>
+    <div class="option-header" onclick="toggleOption('bank-content')">
+        <span>🏦 BANK DEPOSIT / TRANSFER <span class="fee-badge bg-free">ZERO FEES</span></span>
+        <span>▼</span>
+    </div>
+    <div id="bank-content" class="option-content">
+        <div class="bank-details">
+            <div style="background: #eef2f7; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #00529b;">
+                <p style="margin: 0; font-size: 12px; color: #333; line-height: 1.4;">
+                    <b>💡 Recommended for Large Amounts:</b><br>
+                    To avoid high service fees and cash-in limits from E-wallets, we recommend an <b>Over-the-Counter (OTC)</b> deposit at any BPI/BDO branch. This method is 100% free of charge.
+                </p>
             </div>
-            <div id="bank-content" class="option-content">
-                <div class="bank-details">
-                    <div style="background: #eef2f7; padding: 10px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #00529b;">
-                        <p style="margin: 0; font-size: 12px; color: #333;">
-                            <b>💡 Recommended for Big Amounts:</b><br>
-                            Bisitahin ang pinakamalapit na <b>BPI Branch</b> at mag-deposit Over-the-Counter (OTC) upang makaiwas sa anumang additional service fees.
-                        </p>
-                    </div>
+
+            <div style="margin-bottom: 15px;">
+                <b style="color: #b31f24;">BANK: BPI (Savings)</b><br>
+                <span style="font-size: 12px;">Name: JERRIC JHON DELA CRUZ</span><br>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 5px;">
+                    <code id="bpiAcc" style="font-size: 15px; font-weight: bold; background: #f4f4f4; padding: 2px 5px; border-radius: 4px;">4559378092</code>
+                    <button onclick="copyText('bpiAcc')" style="background: #00529b; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 11px; cursor: pointer;">📋 Copy</button>
+                </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
+
+            <div style="margin-bottom: 15px;">
+                <b style="color: #2980b9;">BANK: BDO (Savings)</b><br>
+                <span style="font-size: 12px;">Name: JERRIC JHON DELA CRUZ</span><br>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 5px;">
+                    <code id="bdoAcc" style="font-size: 15px; font-weight: bold; background: #f4f4f4; padding: 2px 5px; border-radius: 4px;">111122223333</code>
+                    <button onclick="copyText('bdoAcc')" style="background: #00529b; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 11px; cursor: pointer;">📋 Copy</button>
+                </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
+            
+            <p style="font-size: 11px; color: #666; line-height: 1.5; margin: 0;">
+                <b>Online Transfer via Instapay:</b><br>
+                You may also use GCash, Maya, or other Bank Apps. 
+                <br><span style="color: var(--danger);">*Please note that your bank or e-wallet provider may charge an Instapay convenience fee.</span>
+            </p>
+        </div>
+    </div>
+</div>
 
                     <b>Bank Name:</b> BPI (Bank of the Philippine Islands)<br>
                     <b>Account Name:</b> JERRIC JHON DELA CRUZ<br>
