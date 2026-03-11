@@ -552,6 +552,21 @@ function toggleOption(id) {
         target.style.display = 'block';
     }
 }
+
+function copyText(elementId) {
+    const textToCopy = document.getElementById(elementId).innerText;
+    
+    // Create a temporary textarea to copy from for better compatibility
+    const tempInput = document.createElement("textarea");
+    tempInput.value = textToCopy;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+
+    // Simple Alert for confirmation
+    alert("Account Number Copied: " + textToCopy);
+}
 </script>
 </body>
 </html>
