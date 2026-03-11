@@ -119,10 +119,27 @@
 </head>
 <body>
 
-<div id="loader" class="loading-screen">
-    <div>
-        <img src="images/logo.png" style="width:200px; margin-bottom:10px;"><br>
-        <span>Data loading please wait...</span>
+<div id="loader" class="loading-screen" style="text-align: center; font-family: 'Segoe UI', sans-serif;">
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;">
+        <img src="images/logo.png" style="width:180px; margin-bottom:10px; animation: pulse 2s infinite;" alt="Logo">
+        
+        <div style="font-size: 18px; font-weight: 800; color: #2c3e50; letter-spacing: 2px; margin-bottom: 12px;">
+            ERRIHO PORTAL
+        </div>
+
+        <div style="display: inline-block; padding: 8px 15px; background: #f8f9fa; border-radius: 50px; border: 1px solid #e9ecef; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <span style="font-size: 12px;">🛡️</span>
+                <div style="text-align: left; line-height: 1.2;">
+                    <b style="font-size: 11px; color: #333; letter-spacing: 0.5px; display: block; text-transform: uppercase;">SECURE PAYMENT GATEWAY</b>
+                    <span style="font-size: 9px; color: #27ae60; font-weight: 600; display: block; text-transform: uppercase;">Trusted & Encrypted</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="font-size: 12px; color: #7f8c8d; letter-spacing: 1px;">
+            Data loading please wait...
+        </div>
     </div>
 </div>
 
@@ -147,8 +164,9 @@
                 </div>
             </div>
         </div>
-    </div> <div id="statusBanner" class="status-banner">Loading...</div>
+    </div>
 
+    <div id="statusBanner" class="status-banner">Loading...</div>
     <div class="bill-card">
         <p>Customer: <b id="custName">---</b></p>
         <h2 id="billNumDisplay">Bill #---</h2>
