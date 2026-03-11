@@ -5,7 +5,7 @@
     <title>Promissory Letter</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
     /* Pang-display sa screen */
     body { font-family: 'Times New Roman', serif; background: #f4f4f4; padding: 10px; color: #333; }
@@ -56,16 +56,15 @@
 
 #promissory-note {
     width: 8.5in;
-    min-height: 13in; /* Ginawang min-height para mag-adjust kung mahaba ang text */
-    padding: 0.8in;
+    min-height: 11in; /* Hayaan itong humaba depende sa text */
+    padding: 0.6in;
     margin: 0 auto;
     background: white;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     position: relative;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    font-family: 'Times New Roman', serif;
+    /* Alisin ang fixed height: 14in dito */
 }
 
 .document-footer {
@@ -455,61 +454,57 @@ if(document.getElementById('s-date-footer')) {
     }
 
     const letter = document.getElementById('promissory-note');
+    const btn = document.getElementById('submitBtn');
+    btn.innerText = "GENERATING ONE-PAGE PDF...";
+    btn.disabled = true;
 
-    // 2. Capture as Canvas
     html2canvas(letter, { 
-        scale: 2, 
+        scale: 2, // Mataas na quality
         useCORS: true,
-        backgroundColor: "#ffffff" 
+        logging: false,
+        backgroundColor: "#ffffff",
+        windowWidth: 816, // Fixed width para sa standard 8.5in
     }).then(canvas => {
         const imgData = canvas.toDataURL("image/png");
         
-        // --- 3. START PDF GENERATION (LEGAL SIZE) ---
         const { jsPDF } = window.jspdf;
+        // Gagawa tayo ng LEGAL size document
         const pdf = new jsPDF({
             orientation: "portrait",
             unit: "in",
-            format: "legal" 
+            format: "legal" // 8.5" x 14"
         });
 
-        const imgWidth = 8.5; 
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        const pdfWidth = 8.5;
+        const pdfHeight = 14;
+
+        /* DITO ANG MAGIC: 
+           Imbes na imgHeight ang gamitin, i-force natin sa 8.5 x 14 
+           para siguradong ONE PAGE lang siya at walang putol.
+        */
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
         
-        // Convert PDF to Base64
         const pdfBase64 = pdf.output('datauristring').split(',')[1]; 
 
-        // --- 4. PREPARE PAYLOAD (KASAMA ANG EMAIL) ---
         const payload = {
             action: "promissory",
             image: pdfBase64, 
             filename: `PN_${data.accRef}_${data.name}.pdf`,
-            email: data.email, // Importante para sa email notification sa client
-            name: data.name,    // Para sa personalized email body
-            accRef: data.accRef
+            email: data.email,
+            name: data.name
         };
 
-        // 5. Send to Google Apps Script
         fetch(baseUrl, {
             method: "POST",
             mode: "no-cors",
-            headers: { "Content-Type": "text/plain" },
             body: JSON.stringify(payload)
         })
         .then(() => {
-            // Pinalitan ang alert message dahil email na ang focus
-            alert("✅ SUBMITTED SUCCESSFULLY!\n\nA copy of your Promissory Note has been sent to your registered email.");
-            
-            // INALIS na dito ang pdf.save() para hindi na mag-auto download sa device
-
-            setTimeout(() => {
-                window.location.href = "statement.html";
-            }, 1500);
+            alert("✅ SUBMITTED SUCCESSFULLY!\nA one-page official copy was sent to your email.");
+            setTimeout(() => { window.location.href = "statement.html"; }, 1500);
         })
         .catch(err => {
-            console.error(err);
-            alert("❌ Network Error. Please try again.");
-            btn.innerText = "Submit Promissory Note";
+            alert("❌ Error. Try again.");
             btn.disabled = false;
         });
     });
