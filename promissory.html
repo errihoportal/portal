@@ -483,22 +483,23 @@ if(document.getElementById('s-date-footer')) {
     const letter = document.getElementById('promissory-note');
 
     html2canvas(letter, { 
-        scale: 2, 
+        scale: 3, // Mas mataas na resolution para hindi malabo
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff",
-        windowWidth: 816, 
+        windowWidth: 816 // Standard pixel width para sa 8.5in
     }).then(canvas => {
-        const imgData = canvas.toDataURL("image/png");
+        const imgData = canvas.toDataURL("image/jpeg", 1.0); // JPEG para mas "crisp"
         const { jsPDF } = window.jspdf;
+        
         const pdf = new jsPDF({
             orientation: "portrait",
             unit: "in",
-            format: "legal" 
+            format: "legal" // 8.5" x 14"
         });
 
         // I-stretch ang image sa buong Legal Page (8.5x14)
-        pdf.addImage(imgData, 'PNG', 0, 0, 8.5, 14, undefined, 'FAST');
+        pdf.addImage(imgData, 'JPEG', 0, 0, 8.5, 14); 
         
         const pdfBase64 = pdf.output('datauristring').split(',')[1]; 
 
