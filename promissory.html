@@ -64,17 +64,17 @@
     /* Linisin ang input para magmukhang saktong underline lang */
     #addressInput {
         border: none;
-        border-bottom: 1px solid black;
+        border-bottom: 1px solid black; /* Ang underline */
         background: transparent;
         font-family: 'Times New Roman', serif;
         font-size: inherit;
         font-weight: bold;
         text-transform: uppercase;
-        outline: none;
+        outline: none; /* Tinatanggal yung blue border pag clinick */
         padding: 0 5px;
-        width: auto;
-        min-width: 150px;
-        display: inline-block;
+        min-width: 200px; /* Haba ng underline */
+        display: inline; /* Para kasama siya sa agos ng text */
+        white-space: pre-wrap; /* Para kung mahaba ang address, mag-aadjust ang line height */
     }
 
     #promiseDate {
@@ -187,11 +187,12 @@
         <p style="line-height: 1.8;">
     I, <span id="fullName" style="font-weight:bold; border-bottom:1px solid #000; display: inline-block; padding: 0 5px;">Loading...</span>, 
     with current billing address at 
-    <span id="addressInput" 
+   <span id="addressInput" 
           contenteditable="true" 
           onfocus="if(this.innerText.trim() == '[ENTER FULL ADDRESS HERE]') this.innerText = '';" 
-          onblur="if(this.innerText.trim() == '') this.innerText = '[ENTER FULL ADDRESS HERE]';"
-          style="border-bottom: 1px solid #000; font-weight: bold; min-width: 200px; display: inline; outline: none; padding: 0 5px; text-transform: uppercase; white-space: pre-wrap;">[ENTER FULL ADDRESS HERE]</span> 
+          onblur="if(this.innerText.trim() == '') this.innerText = '[ENTER FULL ADDRESS HERE]';">
+        [ENTER FULL ADDRESS HERE]
+    </span> 
     hereby acknowledge my outstanding debt to JERRIC JHON DELA CRUZ amounting to 
     <span id="amountWords" style="font-weight:bold; text-transform:uppercase;">---</span> 
     <span id="amountNum" style="font-weight:bold;">(₱0.00)</span>.
