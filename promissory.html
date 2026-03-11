@@ -460,37 +460,47 @@
 
     // --- SUBMIT TO DRIVE ---
     async function submitToDrive() {
-        // 1. Validation: Address at Date Restriction
         const addrElement = document.getElementById('addressInput');
         const addr = addrElement.innerText.trim();
         const promiseDateInput = document.getElementById('promiseDate');
+        
+        // --- DATE VALIDATION LOGIC ---
         const selectedDate = new Date(promiseDateInput.value);
+        selectedDate.setHours(0, 0, 0, 0); // I-reset ang oras para date lang ang ikumpara
+        
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        // Check kung lampas 20 days o back-date (Double security)
         const maxDate = new Date();
         maxDate.setDate(today.getDate() + 20);
 
+        // 1. Harang sa Address
         if (!addr || addr === "" || addr === "[ENTER FULL ADDRESS HERE]" || addr.length < 5) {
             alert("⚠️ Please enter your ACTUAL FULL ADDRESS.");
             addrElement.focus();
             return;
         }
 
-        if (selectedDate < today || selectedDate > maxDate) {
-            alert("⚠️ Invalid Date! Please select a date from today up to 20 days only.");
+        // 2. Harang sa Back-date (Bawal ang kahapon o nakalipas)
+        if (selectedDate < today) {
+            alert("⚠️ Back-dating is NOT allowed. Please select today or a future date.");
+            return;
+        }
+
+        // 3. Harang sa lampas 20 days
+        if (selectedDate > maxDate) {
+            alert("⚠️ Maximum extension is only 20 days from today.");
             return;
         }
 
         const btn = document.getElementById('submitBtn');
         const letter = document.getElementById('promissory-note');
 
-        btn.innerText = "⏳ Submitting High Quality PDF...";
+        btn.innerText = "⏳ Submitting ...";
         btn.disabled = true;
 
-        // --- MOBILE VIEW CAPTURE (COPY PASTE NG ITSURA SA SCREEN) ---
-        const actualWidth = letter.scrollWidth; // Ginamit ang scrollWidth para kuha lahat
+        // --- MOBILE LOOK (CRYSTAL CLEAR) ---
+        const actualWidth = letter.scrollWidth;
         const actualHeight = letter.scrollHeight;
 
         html2canvas(letter, { 
@@ -500,23 +510,21 @@
             backgroundColor: "#ffffff",
             width: actualWidth,
             height: actualHeight,
-            windowWidth: actualWidth // Sinisiguro na mobile view width ang kukunin
+            windowWidth: actualWidth 
         }).then(canvas => {
             const imgData = canvas.toDataURL("image/jpeg", 1.0); 
             const { jsPDF } = window.jspdf;
             
-            // Dynamic PDF Size para hindi putol
             const pdfWidth = 8.5; 
             const pdfHeight = (actualHeight * pdfWidth) / actualWidth;
 
-            // Inalis ang 'compress: true' para hindi lumabo at maputol
             const pdf = new jsPDF({ 
                 orientation: "portrait", 
                 unit: "in", 
                 format: [pdfWidth, pdfHeight] 
             });
 
-            // Ginamit ang 'NONE' sa compression para Crystal Clear
+            // Ginamit ang 'NONE' sa compression para saktong linaw at walang putol
             pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'NONE');
             const pdfBase64 = pdf.output('datauristring').split(',')[1];
 
