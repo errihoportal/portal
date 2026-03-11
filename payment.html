@@ -74,6 +74,43 @@
 .bg-upcoming { background: linear-gradient(135deg, #2980b9, #3498db) !important; color: white !important; }
 .blink-overdue { animation: blink-red 2s infinite; }
 .pulse-today { animation: pulse-blue 1.5s infinite; }
+
+/* Payment Options Styling */
+.payment-options { margin: 20px; }
+.option-item { 
+    border: 1px solid #ddd; 
+    border-radius: 10px; 
+    margin-bottom: 10px; 
+    overflow: hidden; 
+    transition: 0.3s;
+}
+.option-header { 
+    padding: 15px; 
+    background: #fff; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    cursor: pointer; 
+    font-weight: 600;
+    font-size: 13px;
+}
+.option-header:hover { background: #f8f9fa; }
+.option-content { 
+    display: none; 
+    padding: 15px; 
+    background: #fafafa; 
+    border-top: 1px solid #eee; 
+    text-align: center; 
+}
+.fee-badge { 
+    font-size: 10px; 
+    padding: 2px 8px; 
+    border-radius: 10px; 
+    margin-left: 5px; 
+}
+.bg-free { background: #d4edda; color: #155724; }
+.bg-with-fee { background: #fff3cd; color: #856404; }
+.bank-details { text-align: left; font-size: 13px; background: white; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
     
     </style>
 </head>
@@ -117,28 +154,73 @@
     </div>
 
     <div id="activeSection">
-        <div class="qr-section">
-            <img src="images/qrphdesign.png" style="width: 300px; margin-bottom: 10px;" alt="Design Icon">
-            <br>
-            <button class="btn-how-to" onclick="toggleModal(true)">❓ How to pay using QR?</button>
-            <br><br>
-            <img src="" id="qrImg" class="qr-code">
-            <p style="font-size: 11px; margin-top: 10px;">Long press image to save QR</p>
-        </div>
+    <div class="payment-options">
+        <p style="font-size: 13px; font-weight: 600; color: var(--dark); margin-bottom: 15px;">SELECT PAYMENT METHOD:</p>
 
-        <div id="instrModal">
-            <div class="modal-content">
-                <span class="close-instr" onclick="toggleModal(false)">&times;</span>
-                <h3 style="color: var(--primary); margin-top: 0; font-size: 18px;">💡 How to Pay via QRPh</h3>
-                <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 15px;">
-                <div class="step"><div class="step-num">1</div><div class="step-text"><b>Long Press</b> ang QR code at i-save sa gallery.</div></div>
-                <div class="step"><div class="step-num">2</div><div class="step-text">Buksan ang iyong <b>GCash, Maya, o Bank App</b>.</div></div>
-                <div class="step"><div class="step-num">3</div><div class="step-text">Piliin ang <b>"Scan QR"</b> at i-click ang <b>"Upload from Gallery"</b>.</div></div>
-                <div class="step"><div class="step-num">4</div><div class="step-text">Bayaran ang amount at <b>mag-screenshot</b>.</div></div>
-                <div class="step"><div class="step-num">5</div><div class="step-text">I-upload ang screenshot sa <b>Proof of Payment</b> section.</div></div>
-                <button class="btn-submit" style="width: 100%; margin: 15px 0 0 0;" onclick="toggleModal(false)">Got it!</button>
+        <div class="option-item">
+            <div class="option-header" onclick="toggleOption('qrph-content')">
+                <span>🤳 QRPH <span class="fee-badge bg-free">ZERO FEES</span></span>
+                <span>▼</span>
+            </div>
+            <div id="qrph-content" class="option-content">
+                <img src="images/qrphdesign.png" style="width: 100%; max-width: 200px; margin-bottom: 10px;">
+                <br>
+                <img src="" id="qrImg" class="qr-code">
+                <p style="font-size: 11px; margin-top: 10px; color: #7f8c8d;">Scan via GCash, Maya, or any Bank App</p>
+                <button class="btn-how-to" onclick="toggleModal(true)">❓ How to pay?</button>
             </div>
         </div>
+
+        <div class="option-item">
+            <div class="option-header" onclick="toggleOption('bank-content')">
+                <span>🏦 BANK DEPOSIT <span class="fee-badge bg-free">ZERO FEES</span></span>
+                <span>▼</span>
+            </div>
+            <div id="bank-content" class="option-content">
+                <div class="bank-details">
+                    <b>Bank Name:</b> BDO Unibank<br>
+                    <b>Account Name:</b> ERRIHO SERVICES<br>
+                    <b>Account Number:</b> 001234567890<br>
+                    <hr style="border: 0; border-top: 1px solid #eee;">
+                    <small style="color: var(--danger)">*Only OTC or Instapay to BDO are zero fees.</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-item">
+            <div class="option-header" onclick="toggleOption('card-content')">
+                <span>💳 CREDIT / DEBIT CARD <span class="fee-badge bg-with-fee">WITH FEES</span></span>
+                <span>▼</span>
+            </div>
+            <div id="card-content" class="option-content">
+                <p style="font-size: 13px;">Online payment via card is coming soon.<br>For now, please use Bank Transfer.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="instrModal">
+        <div class="modal-content">
+            <span class="close-instr" onclick="toggleModal(false)">&times;</span>
+            <h3 style="color: var(--primary); margin-top: 0; font-size: 18px;">💡 How to Pay via QRPh</h3>
+            <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 15px;">
+            <div class="step"><div class="step-num">1</div><div class="step-text"><b>Long Press</b> ang QR code at i-save sa gallery.</div></div>
+            <div class="step"><div class="step-num">2</div><div class="step-text">Buksan ang iyong <b>GCash, Maya, o Bank App</b>.</div></div>
+            <div class="step"><div class="step-num">3</div><div class="step-text">Piliin ang <b>"Scan QR"</b> at i-click ang <b>"Upload from Gallery"</b>.</div></div>
+            <div class="step"><div class="step-num">4</div><div class="step-text">Bayaran ang amount at <b>mag-screenshot</b>.</div></div>
+            <div class="step"><div class="step-num">5</div><div class="step-text">I-upload ang screenshot sa <b>Proof of Payment</b> section.</div></div>
+            <button class="btn-submit" style="width: 100%; margin: 15px 0 0 0;" onclick="toggleModal(false)">Got it!</button>
+        </div>
+    </div>
+
+    <div class="upload-section">
+        <label class="custom-file-upload">
+            <input type="file" id="fileInput" onchange="updateFileName()" accept="image/*">
+            <span id="fileLabel">📸 Tap to upload Proof of Payment</span>
+            <div id="previewContainer"><img id="imagePreview" src=""></div>
+        </label>
+    </div>
+    <button class="btn-submit" id="submitBtn" onclick="uploadFile()">SUBMIT PAYMENT</button>
+</div>
 
         <div class="upload-section">
             <label class="custom-file-upload">
@@ -434,6 +516,22 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     
     updateClock();
     setInterval(updateClock, 1000);
+}
+
+function toggleOption(id) {
+    // Isara lahat ng contents
+    const contents = document.querySelectorAll('.option-content');
+    contents.forEach(content => {
+        if (content.id !== id) content.style.display = 'none';
+    });
+
+    // I-toggle yung pinili
+    const target = document.getElementById(id);
+    if (target.style.display === 'block') {
+        target.style.display = 'none';
+    } else {
+        target.style.display = 'block';
+    }
 }
 </script>
 </body>
