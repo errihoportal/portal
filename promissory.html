@@ -188,29 +188,27 @@
         </div>
     </div>
 
-    <div class="letter-paper" id="promissory-note">
-        
-    <div class="document-footer">
-    <hr style="border: 0; border-top: 1px solid #ccc; margin-bottom: 10px;">
-    <p style="margin: 0; font-style: italic;">
-        This document is electronically generated and digitally signed. 
-        Issued via ERRIHO Secure System on <span id="s-date-footer"></span>.
-    </p>
-    <p style="margin: 5px 0 0 0; font-weight: bold; color: #333;">
-        OFFICIAL PROMISSORY NOTE - CONFIDENTIAL
-    </p>
-</div>    
+    <div id="security-info">
+            </div>
 
-    <div class="actions" style="margin-top: 30px; margin-bottom: 50px; text-align: center; display: flex; gap: 10px; justify-content: center;">
+        <div class="document-footer" style="margin-top: auto; text-align: center; padding-top: 20px;">
+            <hr style="border: 0; border-top: 1px solid #ccc; margin-bottom: 10px;">
+            <p style="margin: 0; font-style: italic; font-size: 11px;">
+                This document is electronically generated and digitally signed. 
+                Issued via ERRIHO Secure System on <span id="s-date-footer"></span>.
+            </p>
+            <p style="margin: 5px 0 0 0; font-weight: bold; color: #333; font-size: 11px;">
+                OFFICIAL PROMISSORY NOTE - CONFIDENTIAL
+            </p>
+        </div>
+    </div> <div class="actions" style="margin-top: 30px; margin-bottom: 50px; text-align: center; display: flex; gap: 10px; justify-content: center;">
         <button class="btn-clear" onclick="clearSig()" style="background: #95a5a6; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
             Clear Signature
         </button>
-        <button id="submitBtn" class="btn-submit" onclick="submitToDrive()" style="background: #27ae60; color: white; padding: 12px 30px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(39,174,96,0.3);">
+        <button id="submitBtn" class="btn-submit" onclick="submitToDrive()" style="background: #27ae60; color: white; padding: 12px 30px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
             Submit Promissory Note
         </button>
     </div>
-
-
 </body>
 <script>
     const rawData = localStorage.getItem('erriho_user');
