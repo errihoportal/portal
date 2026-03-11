@@ -4,7 +4,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Promissory Letter</title>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
     /* Pang-display sa screen */
     body { font-family: 'Times New Roman', serif; background: #f4f4f4; padding: 10px; color: #333; }
@@ -55,23 +56,33 @@
 
 #promissory-note {
     width: 8.5in;
-    height: 14in; /* Fixed Legal Height */
+    min-height: 13in; /* Ginawang min-height para mag-adjust kung mahaba ang text */
     padding: 0.8in;
     margin: 0 auto;
     background: white;
     box-sizing: border-box;
     display: flex;
-    flex-direction: column; /* Para gumana ang auto-margin sa footer */
+    flex-direction: column;
     position: relative;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Preview look only */
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    font-family: 'Times New Roman', serif;
 }
 
 .document-footer {
-    margin-top: auto; /* Itutulak ang footer sa pinakababa ng page */
+    margin-top: auto; /* Ito ang "magic" para laging nasa baba ang footer */
     text-align: center;
     font-size: 11px;
     color: #555;
-    padding-bottom: 20px;
+    padding-top: 20px;
+}
+
+/* Para sa mobile view, hindi masisira ang hitsura */
+@media screen and (max-width: 8.5in) {
+    #promissory-note {
+        width: 100%;
+        height: auto;
+        padding: 20px;
+    }
 }
 </style>
 </head>
@@ -178,15 +189,8 @@
         </div>
     </div>
 
-    <div class="actions" style="margin-top: 30px; margin-bottom: 50px; text-align: center; display: flex; gap: 10px; justify-content: center;">
-        <button class="btn-clear" onclick="clearSig()" style="background: #95a5a6; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
-            Clear Signature
-        </button>
-        <button id="submitBtn" class="btn-submit" onclick="submitToDrive()" style="background: #27ae60; color: white; padding: 12px 30px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(39,174,96,0.3);">
-            Submit Promissory Note
-        </button>
-    </div>
-
+    <div class="letter-paper" id="promissory-note">
+        
     <div class="document-footer">
     <hr style="border: 0; border-top: 1px solid #ccc; margin-bottom: 10px;">
     <p style="margin: 0; font-style: italic;">
@@ -196,7 +200,17 @@
     <p style="margin: 5px 0 0 0; font-weight: bold; color: #333;">
         OFFICIAL PROMISSORY NOTE - CONFIDENTIAL
     </p>
-</div>
+</div>    
+
+    <div class="actions" style="margin-top: 30px; margin-bottom: 50px; text-align: center; display: flex; gap: 10px; justify-content: center;">
+        <button class="btn-clear" onclick="clearSig()" style="background: #95a5a6; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+            Clear Signature
+        </button>
+        <button id="submitBtn" class="btn-submit" onclick="submitToDrive()" style="background: #27ae60; color: white; padding: 12px 30px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(39,174,96,0.3);">
+            Submit Promissory Note
+        </button>
+    </div>
+
 
 </body>
 <script>
