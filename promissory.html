@@ -351,10 +351,11 @@
             let interest = 0;
 
             if (promiseDate > dueDate) {
-                lateFee = principal * 0.10; 
+                // Pinapako natin sa 2 decimal places ang computation
+                lateFee = parseFloat((principal * 0.10).toFixed(2)); 
                 const diffTime = promiseDate.getTime() - dueDate.getTime();
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                interest = (principal * 0.15) * (diffDays / 30);
+                interest = parseFloat(((principal * 0.15) * (diffDays / 30)).toFixed(2));
             }
 
             let subtotal = principal + lateFee + interest;
@@ -363,21 +364,23 @@
             tableHtml += `
                 <tr style="border-bottom:1px solid #eee;">
                     <td style="padding:6px;">${bill.mo}</td>
-                    <td style="padding:6px;">₱${principal.toLocaleString('en-US', {minimumFractionDigits:2})}</td>
-                    <td style="padding:6px;">₱${lateFee.toLocaleString('en-US', {minimumFractionDigits:2})}</td>
-                    <td style="padding:6px;">₱${interest.toLocaleString('en-US', {minimumFractionDigits:2})}</td>
-                    <td style="padding:6px; text-align:right;"><b>₱${subtotal.toLocaleString('en-US', {minimumFractionDigits:2})}</b></td>
+                    <td style="padding:6px;">₱${principal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                    <td style="padding:6px;">₱${lateFee.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                    <td style="padding:6px;">₱${interest.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                    <td style="padding:6px; text-align:right;"><b>₱${subtotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</b></td>
                 </tr>`;
         });
 
         document.getElementById('breakdownBody').innerHTML = tableHtml;
+        
+        // Final Formatting para sa Total
         const finalStr = totalOverall.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
         document.getElementById('projectedTotal').innerText = "₱ " + finalStr;
         document.getElementById('amountNum').innerText = "(₱ " + finalStr + ")";
         document.getElementById('amountNum2').innerText = finalStr;
         document.getElementById('amountWords').innerText = convertAmountToWords(totalOverall);
     }
-
+    
     function updateDateDisplay() { updateComputation(); }
 
     function convertAmountToWords(amount) {
