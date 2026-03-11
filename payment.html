@@ -209,51 +209,54 @@
 </div>
 
         <div class="option-item" id="palawanPaySection">
-    <div class="option-header" onclick="toggleOption('palawan-content')" style="display: flex; justify-content: space-between; align-items: center;">
+    <div class="option-header" onclick="toggleOption('palawan-content')" style="display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #ed1c24;">
         <div style="display: flex; flex-direction: column; gap: 4px;">
-            <span style="font-size: 14px; font-weight: bold;">
-                <img src="images/palawanpay.png" style="height: 15px; width: auto; vertical-align: middle; margin-right: 5px;" alt=""> 
-                PALAWANPAY / OTC <span class="fee-badge bg-free" style="font-size: 9px; vertical-align: middle;">ZERO FEES</span>
+            <span style="font-size: 14px; font-weight: bold; color: #b31f24;">
+                🏦 PALAWANPAY / OTC 
+                <span class="fee-badge" style="font-size: 9px; vertical-align: middle; background: #ffc107; color: #000;">ZERO FEES</span>
             </span>
-            <small style="font-size: 10px; color: #7f8c8d;" id="palawanLimitText">Available Limit: ₱10,000.00</small>
+            
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+                <img src="images/palawanpay.png" style="height: 18px; width: auto;" alt="PalawanPay">
+            </div>
         </div>
-        <span>▼</span>
+        <span style="color: #ed1c24;">▼</span>
     </div>
 
     <div id="palawan-content" class="option-content">
         <div class="bank-details">
-            <div style="background: #fff5f5; padding: 10px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ed1c24;">
-                <p style="margin: 0; font-size: 11px; color: #333; line-height: 1.4;">
-                    <b>How to pay at Palawan Branch:</b><br>
-                    Tell the <b>Cashier</b> you want to <b>"Cash-In via PalawanPay"</b> and provide the details below:
+            <div style="background: #fff5f5; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ed1c24;">
+                <p style="margin: 0; font-size: 11px; color: #c0392b; line-height: 1.5;">
+                    <b>🚫 STRICTLY NO REGULAR PADALA:</b><br>
+                    Do <b>NOT</b> send as a "Regular Remittance" (yung may Claim Code/Control Number). We will not claim it at any branch.
+                    <br><br>
+                    <b>✅ CORRECT METHOD:</b><br>
+                    Go to any Palawan branch and tell the <b>Cashier</b>: 
+                    <i style="color: #333; font-weight: bold;">"Mag-Cash-in po ako via PalawanPay"</i>
                 </p>
             </div>
 
-            <div style="margin-bottom: 15px;">
-                <b style="color: #ed1c24;">ACCOUNT NAME:</b><br>
-                <span style="font-size: 14px; font-weight: bold;">JERRIC JHON DELA CRUZ</span><br>
+            <div style="margin-bottom: 15px; background: #fdfdfd; padding: 10px; border-radius: 8px;">
+                <b style="color: #ed1c24; font-size: 11px;">ACCOUNT NAME:</b><br>
+                <span style="font-size: 13px; font-weight: bold;">JERRIC JHON DELA CRUZ</span><br>
                 
-                <b style="color: #ed1c24; display:block; margin-top:10px;">PALAWANPAY NUMBER:</b>
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 5px;">
-                    <code id="palawanAcc" style="font-size: 16px; font-weight: bold; background: #f4f4f4; padding: 5px; border-radius: 4px; color: #333;">09123456789</code>
-                    <button onclick="copyText('palawanAcc')" style="background: #ed1c24; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 11px; cursor: pointer;">📋 Copy</button>
+                <div style="margin-top: 10px;">
+                    <b style="color: #ed1c24; font-size: 11px;">PALAWANPAY NUMBER:</b>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 5px;">
+                        <code id="palawanAcc" style="font-size: 16px; font-weight: bold; background: #fff9db; padding: 5px 10px; border-radius: 4px; border: 1px solid #ffe066; color: #333;">09123456789</code>
+                        <button onclick="copyText('palawanAcc')" style="background: #ed1c24; color: white; border: none; padding: 6px 12px; border-radius: 5px; font-size: 11px; cursor: pointer; font-weight: bold;">📋 Copy</button>
+                    </div>
                 </div>
             </div>
 
-            <div style="margin-top: 15px; padding: 10px; background: #fff9db; border-radius: 8px; border: 1px solid #fab005;">
+            <div style="margin-top: 15px; padding: 12px; background: #fff9db; border-radius: 8px; border: 1px solid #fab005;">
                 <p style="margin: 0; font-size: 11px; color: #856404; line-height: 1.4;">
-                    <b>⚠️ IMPORTANT:</b> After paying at the branch, please **take a photo of the receipt** and **upload it below** in the "Proof of Payment" section to verify your transaction.
+                    <b>⚠️ IMPORTANT:</b> After your transaction at the branch, please <b>take a photo of the receipt</b> and <b>upload it below</b> in the "Tap to upload Proof of Payment" section to verify your payment.
                 </p>
-            </div>
-
-            <div style="text-align: center; margin-top: 20px; opacity: 0.7;">
-                <img src="images/palawanpay.png" style="height: 30px; width: auto;" alt="PalawanPay Logo">
-                <span style="display:block; font-size: 9px; color: #7f8c8d; margin-top: 5px;">Authorized PalawanPay Merchant</span>
             </div>
         </div>
     </div>
 </div>
-
         <div class="option-item">
     <div class="option-header" onclick="toggleOption('bank-content')" style="display: flex; justify-content: space-between; align-items: center;">
     <div style="display: flex; flex-direction: column; gap: 4px;">
