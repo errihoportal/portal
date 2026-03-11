@@ -15,22 +15,20 @@
         color: #333; 
     }
     
-    /* Main Paper Container - Naka-set sa Legal Size para sa PDF Export */
     #promissory-note {
         background: white; 
         width: 8.5in; 
-        min-height: 13in; /* Legal size height */
+        min-height: 13in; 
         margin: 0 auto; 
-        padding: 0.8in 1in; /* Standard legal margins */
+        padding: 0.8in 1in; 
         box-shadow: 0 0 10px rgba(0,0,0,0.1); 
         position: relative;
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
-        line-height: 1.8; /* Mas maluwag na line height para sa legal look */
+        line-height: 1.8; 
     }
 
-    /* Watermark - ERRIHO OFFICIAL */
     #promissory-note::after {
         content: "ERRIHO OFFICIAL";
         position: absolute; top: 50%; left: 50%;
@@ -39,7 +37,6 @@
         pointer-events: none;
     }
 
-    /* TAGO ANG BUTTONS KAPAG PRINT O PDF GENERATION */
     @media print {
         header, footer, .actions, .back-link, #pwa-badge { display: none !important; }
         body { background: white; padding: 0; }
@@ -51,16 +48,23 @@
         }
     }
 
-    /* TEXT CONTENT ALIGNMENT */
     .content { 
         font-size: 14px; 
         text-align: justify; 
     }
 
-    /* EXACT UNDERLINE LOGIC: Para sa Address Input */
+    /* --- ANG FIX: Specific class para sa mga kailangang may underline --- */
+    .underline-field {
+        border-bottom: 1px solid black;
+        font-weight: bold;
+        padding: 0 5px;
+        display: inline-block;
+    }
+
+    /* Linisin ang input para magmukhang saktong underline lang */
     #addressInput {
         border: none;
-        border-bottom: 1px solid black; /* Ang underline */
+        border-bottom: 1px solid black;
         background: transparent;
         font-family: 'Times New Roman', serif;
         font-size: inherit;
@@ -68,20 +72,11 @@
         text-transform: uppercase;
         outline: none;
         padding: 0 5px;
-        width: auto;         /* HINDI fixed ang haba para sumunod sa text */
-        min-width: 150px;    /* Minimum na haba ng guhit */
+        width: auto;
+        min-width: 150px;
         display: inline-block;
     }
 
-    /* EXACT UNDERLINE LOGIC: Para sa Name, Unit, at Amount spans */
-    #promissory-note span {
-        border-bottom: 1px solid black; 
-        font-weight: bold;
-        padding: 0 5px;
-        display: inline-block; /* Importante para lumabas ang underline na sakto sa text */
-    }
-
-    /* PARA SA DATE INPUT */
     #promiseDate {
         border: none;
         border-bottom: 1px solid black;
@@ -92,7 +87,11 @@
         width: auto;
     }
 
-    /* SIGNATURE AREA */
+    /* --- Inalis ang general span underline para malinis ang footer --- */
+    #promissory-note span {
+        border-bottom: none; 
+    }
+
     .sig-container {
         margin-top: 50px;
         text-align: center;
@@ -100,14 +99,13 @@
 
     #sig-canvas {
         border: none; 
-        border-bottom: 1px solid #000; /* Isang linya lang para sa pirma */
+        border-bottom: 1px solid #000; 
         width: 300px;
         height: 100px;
         background: #fafafa;
         cursor: crosshair;
     }
 
-    /* SECURITY INFO TABLE (BOTTOM SECTION) */
     #security-info table {
         width: 100%;
         border-collapse: collapse;
@@ -117,16 +115,14 @@
         font-family: sans-serif;
     }
 
-    /* DOCUMENT FOOTER */
     .document-footer {
-        margin-top: auto; /* Pinupush ang footer sa pinaka-ibaba ng legal paper */
+        margin-top: auto; 
         text-align: center;
         font-size: 11px;
         color: #555;
         padding-top: 20px;
     }
 
-    /* MOBILE RESPONSIVENESS */
     @media screen and (max-width: 8.5in) {
         #promissory-note {
             width: 100%;
@@ -134,11 +130,10 @@
             padding: 20px;
         }
         #addressInput {
-            width: 90%; /* Konting adjust para hindi lumabas sa screen sa mobile */
+            width: 90%; 
         }
     }
 
-    /* Placeholder styling */
     ::placeholder {
         text-transform: none;
         font-weight: normal;
