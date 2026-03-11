@@ -16,18 +16,18 @@
     }
     
     #promissory-note {
-    background: white; 
-    width: 8.5in; /* Fixed width */
-    height: 13in; /* Fixed height para sa Long Bond Paper */
-    margin: 0 auto; 
-    padding: 0.8in 1in; 
-    box-shadow: 0 0 10px rgba(0,0,0,0.1); 
-    position: relative;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    line-height: 1.8; 
-}
+        background: white; 
+        width: 8.5in; 
+        min-height: 13in; 
+        margin: 0 auto; 
+        padding: 0.8in 1in; 
+        box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+        position: relative;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        line-height: 1.8; 
+    }
 
     #promissory-note::after {
         content: "ERRIHO OFFICIAL";
@@ -139,6 +139,27 @@
         font-weight: normal;
         color: #aaa;
     }
+
+    /* Ito ang kukunin ng html2canvas para sa PDF */
+#pdf-render-area {
+    position: absolute;
+    left: -9999px; /* Itatago natin sa screen para hindi makita ng customer */
+    top: 0;
+    width: 8.5in;
+    height: 13in;
+    padding: 0.8in 1in;
+    background: white;
+    font-family: 'Times New Roman', serif;
+    line-height: 1.8;
+    box-sizing: border-box;
+    color: black;
+}
+
+/* Siguraduhin na ang text ay malinis sa PDF */
+#pdf-render-area p {
+    margin-bottom: 15px;
+    text-align: justify;
+}
 </style>
 </head>
 <body>
@@ -286,6 +307,36 @@
     <button id="submitBtn" class="btn-submit" onclick="submitToDrive()" style="background: #27ae60; color: white; padding: 12px 30px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
         Submit Promissory Note
     </button>
+</div>
+
+    <div id="pdf-render-area">
+    <h2 style="text-align: center; margin-bottom: 30px;">PROMISSORY LETTER</h2>
+    <p style="text-align: right;">DATE: <span id="pdf-date-today"></span></p>
+    
+    <p>TO: <strong>JERRIC JHON DELA CRUZ</strong><br>
+    RE: Settlement of Overdue Account – <span id="pdf-unit-name"></span></p>
+
+    <p>I, <strong id="pdf-full-name"></strong>, with current billing address at <span id="pdf-address-text" style="border-bottom: 1px solid black; padding: 0 5px;"></span> hereby acknowledge my outstanding debt to JERRIC JHON DELA CRUZ amounting to <span id="pdf-amount-words" style="text-transform: uppercase; font-weight: bold;"></span> (<span id="pdf-amount-num"></span>).</p>
+
+    <p>I am fully aware that my account is severely overdue and that the unit mentioned above is already subject to repossession under our signed Collateral Agreement.</p>
+
+    <p><strong>PROMISE TO PAY:</strong><br>
+    I hereby promise and commit to settle the full amount of <strong id="pdf-amount-num2"></strong> on or before <strong id="pdf-promise-date"></strong>.</p>
+
+    <p><strong>TERMS AND CONDITIONS:</strong></p>
+    <ol>
+        <li><strong>Full Settlement:</strong> I understand that this is the final extension granted to me.</li>
+        <li><strong>Voluntary Surrender:</strong> If I fail to settle... (Copy mo lahat ng legal terms mo dito)</li>
+    </ol>
+
+    <div style="margin-top: 50px; text-align: center;">
+        <img id="pdf-sig-image" style="max-width: 300px; border-bottom: 1px solid black;"><br>
+        <strong><span id="pdf-footer-name"></span></strong><br>
+        <span>(Signature over Printed Name)</span>
+    </div>
+    
+    <div id="pdf-security-section" style="margin-top: 30px; font-size: 10px; color: gray;">
+        </div>
 </div>
 </body>
 <script>
@@ -459,7 +510,8 @@
     function clearSig() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
     // --- SUBMIT TO DRIVE ---
-    async function submitToDrive() {
+   async function submitToDrive() {
+    // 1. KUNIN ANG MGA INPUTS PARA SA VALIDATION
     const addrElement = document.getElementById('addressInput');
     const addr = addrElement.innerText.trim();
     const promiseDateInput = document.getElementById('promiseDate');
@@ -472,51 +524,74 @@
     const maxDate = new Date();
     maxDate.setDate(today.getDate() + 20);
 
+    // --- CHECK KUNG MAY ADDRESS ---
     if (!addr || addr === "" || addr === "[ENTER FULL ADDRESS HERE]" || addr.length < 5) {
         alert("⚠️ Please enter your ACTUAL FULL ADDRESS.");
         addrElement.focus();
         return;
     }
 
+    // --- CHECK KUNG BACK-DATE ---
     if (selectedDate < today) {
         alert("⚠️ Back-dating is NOT allowed.");
         return;
     }
 
+    // --- CHECK KUNG LAMPAS 20 DAYS ---
     if (selectedDate > maxDate) {
         alert("⚠️ Maximum extension is 20 days only.");
         return;
     }
 
-    const btn = document.getElementById('submitBtn');
-    const letter = document.getElementById('promissory-note');
+    // --- KUNIN ANG SIGNATURE PARA SA PDF ---
+    const sigCanvas = document.getElementById('sig-canvas');
+    // Check kung blangko ang signature (optional but recommended)
+    const sigImageData = sigCanvas.toDataURL("image/png");
 
-    btn.innerText = "⏳ Submitting...";
+    const btn = document.getElementById('submitBtn');
+    btn.innerText = "⏳ Generating Official PDF...";
     btn.disabled = true;
 
-   // --- EXACT LEGAL SIZE CAPTURE ---
-html2canvas(letter, { 
-    scale: 2, // Sapat na ang 2 para sa malinaw na text pero hindi sobrang bigat na file
-    useCORS: true,
-    logging: false,
-    width: 816,  // 8.5 inches * 96 dpi
-    height: 1248 // 13 inches * 96 dpi
-}).then(canvas => {
-    const imgData = canvas.toDataURL("image/jpeg", 0.9); // 0.9 quality para optimize ang size
-    const { jsPDF } = window.jspdf;
+    // 2. I-POPULATE ANG IYONG CLEAN PDF TEMPLATE (Hidden Area)
+    // Siguraduhin na ang mga IDs na ito ay nasa HTML mo gaya ng pinag-usapan natin kanina
+    document.getElementById('pdf-address-text').innerText = addr;
+    document.getElementById('pdf-promise-date').innerText = promiseDateInput.value;
+    document.getElementById('pdf-sig-image').src = sigImageData;
     
-    // FORCE LEGAL SIZE: 8.5in x 13in
-    const pdf = new jsPDF({ 
-        orientation: "portrait", 
-        unit: "in", 
-        format: [8.5, 13] // Ito ang fixed Long Bond Paper size
-    });
+    // I-sync ang iba pang detalye
+    document.getElementById('pdf-date-today').innerText = document.getElementById('dateToday').innerText;
+    document.getElementById('pdf-unit-name').innerText = document.getElementById('unitName').innerText;
+    document.getElementById('pdf-full-name').innerText = document.getElementById('fullName').innerText;
+    document.getElementById('pdf-amount-words').innerText = document.getElementById('amountWords').innerText;
+    document.getElementById('pdf-amount-num').innerText = document.getElementById('amountNum').innerText;
+    document.getElementById('pdf-amount-num2').innerText = document.getElementById('amountNum2').innerText;
+    document.getElementById('pdf-footer-name').innerText = document.getElementById('footerName').innerText;
+    document.getElementById('pdf-security-section').innerHTML = document.getElementById('security-info').innerHTML;
 
-    // I-fit ang image sa buong page
-    pdf.addImage(imgData, 'JPEG', 0, 0, 8.5, 13);
-    
-    const pdfBase64 = pdf.output('datauristring').split(',')[1];
+    // 3. CAPTURE THE HIDDEN TEMPLATE (Legal Size: 8.5 x 13)
+    const pdfArea = document.getElementById('pdf-render-area');
 
+    html2canvas(pdfArea, { 
+        scale: 2, // 2 is enough for clear text and smaller file size
+        useCORS: true,
+        logging: false,
+        width: 816,  // 8.5in * 96dpi
+        height: 1248 // 13in * 96dpi
+    }).then(canvas => {
+        const imgData = canvas.toDataURL("image/jpeg", 0.9); 
+        const { jsPDF } = window.jspdf;
+        
+        // --- FORCE LEGAL SIZE PDF ---
+        const pdf = new jsPDF({ 
+            orientation: "portrait", 
+            unit: "in", 
+            format: [8.5, 13] 
+        });
+
+        pdf.addImage(imgData, 'JPEG', 0, 0, 8.5, 13);
+        const pdfBase64 = pdf.output('datauristring').split(',')[1];
+
+        // 4. PAYLOAD FOR GOOGLE DRIVE & EMAIL
         const payload = {
             action: "promissory",
             image: pdfBase64, 
@@ -525,6 +600,7 @@ html2canvas(letter, {
             name: data.name
         };
 
+        // 5. SEND TO YOUR GOOGLE SCRIPT
         fetch(baseUrl, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
         .then(() => {
             alert("✅ SUBMITTED SUCCESSFULLY!");
@@ -532,7 +608,7 @@ html2canvas(letter, {
         })
         .catch((err) => {
             console.error(err);
-            alert("❌ Error.");
+            alert("❌ Error submitting to server.");
             btn.innerText = "Submit Promissory Note";
             btn.disabled = false;
         });
