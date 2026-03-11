@@ -343,8 +343,56 @@
         <span>(Signature over Printed Name)</span>
     </div>
     
-    <div id="pdf-security-section" style="margin-top: 30px; font-size: 10px; color: gray;">
-        </div>
+    <div id="pdf-security-section" style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 15px; font-family: Arial, sans-serif;">
+    <h4 style="font-size: 10px; color: #333; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Digital Audit Trail & Security Identification</h4>
+    
+    <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+        <tr>
+            <td style="padding: 5px; vertical-align: top; border: 1px solid #f0f0f0;">
+                <strong style="font-size: 8px; color: #7f8c8d;">SIGNER NAME</strong><br>
+                <span id="pdf-s-name" style="font-size: 10px; color: #2c3e50; font-weight: bold;">---</span>
+            </td>
+            <td style="padding: 5px; vertical-align: top; border: 1px solid #f0f0f0;">
+                <strong style="font-size: 8px; color: #7f8c8d;">CLIENT ACCOUNT #</strong><br>
+                <span id="pdf-s-acc" style="font-size: 10px; color: #2c3e50; font-weight: bold;">---</span>
+            </td>
+            <td style="padding: 5px; vertical-align: top; border: 1px solid #f0f0f0;">
+                <strong style="font-size: 8px; color: #7f8c8d;">IP ADDRESS</strong><br>
+                <span id="pdf-s-ip" style="font-size: 10px; color: #2c3e50; font-weight: bold;">---</span>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 5px; vertical-align: top; border: 1px solid #f0f0f0;">
+                <strong style="font-size: 8px; color: #7f8c8d;">TIMESTAMP</strong><br>
+                <span id="pdf-s-date" style="font-size: 10px; color: #2c3e50;">---</span>
+            </td>
+            <td style="padding: 5px; vertical-align: top; border: 1px solid #f0f0f0;">
+                <strong style="font-size: 8px; color: #7f8c8d;">VERIFIED MOBILE</strong><br>
+                <span id="pdf-s-mobile" style="font-size: 10px; color: #2c3e50;">---</span>
+            </td>
+            <td style="padding: 5px; vertical-align: top; border: 1px solid #f0f0f0;">
+                <strong style="font-size: 8px; color: #7f8c8d;">VERIFIED EMAIL</strong><br>
+                <span id="pdf-s-email" style="font-size: 10px; color: #2c3e50;">---</span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" style="padding: 8px; vertical-align: top; border: 1px solid #f0f0f0; background-color: #f9f9f9;">
+                <strong style="font-size: 8px; color: #7f8c8d;">INTENT & REASON</strong><br>
+                <span style="font-size: 9px; color: #555;">Formal Acknowledgement of Debt and Promise to Pay via ERRIHO PORTAL Secure Electronic Signature Platform.</span>
+            </td>
+        </tr>
+    </table>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <hr style="border: 0; border-top: 1px solid #ccc; margin-bottom: 5px;">
+        <p style="margin: 0; font-style: italic; font-size: 9px; color: #95a5a6;">
+            This document is a legally binding electronic record. Issued via ERRIHO PORTAL.
+        </p>
+        <p style="margin: 2px 0 0 0; font-weight: bold; color: #000; font-size: 10px; letter-spacing: 2px;">
+            OFFICIAL PROMISSORY NOTE - CONFIDENTIAL
+        </p>
+    </div>
+</div>
 </div>
 </body>
 <script>
@@ -566,7 +614,7 @@
     document.getElementById('pdf-promise-date').innerText = promiseDateInput.value;
     document.getElementById('pdf-sig-image').src = sigImageData;
     
-    // I-sync ang iba pang detalye
+    // 1-sync ang iba pang detalye
     document.getElementById('pdf-date-today').innerText = document.getElementById('dateToday').innerText;
     document.getElementById('pdf-unit-name').innerText = document.getElementById('unitName').innerText;
     document.getElementById('pdf-full-name').innerText = document.getElementById('fullName').innerText;
@@ -575,6 +623,14 @@
     document.getElementById('pdf-amount-num2').innerText = document.getElementById('amountNum2').innerText;
     document.getElementById('pdf-footer-name').innerText = document.getElementById('footerName').innerText;
     document.getElementById('pdf-security-section').innerHTML = document.getElementById('security-info').innerHTML;
+
+    // 2. I-sync ang Security Audit Trail (Isa-isa para manatili ang magandang layout ng PDF)
+document.getElementById('pdf-s-name').innerText = document.getElementById('s-name').innerText;
+document.getElementById('pdf-s-acc').innerText = document.getElementById('s-acc').innerText;
+document.getElementById('pdf-s-ip').innerText = document.getElementById('s-ip').innerText;
+document.getElementById('pdf-s-date').innerText = document.getElementById('s-date').innerText;
+document.getElementById('pdf-s-mobile').innerText = document.getElementById('s-mobile').innerText;
+document.getElementById('pdf-s-email').innerText = document.getElementById('s-email').innerText;
 
     // 3. CAPTURE THE HIDDEN TEMPLATE (Legal Size: 8.5 x 13)
     const pdfArea = document.getElementById('pdf-render-area');
