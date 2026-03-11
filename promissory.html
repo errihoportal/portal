@@ -442,7 +442,6 @@
         const addrElement = document.getElementById('addressInput');
         const addr = addrElement.innerText.trim(); 
         
-        // 1. Validation para sa Address
         if (!addr || addr === "" || addr === "[ENTER FULL ADDRESS HERE]" || addr.length < 5) {
             alert("⚠️ Please enter your ACTUAL FULL ADDRESS.");
             addrElement.style.backgroundColor = "#ffcccc"; 
@@ -450,33 +449,46 @@
             return;
         }
 
-        // 2. I-define ang mga kailangang variables (Mahalaga ito para hindi mag-error)
         const btn = document.getElementById('submitBtn');
         const letter = document.getElementById('promissory-note');
-        const originalWidth = letter.style.width;
 
-        // 3. Loading State
         btn.innerText = "⏳ Submitting...";
         btn.disabled = true;
 
-        // 4. I-set ang width para sa maayos na PDF capture (Legal Size Alignment)
-        letter.style.width = "816px"; 
+        // --- MOBILE LOOK FIX ---
+        // Hindi na natin ifo-force sa 816px. 
+        // Gagamitin natin ang natural width ng screen (Mobile Width).
+        const currentWidth = letter.offsetWidth; 
+        const currentHeight = letter.offsetHeight;
 
-        html2canvas(letter, { scale: 3, useCORS: true, windowWidth: 816 }).then(canvas => {
-            letter.style.width = originalWidth; // Ibalik sa dati ang display ng UI
-            
+        html2canvas(letter, { 
+            scale: 3, 
+            useCORS: true,
+            logging: false,
+            width: currentWidth,
+            height: currentHeight
+        }).then(canvas => {
             const imgData = canvas.toDataURL("image/jpeg", 0.9); 
             const { jsPDF } = window.jspdf;
             
-            // Portrait, Inches, Legal Size (8.5 x 14)
-            const pdf = new jsPDF({ orientation: "portrait", unit: "in", format: "legal" });
-            pdf.addImage(imgData, 'JPEG', 0, 0, 8.5, 14);
+            // Dito natin ia-adjust ang PDF size para mag-match sa Mobile Aspect Ratio
+            // Imbes na fixed Legal, gagawin nating dynamic ang laki ng paper
+            const pdfWidth = 8.5; // Standard width
+            const pdfHeight = (currentHeight * pdfWidth) / currentWidth; // Calculate height based on mobile ratio
+
+            const pdf = new jsPDF({ 
+                orientation: "portrait", 
+                unit: "in", 
+                format: [pdfWidth, pdfHeight] 
+            });
+
+            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
             const pdfBase64 = pdf.output('datauristring').split(',')[1];
 
             const payload = {
                 action: "promissory",
                 image: pdfBase64, 
-                filename: `PN_${data.accRef}_${data.name}.pdf`,
+                filename: `PN_Mobile_${data.accRef}.pdf`,
                 email: data.email,
                 name: data.name
             };
@@ -487,8 +499,7 @@
                 setTimeout(() => { window.location.href = "statement.html"; }, 1500);
             })
             .catch((err) => {
-                console.error(err);
-                alert("❌ Error submitting document.");
+                alert("❌ Error.");
                 btn.innerText = "Submit Promissory Note";
                 btn.disabled = false;
             });
