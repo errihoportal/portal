@@ -231,16 +231,21 @@
     </div>
 </div>
 
-      <div class="option-item">
-    <div class="option-header" onclick="toggleOption('card-content')">
-        <span>💳 CREDIT/DEBIT CARD / GOOGLE PAY / APPLE PAY (comimg soon) <span class="fee-badge bg-with-fee">WITH FEES</span></span>
-        <span>▼</span>
+      <div class="option-header" onclick="toggleOption('card-content')" style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+        <span style="font-size: 14px; font-weight: bold;">
+            💳 CREDIT / DEBIT CARD / GPAY 
+            <span class="fee-badge bg-with-fee" style="font-size: 9px; vertical-align: middle;">WITH FEES</span>
+        </span>
+        
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+            <img src="images/visa.png" style="height: 10px; width: auto;" alt="Visa">
+            <img src="images/mastercard.png" style="height: 14px; width: auto;" alt="Mastercard">
+            <img src="images/gpay.png" style="height: 12px; width: auto;" alt="GPay">
+            <img src="images/applepay.png" style="height: 12px; width: auto;" alt="ApplePay">
+        </div>
     </div>
-
-    <div style="text-align: center; margin-bottom: 15px; display: flex; justify-content: center; gap: 15px; opacity: 0.8;">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/2560px-Google_Pay_Logo.svg.png" style="height: 18px;">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Apple_Pay_logo.svg/2560px-Apple_Pay_logo.svg.png" style="height: 18px;">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" style="height: 12px;">
+    <span>▼</span>
 </div>
     
     <div id="card-content" class="option-content">
