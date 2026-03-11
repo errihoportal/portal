@@ -232,40 +232,66 @@
 </div>
 
       <div class="option-item">
-                <div class="option-header" onclick="toggleOption('card-content')">
-                    <span>💳 CREDIT / DEBIT CARD <span class="fee-badge bg-with-fee">WITH FEES</span></span>
-                    <span>▼</span>
+    <div class="option-header" onclick="toggleOption('card-content')">
+        <span>💳 CREDIT / DEBIT CARD <span class="fee-badge bg-with-fee">WITH FEES</span></span>
+        <span>▼</span>
+    </div>
+    
+    <div id="card-content" class="option-content">
+        <div class="bank-details" style="text-align: left;">
+            <div style="background: #fff5f5; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #e74c3c;">
+                <p style="margin: 0; font-size: 11px; color: #c0392b; line-height: 1.4;">
+                    <b>⚠️ Card Payment Notice:</b> Card transactions are processed via <b>GCash for Business</b> terminals at our authorized Hubs. 
+                    A <b>3.20% Convenience Fee</b> is applied by the payment provider. This fee does not go to Erriho.
+                </p>
+            </div>
+
+            <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 15px; border: 1px solid #eee;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Bill Amount:</span> 
+                    <span id="cardBaseAmount" style="font-weight: 600;">₱0.00</span>
                 </div>
-                <div id="card-content" class="option-content">
-                    <div class="bank-details" style="text-align: left;">
-                        <div style="background: #fff5f5; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--danger);">
-                            <p style="margin: 0; font-size: 11px; color: #c0392b; line-height: 1.4;">
-                                <b>⚠️ Card Payment Notice:</b> 3.20% Processing Fee applies via <b>GCash for Business</b> at our Hubs.
-                            </p>
-                        </div>
-                        <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; font-size: 13px; margin-bottom: 15px;">
-                            <div class="fee-item" style="display:flex; justify-content:space-between;"><span>Bill Amount:</span> <span id="cardBaseAmount">₱0.00</span></div>
-                            <div class="fee-item" style="display:flex; justify-content:space-between;"><span>Fee (3.20%):</span> <span id="cardFeeAmount">₱0.00</span></div>
-                            <hr style="border:0; border-top:1px solid #ddd; margin: 5px 0;">
-                            <div class="fee-item" style="display:flex; justify-content:space-between; font-weight: bold;">
-                                <span>Total to Swipe:</span> <span id="cardTotalAmount">₱0.00</span>
-                            </div>
-                        </div>
-                        <div style="font-size: 12px;">
-                            <b style="color: var(--primary);">📍 AUTHORIZED HUBS:</b><br>
-                            • Butuan Hub: <b>Jerric Jhon Dela Cruz</b> (09123456789)<br>
-                            <span style="color:#95a5a6;">• Caloocan / Masbate: Coming Soon</span>
-                        </div>
-                        <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
-                        <label style="display: flex; gap: 8px; font-size: 11px; cursor: pointer;">
-                            <input type="checkbox" id="feeAgree">
-                            <span>I agree to the 3.20% processing fee. Receipt via GCash Business email.</span>
-                        </label>
-                    </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #e74c3c;">
+                    <span>Convenience Fee (3.20%):</span> 
+                    <span id="cardFeeAmount">+ ₱0.00</span>
+                </div>
+                <hr style="border:0; border-top:1px solid #ddd; margin: 8px 0;">
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 15px; color: #2c3e50;">
+                    <span>Total to Swipe:</span> 
+                    <span id="cardTotalAmount">₱0.00</span>
                 </div>
             </div>
-        </div>
 
+            <div style="font-size: 12px; line-height: 1.6;">
+                <b style="color: #2980b9;">📍 AUTHORIZED HUBS:</b><br>
+                
+                <div style="margin-top: 8px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+                    <b>• Butuan Hub (Main)</b><br>
+                    <span style="color: #555;">Address: [Your Complete Address Here]</span><br>
+                    Person-in-charge: <b>Jerric Jhon Dela Cruz</b><br>
+                    Contact: <b>09123456789</b>
+                </div>
+
+                <div style="margin-top: 8px; color: #95a5a6;">
+                    <i>• Caloocan Hub - (Coming Soon)</i><br>
+                    <i>• Masbate Hub - (Coming Soon)</i>
+                </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
+
+            <label style="display: flex; gap: 10px; font-size: 11px; cursor: pointer; align-items: flex-start; background: #fdfdfd; padding: 10px; border-radius: 5px; border: 1px solid #f0f0f0;">
+                <input type="checkbox" id="feeAgree" style="margin-top: 3px; transform: scale(1.2);">
+                <span style="color: #444;">I agree to the <b>3.20% processing fee</b>. I understand that the official receipt for this fee will be sent by <b>GCash for Business</b> to my email after the transaction.</span>
+            </label>
+
+            <div style="text-align: center; margin-top: 15px; opacity: 0.6;">
+                <img src="https://getlogovector.com/wp-content/uploads/2021/01/gcash-logo-vector.png" style="height: 14px; vertical-align: middle;">
+                <span style="font-size: 10px; color: #7f8c8d; margin-left: 5px;">Powered by GCash for Business</span>
+            </div>
+        </div>
+    </div>
+</div>
     <div id="instrModal">
         <div class="modal-content">
             <span class="close-instr" onclick="toggleModal(false)">&times;</span>
