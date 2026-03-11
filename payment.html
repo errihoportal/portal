@@ -737,33 +737,42 @@ if(document.getElementById('cardBaseAmount')) {
 function toggleOption(id) {
     const allOptions = document.querySelectorAll('.option-item');
     const targetContent = document.getElementById(id);
+    const selectedOption = targetContent.closest('.option-item');
+    const arrow = selectedOption.querySelector('span:last-child');
+    
+    // Check kung kasalukuyang nakabukas ang clinick
     const isOpening = targetContent.style.display !== 'block';
 
     if (isOpening) {
-        // 1. Itago lahat ng option items (yung buong box)
+        // 1. Itago ang lahat ng IBANG option-item boxes
         allOptions.forEach(option => {
-            option.style.display = 'none';
+            if (option !== selectedOption) {
+                option.style.display = 'none';
+            }
         });
 
-        // 2. Ipakita lang yung piniling option item
-        const selectedOption = document.querySelector(`[onclick="toggleOption('${id}')"]`).closest('.option-item');
-        selectedOption.style.display = 'block';
-
-        // 3. Buksan yung content (yung details sa loob)
+        // 2. Ipakita ang content ng pinili
         targetContent.style.display = 'block';
         
-        // 4. Palitan ang arrow (optional)
-        selectedOption.querySelector('span:last-child').innerText = '▲';
+        // 3. Palitan ang arrow sa UP
+        if (arrow) arrow.innerText = '▲';
+        
+        // 4. Siguraduhin na naka-display 'block' ang napiling item
+        selectedOption.style.display = 'block';
+
     } else {
-        // Kung i-iclick ulit para "i-cancel" o bumalik sa listahan
+        // PAG NAKABUKAS NA AT CLINICK ULIT (CLOSING)
+        
+        // 1. Ipakita ulit ang lahat ng options sa listahan
         allOptions.forEach(option => {
             option.style.display = 'block';
         });
+
+        // 2. Itago ang content ng clinick
         targetContent.style.display = 'none';
         
-        // Ibalik ang arrow sa baba
-        const selectedOption = document.querySelector(`[onclick="toggleOption('${id}')"]`).closest('.option-item');
-        selectedOption.querySelector('span:last-child').innerText = '▼';
+        // 3. Ibalik ang arrow sa DOWN
+        if (arrow) arrow.innerText = '▼';
     }
 }
 
