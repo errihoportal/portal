@@ -160,9 +160,12 @@
         <div class="option-item">
         <div class="option-header" onclick="toggleOption('qrph-content')">
     <div style="display: flex; flex-direction: column; align-items: flex-start;">
-        <div style="display: flex; align-items: center; gap: 5px;">
+        <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
             <span style="font-size: 14px;">🤳</span>
-            <img src="images/qrph.png" style="height:50px; width: auto; vertical-align: middle;" alt="QRPH">
+            <img src="images/qrph.png" style="height: 50px; width: auto; vertical-align: middle;" alt="QRPH">
+            
+            <span style="font-size: 8px; font-weight: 800; background: #2ecc71; color: white; padding: 1px 5px; border-radius: 3px; letter-spacing: 0.5px;">RECOMMENDED</span>
+            
             <span class="fee-badge bg-free" style="font-size: 9px;">ZERO FEES</span>
         </div>
         
@@ -187,10 +190,21 @@
 </div>
 
         <div class="option-item">
-    <div class="option-header" onclick="toggleOption('bank-content')">
-        <span>🏦 BANK DEPOSIT / TRANSFER <span class="fee-badge bg-free">ZERO FEES</span></span>
-        <span>▼</span>
+    <div class="option-header" onclick="toggleOption('bank-content')" style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+        <span style="font-size: 14px; font-weight: bold;">
+            🏦 BANK DEPOSIT / TRANSFER 
+            <span class="fee-badge bg-free" style="font-size: 9px; vertical-align: middle;">ZERO FEES</span>
+        </span>
+        
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+            <img src="images/bpi.png" style="height: 50px; width: auto;" alt="BPI">
+            <img src="images/bdo.png" style="height: 50px; width: auto;" alt="BDO">
+        </div>
     </div>
+    <span>▼</span>
+</div>
+            
     <div id="bank-content" class="option-content">
         <div class="bank-details">
             <div style="background: #eef2f7; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #00529b;">
