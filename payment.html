@@ -231,16 +231,53 @@
     </div>
 </div>
 
-        <div class="option-item">
-            <div class="option-header" onclick="toggleOption('card-content')">
-                <span>💳 CREDIT / DEBIT CARD <span class="fee-badge bg-with-fee">WITH FEES</span></span>
-                <span>▼</span>
-            </div>
-            <div id="card-content" class="option-content">
-                <p style="font-size: 13px;">Online payment via card is coming soon.<br>For now, please use Bank Transfer.</p>
+        <div id="card-content" class="option-content">
+    <div class="bank-details">
+        <div style="background: #fff5f5; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--danger);">
+            <p style="margin: 0; font-size: 11px; color: #c0392b; line-height: 1.4;">
+                <b>⚠️ Card Payment Notice:</b> Card transactions are processed via <b>GCash for Business</b> terminals at our authorized Hubs. 
+                A <b>3.20% Convenience Fee</b> is applied by the payment provider. This fee does not go to Erriho.
+            </p>
+        </div>
+
+        <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; font-size: 13px; margin-bottom: 15px;">
+            <div class="fee-item"><span>Bill Amount:</span> <span id="cardBaseAmount">₱0.00</span></div>
+            <div class="fee-item"><span>Convenience Fee (3.20%):</span> <span id="cardFeeAmount">₱0.00</span></div>
+            <hr style="border:0; border-top:1px solid #ddd; margin: 5px 0;">
+            <div class="fee-item" style="font-weight: bold; color: var(--dark);">
+                <span>Total to Swipe:</span> <span id="cardTotalAmount">₱0.00</span>
             </div>
         </div>
+
+        <div style="font-size: 12px; line-height: 1.6;">
+            <b style="color: var(--primary);">📍 AUTHORIZED HUBS:</b><br>
+            
+            <div style="margin-top: 8px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+                <b>• Butuan Hub (Main)</b><br>
+                Address: [Insert Street, Brgy, Butuan City]<br>
+                Person-in-charge: <b>Jerric Jhon Dela Cruz</b><br>
+                Contact: 09123456789
+            </div>
+
+            <div style="margin-top: 8px; color: #95a5a6;">
+                <i>• Caloocan Hub - (Coming Soon)</i><br>
+                <i>• Masbate Hub - (Coming Soon)</i>
+            </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
+
+        <label style="display: flex; gap: 8px; font-size: 11px; cursor: pointer; align-items: flex-start; margin-bottom: 10px;">
+            <input type="checkbox" id="feeAgree" style="margin-top: 3px;">
+            <span>I agree to the 3.20% processing fee. I understand that the official receipt for this fee will be sent by <b>GCash for Business</b> to my email after the transaction.</span>
+        </label>
+
+        <div style="text-align: center; margin-top: 10px;">
+            <img src="https://getlogovector.com/wp-content/uploads/2021/01/gcash-logo-vector.png" style="height: 15px; opacity: 0.7;">
+            <span style="font-size: 9px; color: #bdc3c7; display: block;">Powered by GCash for Business</span>
+        </div>
     </div>
+</div>
 
     <div id="instrModal">
         <div class="modal-content">
@@ -337,6 +374,18 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         document.getElementById('totalAmount').innerText = data.amount;
         document.getElementById('dueDateText').innerText = data.dueDate;
         document.getElementById('qrImg').src = data.qrLink;
+
+        // --- ADD THIS: Card Fee Calculation ---
+        const baseAmt = parseFloat(data.amount.replace(/,/g, ''));
+        const cardFee = baseAmt * 0.032;
+        const totalWithCardFee = baseAmt + cardFee;
+
+        if(document.getElementById('cardBaseAmount')) {
+            document.getElementById('cardBaseAmount').innerText = "₱" + baseAmt.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('cardFeeAmount').innerText = "₱" + cardFee.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('cardTotalAmount').innerText = "₱" + totalWithCardFee.toLocaleString(undefined, {minimumFractionDigits: 2});
+        }
+        // --------------------------------------
 
         const banner = document.getElementById('statusBanner');
         const graceArea = document.getElementById('gracePeriodArea');
@@ -475,6 +524,16 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         const submitBtn = document.getElementById('submitBtn');
         
         if (fileInput.files.length === 0) { alert("Please select a photo of your receipt."); return; }
+        // --- ADD THIS: Fee Agreement Check ---
+        const cardContent = document.getElementById('card-content');
+        const feeAgree = document.getElementById('feeAgree');
+        if (cardContent && cardContent.style.display === 'block') {
+            if (feeAgree && !feeAgree.checked) {
+                alert("Please agree to the 3.20% processing fee before submitting.");
+                return;
+            }
+        }
+        // --------------------------------------
         submitBtn.disabled = true;
         submitBtn.innerText = "Uploading... Please wait";
         const file = fileInput.files[0];
