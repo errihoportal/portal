@@ -438,25 +438,18 @@
 
     // --- SUBMIT TO DRIVE ---
     async function submitToDrive() {
-        const addrElement = document.getElementById('addressInput');
-        const addr = addrElement.innerText.trim();
-        const pDateVal = document.getElementById('promiseDate').value;
+    // 1. DITO ANG FIX: innerText ang gamitin para sa span
+    const addrElement = document.getElementById('addressInput');
+    const addr = addrElement.innerText.trim(); 
+    
+    // 2. Validation para hindi makalusot ang blanko o yung placeholder
+    if (!addr || addr === "" || addr === "[ENTER FULL ADDRESS HERE]" || addr.length < 5) {
+        alert("⚠️ Please enter your ACTUAL FULL ADDRESS.");
+        addrElement.style.backgroundColor = "#ffcccc"; // Magkukulay pula para mapansin
+        addrElement.focus();
+        return;
+    }
         
-        // Validations
-        if (!addr || addr === "" || addr === "[ENTER FULL ADDRESS HERE]" || addr.length < 5) {
-            alert("⚠️ Please enter your ACTUAL FULL ADDRESS.");
-            addrElement.focus();
-            return;
-        }
-
-        const btn = document.getElementById('submitBtn');
-        btn.innerText = "⏳ Submitting...";
-        btn.disabled = true;
-
-        const letter = document.getElementById('promissory-note');
-        const originalWidth = letter.style.width;
-        letter.style.width = "816px"; 
-
         html2canvas(letter, { scale: 3, useCORS: true, windowWidth: 816 }).then(canvas => {
             letter.style.width = originalWidth;
             const imgData = canvas.toDataURL("image/jpeg", 0.9); 
