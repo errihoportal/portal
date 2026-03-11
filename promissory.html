@@ -437,11 +437,12 @@
     function clearSig() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
     // --- SUBMIT TO DRIVE ---
-    // --- SUBMIT TO DRIVE ---
     async function submitToDrive() {
+        // 1. Kuhanin ang Address mula sa Span
         const addrElement = document.getElementById('addressInput');
         const addr = addrElement.innerText.trim(); 
         
+        // Validation: Hindi pwedeng blanko o placeholder
         if (!addr || addr === "" || addr === "[ENTER FULL ADDRESS HERE]" || addr.length < 5) {
             alert("⚠️ Please enter your ACTUAL FULL ADDRESS.");
             addrElement.style.backgroundColor = "#ffcccc"; 
@@ -449,32 +450,33 @@
             return;
         }
 
+        // 2. I-define ang mga elements
         const btn = document.getElementById('submitBtn');
         const letter = document.getElementById('promissory-note');
 
+        // Loading State
         btn.innerText = "⏳ Submitting...";
         btn.disabled = true;
 
-        // --- MOBILE LOOK FIX ---
-        // Hindi na natin ifo-force sa 816px. 
-        // Gagamitin natin ang natural width ng screen (Mobile Width).
-        const currentWidth = letter.offsetWidth; 
-        const currentHeight = letter.offsetHeight;
+        // --- MOBILE LOOK CAPTURE ---
+        // Kinukuha ang eksaktong sukat ng screen mo ngayon (Actual Mobile Width)
+        const actualWidth = letter.offsetWidth;
+        const actualHeight = letter.offsetHeight;
 
         html2canvas(letter, { 
-            scale: 3, 
+            scale: 2, // Sapat na linaw para sa mobile
             useCORS: true,
             logging: false,
-            width: currentWidth,
-            height: currentHeight
+            width: actualWidth,
+            height: actualHeight
         }).then(canvas => {
-            const imgData = canvas.toDataURL("image/jpeg", 0.9); 
+            const imgData = canvas.toDataURL("image/jpeg", 0.8); 
             const { jsPDF } = window.jspdf;
             
-            // Dito natin ia-adjust ang PDF size para mag-match sa Mobile Aspect Ratio
-            // Imbes na fixed Legal, gagawin nating dynamic ang laki ng paper
-            const pdfWidth = 8.5; // Standard width
-            const pdfHeight = (currentHeight * pdfWidth) / currentWidth; // Calculate height based on mobile ratio
+            // Dito gagawa tayo ng PDF na ang sukat ay base sa "Mobile Aspect Ratio"
+            // Para hindi magmukhang bond paper, kundi mukhang screenshot ng CP
+            const pdfWidth = 8.5; 
+            const pdfHeight = (actualHeight * pdfWidth) / actualWidth;
 
             const pdf = new jsPDF({ 
                 orientation: "portrait", 
@@ -488,7 +490,7 @@
             const payload = {
                 action: "promissory",
                 image: pdfBase64, 
-                filename: `PN_Mobile_${data.accRef}.pdf`,
+                filename: `PN_${data.accRef}_${data.name}.pdf`,
                 email: data.email,
                 name: data.name
             };
@@ -499,7 +501,8 @@
                 setTimeout(() => { window.location.href = "statement.html"; }, 1500);
             })
             .catch((err) => {
-                alert("❌ Error.");
+                console.error(err);
+                alert("❌ Error submitting document.");
                 btn.innerText = "Submit Promissory Note";
                 btn.disabled = false;
             });
