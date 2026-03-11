@@ -271,175 +271,132 @@
 <script>
     const rawData = localStorage.getItem('erriho_user');
     const data = JSON.parse(rawData);
-    // Siguraduhin na ang URL na ito ay ang "Web App" URL ng iyong Apps Script
     const baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
 
     window.onload = function() {
-    if (data) {
-        // --- 0. IP ADDRESS FETCHER ---
-        fetch('https://api.ipify.org?format=json')
-            .then(response => response.json())
-            .then(ipData => {
-                document.getElementById('s-ip').innerText = ipData.ip;
-            })
-            .catch(() => { document.getElementById('s-ip').innerText = "Unavailable"; });
+        if (data) {
+            // --- 0. IP ADDRESS FETCHER ---
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(ipData => {
+                    document.getElementById('s-ip').innerText = ipData.ip;
+                })
+                .catch(() => { document.getElementById('s-ip').innerText = "Unavailable"; });
 
-        // 1. Set Header Date
-        const today = new Date();
-        const options = { month: 'long', day: 'numeric', year: 'numeric' };
-        document.getElementById('dateToday').innerText = today.toLocaleDateString('en-US', options);
+            // 1. Set Header Date
+            const today = new Date();
+            const options = { month: 'long', day: 'numeric', year: 'numeric' };
+            document.getElementById('dateToday').innerText = today.toLocaleDateString('en-US', options);
 
-        // --- 2. RESTRICTION: NO BACK-DATE & MAX 15 DAYS ---
-        const dateInput = document.getElementById('promiseDate');
-        
-        // Accurate Local Date (YYYY-MM-DD)
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        const minDateStr = `${year}-${month}-${day}`;
-        
-        const maxDate = new Date();
-        maxDate.setDate(today.getDate() + 15);
-        
-        const maxYear = maxDate.getFullYear();
-        const maxMonth = String(maxDate.getMonth() + 1).padStart(2, '0');
-        const maxDay = String(maxDate.getDate()).padStart(2, '0');
-        const maxDateStr = `${maxYear}-${maxMonth}-${maxDay}`;
+            // --- 2. RESTRICTION: NO BACK-DATE & MAX 20 DAYS ---
+            const dateInput = document.getElementById('promiseDate');
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const minDateStr = `${year}-${month}-${day}`;
+            
+            const maxDate = new Date();
+            maxDate.setDate(today.getDate() + 20); // Ginawa nating 20 days
+            
+            const maxDateStr = `${maxDate.getFullYear()}-${String(maxDate.getMonth() + 1).padStart(2, '0')}-${String(maxDate.getDate()).padStart(2, '0')}`;
 
-        dateInput.min = minDateStr; // Lock: Kahapon pababa ay disabled
-        dateInput.max = maxDateStr; // Lock: Lagpas 15 days ay disabled
-        dateInput.value = minDateStr; // Default: Today
-        // --- 3. ADDRESS AUTO-CAPITALIZE ---
-        const addrInput = document.getElementById('addressInput');
-        if(addrInput) {
-            addrInput.addEventListener('input', function() {
-                this.value = this.value.toUpperCase();
-            });
+            dateInput.min = minDateStr;
+            dateInput.max = maxDateStr;
+            dateInput.value = minDateStr;
+
+            // --- 3. USER INFO MAPPING ---
+            document.getElementById('fullName').innerText = data.name || "N/A";
+            document.getElementById('footerName').innerText = (data.name || "N/A").toUpperCase();
+            document.getElementById('unitName').innerText = data.productName || "No Unit Info";
+            
+            // Security Info
+            document.getElementById('s-name').innerText = data.name || "---";
+            document.getElementById('s-acc').innerText = data.accRef || "---";
+            document.getElementById('s-mobile').innerText = data.mobile || "---";
+            document.getElementById('s-email').innerText = data.email || "---";
+            
+            const nowStr = today.toLocaleString();
+            if(document.getElementById('s-date')) document.getElementById('s-date').innerText = nowStr;
+            if(document.getElementById('s-date-footer')) document.getElementById('s-date-footer').innerText = nowStr;
+            
+            updateComputation();
+        } else {
+            alert("No user data found.");
+            window.location.href = "index.html";
         }
+    };
 
-        // 4. User Info Mapping (Siguraduhing tama ang mga ID sa HTML mo)
-        document.getElementById('fullName').innerText = data.name || "N/A";
-        document.getElementById('footerName').innerText = (data.name || "N/A").toUpperCase();
-        document.getElementById('unitName').innerText = data.productName || "No Unit Info";
-        
-        // Security Info Mapping
-        document.getElementById('s-name').innerText = data.name || "---";
-        document.getElementById('s-acc').innerText = data.accRef || "---";
-        document.getElementById('s-mobile').innerText = data.mobile || "---";
-        document.getElementById('s-email').innerText = data.email || "---";
-        
-        // Gamitin ang s-date kung ito ang nasa HTML mo
-        if(document.getElementById('s-date')) {
-            document.getElementById('s-date').innerText = today.toLocaleString();
-        }
-        // Idagdag ito sa loob ng window.onload (Step 4 sa luma mong code)
-const nowStr = today.toLocaleString();
-if(document.getElementById('s-date')) {
-    document.getElementById('s-date').innerText = nowStr;
-}
-if(document.getElementById('s-date-footer')) {
-    document.getElementById('s-date-footer').innerText = nowStr;
-}
-        
-        // 5. Initial Run
-        updateComputation();
-    } else {
-        alert("No user data found.");
-        window.location.href = "index.html";
-    }
-};
-    
     function updateComputation() {
-    let pDateVal = document.getElementById('promiseDate').value;
-    if (!pDateVal) return;
-    
-    let promiseDate = new Date(pDateVal);
-    promiseDate.setHours(0,0,0,0);
-    
-    let totalOverall = 0;
-    let tableHtml = "";
-
-    if (!data || !data.schedule) return;
-
-    data.schedule.forEach(bill => {
-        // Filter: Unpaid bills lamang
-        if (bill.p_date !== "---" && bill.p_date !== "" && bill.p_date !== null) return;
-        if (bill.st === "PAID" || bill.st === "Paid") return;
-
-        let principal = parseFloat(bill.p_amt.toString().replace(/[₱,]/g, '')) || 0;
+        let pDateVal = document.getElementById('promiseDate').value;
+        if (!pDateVal) return;
         
-        // DITO ANG BASEHAN: Due Date ng bill (e.g., Feb 12)
-        let dueDate = new Date(bill.mo); 
-        dueDate.setHours(0,0,0,0);
+        let promiseDate = new Date(pDateVal);
+        promiseDate.setHours(0,0,0,0);
+        
+        let totalOverall = 0;
+        let tableHtml = "";
 
-        let lateFee = 0;
-        let interest = 0;
+        if (!data || !data.schedule) return;
 
-        // --- DYNAMIC COMPUTATION BASED ON SELECTION ---
-        if (promiseDate > dueDate) {
-            // 1. Late Fee: 10% ng Principal (Fixed once nag-lapse)
-            lateFee = principal * 0.10; 
-            
-            // 2. Interest: 15% Annual Rate divided by 360 days
-            const diffTime = promiseDate.getTime() - dueDate.getTime();
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-            
-            // Interest = Principal * 0.15 * (Bilang ng araw mula Due Date hanggang Promise Date / 360)
-            interest = (principal * 0.15) * (diffDays / 30);
-        }
+        data.schedule.forEach(bill => {
+            if (bill.p_date !== "---" && bill.p_date !== "" && bill.p_date !== null) return;
+            if (bill.st === "PAID" || bill.st === "Paid") return;
 
-        let subtotal = principal + lateFee + interest;
-        totalOverall += subtotal;
+            let principal = parseFloat(bill.p_amt.toString().replace(/[₱,]/g, '')) || 0;
+            let dueDate = new Date(bill.mo); 
+            dueDate.setHours(0,0,0,0);
 
-        tableHtml += `
-            <tr style="border-bottom:1px solid #eee;">
-                <td style="padding:6px;">${bill.mo}</td>
-                <td style="padding:6px;">₱${principal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                <td style="padding:6px;">₱${lateFee.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                <td style="padding:6px;">₱${interest.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                <td style="padding:6px; text-align:right;"><b>₱${subtotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</b></td>
-            </tr>`;
-    });
+            let lateFee = 0;
+            let interest = 0;
 
-    // Update displays
-    document.getElementById('breakdownBody').innerHTML = tableHtml;
-    
-    const finalStr = totalOverall.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-    document.getElementById('projectedTotal').innerText = "₱ " + finalStr;
-    document.getElementById('amountNum').innerText = "(₱ " + finalStr + ")";
-    document.getElementById('amountNum2').innerText = finalStr;
+            if (promiseDate > dueDate) {
+                lateFee = principal * 0.10; 
+                const diffTime = promiseDate.getTime() - dueDate.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                interest = (principal * 0.15) * (diffDays / 30);
+            }
 
-    // Amount in Words
-    document.getElementById('amountWords').innerText = convertAmountToWords(totalOverall);
-}
+            let subtotal = principal + lateFee + interest;
+            totalOverall += subtotal;
 
-    function updateDateDisplay() {
-        updateComputation();
+            tableHtml += `
+                <tr style="border-bottom:1px solid #eee;">
+                    <td style="padding:6px;">${bill.mo}</td>
+                    <td style="padding:6px;">₱${principal.toLocaleString('en-US', {minimumFractionDigits:2})}</td>
+                    <td style="padding:6px;">₱${lateFee.toLocaleString('en-US', {minimumFractionDigits:2})}</td>
+                    <td style="padding:6px;">₱${interest.toLocaleString('en-US', {minimumFractionDigits:2})}</td>
+                    <td style="padding:6px; text-align:right;"><b>₱${subtotal.toLocaleString('en-US', {minimumFractionDigits:2})}</b></td>
+                </tr>`;
+        });
+
+        document.getElementById('breakdownBody').innerHTML = tableHtml;
+        const finalStr = totalOverall.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+        document.getElementById('projectedTotal').innerText = "₱ " + finalStr;
+        document.getElementById('amountNum').innerText = "(₱ " + finalStr + ")";
+        document.getElementById('amountNum2').innerText = finalStr;
+        document.getElementById('amountWords').innerText = convertAmountToWords(totalOverall);
     }
 
-    // --- HELPER: AMOUNT TO WORDS ---
+    function updateDateDisplay() { updateComputation(); }
+
     function convertAmountToWords(amount) {
         if (amount === 0) return "Zero Pesos";
         const words = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
         const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
-        
         function helper(n) {
             if (n < 20) return words[n];
             if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? " " + words[n % 10] : "");
             if (n < 1000) return words[Math.floor(n / 100)] + " Hundred" + (n % 100 !== 0 ? " and " + helper(n % 100) : "");
             return "";
         }
-
         let mainPart = Math.floor(amount);
         let centPart = Math.round((amount - mainPart) * 100);
-        
         let result = "";
         if (mainPart >= 1000) {
             result += helper(Math.floor(mainPart / 1000)) + " Thousand ";
             mainPart %= 1000;
         }
         result += helper(mainPart);
-        
         let centStr = centPart > 0 ? ` and ${centPart}/100` : "";
         return result + " Pesos" + centStr + " Only";
     }
@@ -448,8 +405,6 @@ if(document.getElementById('s-date-footer')) {
     const canvas = document.getElementById('sig-canvas');
     const ctx = canvas.getContext('2d');
     let drawing = false;
-
-    // Adjust canvas resolution for clearer signatures
     canvas.width = canvas.offsetWidth * 2;
     canvas.height = canvas.offsetHeight * 2;
     ctx.scale(2, 2);
@@ -470,8 +425,6 @@ if(document.getElementById('s-date-footer')) {
         ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = "#000";
         ctx.lineTo(pos.x, pos.y); ctx.stroke();
     });
-
-    // Touch Support
     canvas.addEventListener('touchstart', (e) => { drawing = true; ctx.beginPath(); e.preventDefault(); });
     canvas.addEventListener('touchmove', (e) => {
         if (!drawing) return;
@@ -483,100 +436,54 @@ if(document.getElementById('s-date-footer')) {
     function clearSig() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
     // --- SUBMIT TO DRIVE ---
-   async function submitToDrive() {
-    // 1. Mga Validation (Address at Date)
-    const addr = document.getElementById('addressInput').value;
-    const pDateVal = document.getElementById('promiseDate').value;
-    const selectedDate = new Date(pDateVal);
-    selectedDate.setHours(0,0,0,0);
-    
-    const todayCheck = new Date();
-    todayCheck.setHours(0,0,0,0);
-
-    const maxAllowedDate = new Date();
-    maxAllowedDate.setDate(todayCheck.getDate() + 20);
-    maxAllowedDate.setHours(0,0,0,0);
-
-    if (selectedDate < todayCheck) {
-        alert("❌ Error: Back-dating is not allowed.");
-        return;
-    }
-    if (selectedDate > maxAllowedDate) {
-        alert("❌ Error: Maximum extension is 15 days only.");
-        return;
-    }
-    if (!addr || addr.trim().length < 5) {
-        alert("⚠️ Please enter your FULL ADDRESS.");
-        return;
-    }
-
-    // 2. Button Status
-    const btn = document.getElementById('submitBtn');
-    btn.innerText = "⏳ Submitting Secure Document...";
-    btn.disabled = true;
-
-    const letter = document.getElementById('promissory-note');
-
-    // 1. FORCE THE LAYOUT TO BE RIGID (Desktop Look)
-    // Nilalagyan natin ng pansamantalang fixed width para hindi ito "mobile style"
-    const originalWidth = letter.style.width;
-    letter.style.width = "816px"; // 8.5 inches at 96 DPI
-
-    html2canvas(letter, { 
-        scale: 4, // Sobrang linaw (High Resolution)
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
-        windowWidth: 816, // Ino-override ang mobile viewport
-        onclone: (clonedDoc) => {
-            // Siguraduhin na ang inputs ay kita sa clone
-            const clonedAddress = clonedDoc.getElementById('addressInput');
-            if(clonedAddress) clonedAddress.style.border = "none"; 
+    async function submitToDrive() {
+        const addrElement = document.getElementById('addressInput');
+        const addr = addrElement.innerText.trim();
+        const pDateVal = document.getElementById('promiseDate').value;
+        
+        // Validations
+        if (!addr || addr === "" || addr === "[ENTER FULL ADDRESS HERE]" || addr.length < 5) {
+            alert("⚠️ Please enter your ACTUAL FULL ADDRESS.");
+            addrElement.focus();
+            return;
         }
-    }).then(canvas => {
-        // Ibalik ang original width ng letter sa screen para hindi masira ang UI
-        letter.style.width = originalWidth;
 
-        const imgData = canvas.toDataURL("image/jpeg", 1.0); 
-        const { jsPDF } = window.jspdf;
-        
-        // 2. USE LEGAL SIZE (Standard for Promissory Notes)
-        const pdf = new jsPDF({
-            orientation: "portrait",
-            unit: "in",
-            format: "legal" // 8.5in x 14in
+        const btn = document.getElementById('submitBtn');
+        btn.innerText = "⏳ Submitting...";
+        btn.disabled = true;
+
+        const letter = document.getElementById('promissory-note');
+        const originalWidth = letter.style.width;
+        letter.style.width = "816px"; 
+
+        html2canvas(letter, { scale: 3, useCORS: true, windowWidth: 816 }).then(canvas => {
+            letter.style.width = originalWidth;
+            const imgData = canvas.toDataURL("image/jpeg", 0.9); 
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({ orientation: "portrait", unit: "in", format: "legal" });
+            pdf.addImage(imgData, 'JPEG', 0, 0, 8.5, 14);
+            const pdfBase64 = pdf.output('datauristring').split(',')[1];
+
+            const payload = {
+                action: "promissory",
+                image: pdfBase64, 
+                filename: `PN_${data.accRef}_${data.name}.pdf`,
+                email: data.email,
+                name: data.name
+            };
+
+            fetch(baseUrl, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+            .then(() => {
+                alert("✅ SUBMITTED SUCCESSFULLY!");
+                setTimeout(() => { window.location.href = "statement.html"; }, 1500);
+            })
+            .catch(() => {
+                alert("❌ Error.");
+                btn.innerText = "Submit Promissory Note";
+                btn.disabled = false;
+            });
         });
-
-        // 3. EXACT PLACEMENT (Eksaktong lapat sa papel)
-        // Nilalagyan natin ng margin na 0.5 sa taas/baba para hindi dikit sa kanto
-        pdf.addImage(imgData, 'JPEG', 0, 0, 8.5, 14, undefined, 'FAST'); 
-        
-        const pdfBase64 = pdf.output('datauristring').split(',')[1];
-
-        const payload = {
-            action: "promissory",
-            image: pdfBase64, 
-            filename: `PN_${data.accRef}_${data.name}.pdf`,
-            email: data.email,
-            name: data.name
-        };
-
-        fetch(baseUrl, {
-            method: "POST",
-            mode: "no-cors",
-            body: JSON.stringify(payload)
-        })
-        .then(() => {
-            alert("✅ SUBMITTED SUCCESSFULLY!");
-            setTimeout(() => { window.location.href = "statement.html"; }, 1500);
-        })
-        .catch(err => {
-            alert("❌ Submission Error.");
-            btn.innerText = "Submit Promissory Note";
-            btn.disabled = false;
-        });
-    });
-}
+    }
 </script>
 </body>
 </html>
