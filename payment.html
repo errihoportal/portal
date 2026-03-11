@@ -194,6 +194,9 @@
     </div>
     <span>▼</span>
 </div>
+            <button onclick="location.reload()" style="background: #f1f3f5; border: 1px solid #dee2e6; padding: 5px 10px; border-radius: 5px; font-size: 11px; margin-bottom: 15px; cursor: pointer; color: #495057;">
+    ← Change Payment Method
+</button>
             <div id="qrph-content" class="option-content">
                 <img src="images/qrphdesign.png" style="width: 100%; max-width: 200px; margin-bottom: 10px;">
                 <br>
@@ -735,18 +738,35 @@ if(document.getElementById('cardBaseAmount')) {
 }
 
 function toggleOption(id) {
-    // Isara lahat ng contents
-    const contents = document.querySelectorAll('.option-content');
-    contents.forEach(content => {
-        if (content.id !== id) content.style.display = 'none';
-    });
+    const allOptions = document.querySelectorAll('.option-item');
+    const targetContent = document.getElementById(id);
+    const isOpening = targetContent.style.display !== 'block';
 
-    // I-toggle yung pinili
-    const target = document.getElementById(id);
-    if (target.style.display === 'block') {
-        target.style.display = 'none';
+    if (isOpening) {
+        // 1. Itago lahat ng option items (yung buong box)
+        allOptions.forEach(option => {
+            option.style.display = 'none';
+        });
+
+        // 2. Ipakita lang yung piniling option item
+        const selectedOption = document.querySelector(`[onclick="toggleOption('${id}')"]`).closest('.option-item');
+        selectedOption.style.display = 'block';
+
+        // 3. Buksan yung content (yung details sa loob)
+        targetContent.style.display = 'block';
+        
+        // 4. Palitan ang arrow (optional)
+        selectedOption.querySelector('span:last-child').innerText = '▲';
     } else {
-        target.style.display = 'block';
+        // Kung i-iclick ulit para "i-cancel" o bumalik sa listahan
+        allOptions.forEach(option => {
+            option.style.display = 'block';
+        });
+        targetContent.style.display = 'none';
+        
+        // Ibalik ang arrow sa baba
+        const selectedOption = document.querySelector(`[onclick="toggleOption('${id}')"]`).closest('.option-item');
+        selectedOption.querySelector('span:last-child').innerText = '▼';
     }
 }
 
