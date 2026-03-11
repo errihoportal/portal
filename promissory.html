@@ -448,6 +448,7 @@ if(document.getElementById('s-date-footer')) {
 
     // --- SUBMIT TO DRIVE ---
    async function submitToDrive() {
+    // 1. Mga Validation (Address at Date)
     const addr = document.getElementById('addressInput').value;
     const pDateVal = document.getElementById('promiseDate').value;
     const selectedDate = new Date(pDateVal);
@@ -456,12 +457,10 @@ if(document.getElementById('s-date-footer')) {
     const todayCheck = new Date();
     todayCheck.setHours(0,0,0,0);
 
-    // --- SECURITY CHECK: 15 DAYS LIMIT ---
     const maxAllowedDate = new Date();
     maxAllowedDate.setDate(todayCheck.getDate() + 15);
     maxAllowedDate.setHours(0,0,0,0);
 
-    // 1. Validations
     if (selectedDate < todayCheck) {
         alert("❌ Error: Back-dating is not allowed.");
         return;
@@ -471,37 +470,40 @@ if(document.getElementById('s-date-footer')) {
         return;
     }
     if (!addr || addr.trim().length < 5) {
-        alert("⚠️ Please enter your FULL ADDRESS (ALL CAPS).");
+        alert("⚠️ Please enter your FULL ADDRESS.");
         return;
     }
 
+    // 2. Button Status
     const btn = document.getElementById('submitBtn');
-    btn.innerText = "⏳ Processing Document...";
+    btn.innerText = "⏳ Submitting Secure Document...";
     btn.disabled = true;
 
-    // Kunin ang element na "promissory-note" lang (wala na ang buttons dito)
     const letter = document.getElementById('promissory-note');
 
+    // 3. High-Quality Rendering
     html2canvas(letter, { 
-        scale: 3, // Mas mataas na resolution para hindi malabo
+        scale: 3, // High resolution (iwas labo)
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff",
-        windowWidth: 816 // Standard pixel width para sa 8.5in
+        windowWidth: 816 // Ang 8.5 inches ay ~816 pixels sa standard DPI
     }).then(canvas => {
-        const imgData = canvas.toDataURL("image/jpeg", 1.0); // JPEG para mas "crisp"
+        // Ginawang JPEG (quality 1.0) para mas sharp ang text kaysa sa PNG
+        const imgData = canvas.toDataURL("image/jpeg", 1.0); 
         const { jsPDF } = window.jspdf;
         
         const pdf = new jsPDF({
             orientation: "portrait",
             unit: "in",
-            format: "legal" // 8.5" x 14"
+            format: "legal" // Siguradong 8.5 x 14 inches
         });
 
-        // I-stretch ang image sa buong Legal Page (8.5x14)
-        pdf.addImage(imgData, 'JPEG', 0, 0, 8.5, 14); 
+        // 4. Alignment Fix (Eksakto sa 8.5 x 14)
+        // Nilagay sa 0, 0 para walang white borders na hindi pantay
+        pdf.addImage(imgData, 'JPEG', 0, 0, 8.5, 14, undefined, 'FAST'); 
         
-        const pdfBase64 = pdf.output('datauristring').split(',')[1]; 
+        const pdfBase64 = pdf.output('datauristring').split(',')[1];
 
         const payload = {
             action: "promissory",
@@ -511,17 +513,18 @@ if(document.getElementById('s-date-footer')) {
             name: data.name
         };
 
+        // 5. Submission
         fetch(baseUrl, {
             method: "POST",
             mode: "no-cors",
             body: JSON.stringify(payload)
         })
         .then(() => {
-            alert("✅ SUBMITTED SUCCESSFULLY!\nA clean official copy was sent to your email.");
+            alert("✅ SUBMITTED SUCCESSFULLY!\nA high-quality official copy was sent to your email.");
             setTimeout(() => { window.location.href = "statement.html"; }, 1500);
         })
         .catch(err => {
-            alert("❌ Error. Try again.");
+            alert("❌ Error connecting to server.");
             btn.innerText = "Submit Promissory Note";
             btn.disabled = false;
         });
