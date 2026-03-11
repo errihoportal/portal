@@ -7,22 +7,31 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-    /* Pang-display sa screen */
-    body { font-family: 'Times New Roman', serif; background: #f4f4f4; padding: 10px; color: #333; }
+    /* Pang-display sa screen at General Font */
+    body { 
+        font-family: 'Times New Roman', serif; 
+        background: #f4f4f4; 
+        padding: 10px; 
+        color: #333; 
+    }
     
-    .letter-paper { 
+    /* Main Paper Container - Naka-set sa Legal Size para sa PDF Export */
+    #promissory-note {
         background: white; 
-        width: 100%; 
-        max-width: 800px; /* Standard A4 width ratio */
+        width: 8.5in; 
+        min-height: 13in; /* Legal size height */
         margin: 0 auto; 
-        padding: 40px; 
+        padding: 0.8in 1in; /* Standard legal margins */
         box-shadow: 0 0 10px rgba(0,0,0,0.1); 
         position: relative;
         box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        line-height: 1.8; /* Mas maluwag na line height para sa legal look */
     }
 
-    /* Watermark */
-    .letter-paper::after {
+    /* Watermark - ERRIHO OFFICIAL */
+    #promissory-note::after {
         content: "ERRIHO OFFICIAL";
         position: absolute; top: 50%; left: 50%;
         transform: translate(-50%, -50%) rotate(-45deg);
@@ -30,80 +39,111 @@
         pointer-events: none;
     }
 
-    /* TAGO ANG BUTTONS KAPAG PRINT O PDF */
+    /* TAGO ANG BUTTONS KAPAG PRINT O PDF GENERATION */
     @media print {
         header, footer, .actions, .back-link, #pwa-badge { display: none !important; }
         body { background: white; padding: 0; }
-        .letter-paper { 
+        #promissory-note { 
             box-shadow: none !important; 
             margin: 0 !important; 
             width: 100% !important; 
-            padding: 20px !important; /* Binawasan ang padding para hindi lumampas */
+            padding: 0.8in 1in !important;
         }
-        /* Para hindi maputol ang sulat */
-        p, li { orphans: 3; widows: 3; }
     }
 
-    .content { font-size: 14px; text-align: justify; line-height: 1.4; }
-    #sig-canvas { border: 1px dashed #ccc; cursor: crosshair; width: 300px; height: 100px; background: #fafafa; }
+    /* TEXT CONTENT ALIGNMENT */
+    .content { 
+        font-size: 14px; 
+        text-align: justify; 
+    }
 
+    /* EXACT UNDERLINE LOGIC: Para sa Address Input */
     #addressInput {
-    text-transform: uppercase; /* Ginagawang All Caps ang display habang nagtatype */
-}
-::placeholder {
-    text-transform: none; /* Para manatiling normal ang "Enter your full address" na text */
-}
-
-#promissory-note {
-    width: 8.5in;
-    min-height: 13in; /* Mas mahaba para sa Legal size */
-    padding: 0.8in 1in; /* Mas malapad na margin para magmukhang pormal */
-    margin: 0 auto;
-    background: white;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    font-family: 'Times New Roman', serif; /* Standard Legal Font */
-    line-height: 1.6;
-}
-
-/* Para sa Signature Area */
-.sig-container {
-    margin-top: 50px;
-    text-align: center;
-}
-
-#sig-canvas {
-    border: none; /* Alisin ang dashed border sa final PDF */
-    border-bottom: 1px solid #000; /* Isang linya lang sa ilalim */
-    width: 300px;
-    height: 100px;
-}
-
-/* Pantay na columns para sa Security Info */
-#security-info table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 30px;
-    font-size: 11px;
-}
-
-.document-footer {
-    margin-top: auto; /* Ito ang "magic" para laging nasa baba ang footer */
-    text-align: center;
-    font-size: 11px;
-    color: #555;
-    padding-top: 20px;
-}
-
-/* Para sa mobile view, hindi masisira ang hitsura */
-@media screen and (max-width: 8.5in) {
-    #promissory-note {
-        width: 100%;
-        height: auto;
-        padding: 20px;
+        border: none;
+        border-bottom: 1px solid black; /* Ang underline */
+        background: transparent;
+        font-family: 'Times New Roman', serif;
+        font-size: inherit;
+        font-weight: bold;
+        text-transform: uppercase;
+        outline: none;
+        padding: 0 5px;
+        width: auto;         /* HINDI fixed ang haba para sumunod sa text */
+        min-width: 150px;    /* Minimum na haba ng guhit */
+        display: inline-block;
     }
-}
+
+    /* EXACT UNDERLINE LOGIC: Para sa Name, Unit, at Amount spans */
+    #promissory-note span {
+        border-bottom: 1px solid black; 
+        font-weight: bold;
+        padding: 0 5px;
+        display: inline-block; /* Importante para lumabas ang underline na sakto sa text */
+    }
+
+    /* PARA SA DATE INPUT */
+    #promiseDate {
+        border: none;
+        border-bottom: 1px solid black;
+        font-family: 'Times New Roman', serif;
+        font-weight: bold;
+        outline: none;
+        background: transparent;
+        width: auto;
+    }
+
+    /* SIGNATURE AREA */
+    .sig-container {
+        margin-top: 50px;
+        text-align: center;
+    }
+
+    #sig-canvas {
+        border: none; 
+        border-bottom: 1px solid #000; /* Isang linya lang para sa pirma */
+        width: 300px;
+        height: 100px;
+        background: #fafafa;
+        cursor: crosshair;
+    }
+
+    /* SECURITY INFO TABLE (BOTTOM SECTION) */
+    #security-info table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 30px;
+        font-size: 10px;
+        color: #7f8c8d;
+        font-family: sans-serif;
+    }
+
+    /* DOCUMENT FOOTER */
+    .document-footer {
+        margin-top: auto; /* Pinupush ang footer sa pinaka-ibaba ng legal paper */
+        text-align: center;
+        font-size: 11px;
+        color: #555;
+        padding-top: 20px;
+    }
+
+    /* MOBILE RESPONSIVENESS */
+    @media screen and (max-width: 8.5in) {
+        #promissory-note {
+            width: 100%;
+            height: auto;
+            padding: 20px;
+        }
+        #addressInput {
+            width: 90%; /* Konting adjust para hindi lumabas sa screen sa mobile */
+        }
+    }
+
+    /* Placeholder styling */
+    ::placeholder {
+        text-transform: none;
+        font-weight: normal;
+        color: #aaa;
+    }
 </style>
 </head>
 <body>
@@ -481,26 +521,38 @@ if(document.getElementById('s-date-footer')) {
 
     const letter = document.getElementById('promissory-note');
 
-    // 3. High-Quality Rendering
+    // 1. FORCE THE LAYOUT TO BE RIGID (Desktop Look)
+    // Nilalagyan natin ng pansamantalang fixed width para hindi ito "mobile style"
+    const originalWidth = letter.style.width;
+    letter.style.width = "816px"; // 8.5 inches at 96 DPI
+
     html2canvas(letter, { 
-        scale: 3, // High resolution (iwas labo)
+        scale: 4, // Sobrang linaw (High Resolution)
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff",
-        windowWidth: 816 // Ang 8.5 inches ay ~816 pixels sa standard DPI
+        windowWidth: 816, // Ino-override ang mobile viewport
+        onclone: (clonedDoc) => {
+            // Siguraduhin na ang inputs ay kita sa clone
+            const clonedAddress = clonedDoc.getElementById('addressInput');
+            if(clonedAddress) clonedAddress.style.border = "none"; 
+        }
     }).then(canvas => {
-        // Ginawang JPEG (quality 1.0) para mas sharp ang text kaysa sa PNG
+        // Ibalik ang original width ng letter sa screen para hindi masira ang UI
+        letter.style.width = originalWidth;
+
         const imgData = canvas.toDataURL("image/jpeg", 1.0); 
         const { jsPDF } = window.jspdf;
         
+        // 2. USE LEGAL SIZE (Standard for Promissory Notes)
         const pdf = new jsPDF({
             orientation: "portrait",
             unit: "in",
-            format: "legal" // Siguradong 8.5 x 14 inches
+            format: "legal" // 8.5in x 14in
         });
 
-        // 4. Alignment Fix (Eksakto sa 8.5 x 14)
-        // Nilagay sa 0, 0 para walang white borders na hindi pantay
+        // 3. EXACT PLACEMENT (Eksaktong lapat sa papel)
+        // Nilalagyan natin ng margin na 0.5 sa taas/baba para hindi dikit sa kanto
         pdf.addImage(imgData, 'JPEG', 0, 0, 8.5, 14, undefined, 'FAST'); 
         
         const pdfBase64 = pdf.output('datauristring').split(',')[1];
@@ -513,18 +565,17 @@ if(document.getElementById('s-date-footer')) {
             name: data.name
         };
 
-        // 5. Submission
         fetch(baseUrl, {
             method: "POST",
             mode: "no-cors",
             body: JSON.stringify(payload)
         })
         .then(() => {
-            alert("✅ SUBMITTED SUCCESSFULLY!\nA high-quality official copy was sent to your email.");
+            alert("✅ SUBMITTED SUCCESSFULLY!");
             setTimeout(() => { window.location.href = "statement.html"; }, 1500);
         })
         .catch(err => {
-            alert("❌ Error connecting to server.");
+            alert("❌ Submission Error.");
             btn.innerText = "Submit Promissory Note";
             btn.disabled = false;
         });
