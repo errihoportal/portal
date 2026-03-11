@@ -460,13 +460,26 @@
 
     // --- SUBMIT TO DRIVE ---
     async function submitToDrive() {
+        // 1. Validation: Address at Date Restriction
         const addrElement = document.getElementById('addressInput');
-        const addr = addrElement.innerText.trim(); 
-        
+        const addr = addrElement.innerText.trim();
+        const promiseDateInput = document.getElementById('promiseDate');
+        const selectedDate = new Date(promiseDateInput.value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Check kung lampas 20 days o back-date (Double security)
+        const maxDate = new Date();
+        maxDate.setDate(today.getDate() + 20);
+
         if (!addr || addr === "" || addr === "[ENTER FULL ADDRESS HERE]" || addr.length < 5) {
             alert("⚠️ Please enter your ACTUAL FULL ADDRESS.");
-            addrElement.style.backgroundColor = "#ffcccc"; 
             addrElement.focus();
+            return;
+        }
+
+        if (selectedDate < today || selectedDate > maxDate) {
+            alert("⚠️ Invalid Date! Please select a date from today up to 20 days only.");
             return;
         }
 
@@ -476,33 +489,35 @@
         btn.innerText = "⏳ Submitting High Quality PDF...";
         btn.disabled = true;
 
-        const actualWidth = letter.offsetWidth;
-        const actualHeight = letter.offsetHeight;
+        // --- MOBILE VIEW CAPTURE (COPY PASTE NG ITSURA SA SCREEN) ---
+        const actualWidth = letter.scrollWidth; // Ginamit ang scrollWidth para kuha lahat
+        const actualHeight = letter.scrollHeight;
 
-        // --- HIGH RESOLUTION CAPTURE ---
         html2canvas(letter, { 
-            scale: 4, // Tinaasan sa 4 para sobrang linaw (Retina quality)
+            scale: 4, 
             useCORS: true,
             logging: false,
-            backgroundColor: "#ffffff", // Siguradong puti ang background
+            backgroundColor: "#ffffff",
             width: actualWidth,
-            height: actualHeight
+            height: actualHeight,
+            windowWidth: actualWidth // Sinisiguro na mobile view width ang kukunin
         }).then(canvas => {
-            // Quality is set to 1.0 (100%) JPEG quality
             const imgData = canvas.toDataURL("image/jpeg", 1.0); 
             const { jsPDF } = window.jspdf;
             
+            // Dynamic PDF Size para hindi putol
             const pdfWidth = 8.5; 
             const pdfHeight = (actualHeight * pdfWidth) / actualWidth;
 
+            // Inalis ang 'compress: true' para hindi lumabo at maputol
             const pdf = new jsPDF({ 
                 orientation: "portrait", 
                 unit: "in", 
-                format: [pdfWidth, pdfHeight],
-                compress: true // Binuhay ang compression para kahit malinaw, hindi sobrang bigat ng file
+                format: [pdfWidth, pdfHeight] 
             });
 
-            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+            // Ginamit ang 'NONE' sa compression para Crystal Clear
+            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'NONE');
             const pdfBase64 = pdf.output('datauristring').split(',')[1];
 
             const payload = {
@@ -520,7 +535,7 @@
             })
             .catch((err) => {
                 console.error(err);
-                alert("❌ Error submitting document.");
+                alert("❌ Error submitting.");
                 btn.innerText = "Submit Promissory Note";
                 btn.disabled = false;
             });
