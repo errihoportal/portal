@@ -267,7 +267,7 @@
                 </div>
                 <hr style="border:0; border-top:1px solid #ddd; margin: 8px 0;">
                 <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 15px; color: #2c3e50;">
-                    <span>Total to Swipe:</span> 
+                    <span>Total to Tap:</span> 
                     <span id="cardTotalAmount">₱0.00</span>
                 </div>
             </div>
@@ -409,15 +409,18 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         document.getElementById('qrImg').src = data.qrLink;
 
         // --- ADD THIS: Card Fee Calculation ---
-        const baseAmt = parseFloat(data.amount.replace(/,/g, ''));
-        const cardFee = baseAmt * 0.032;
-        const totalWithCardFee = baseAmt + cardFee;
+const baseAmt = parseFloat(data.amount.replace(/,/g, ''));
 
-        if(document.getElementById('cardBaseAmount')) {
-            document.getElementById('cardBaseAmount').innerText = "₱" + baseAmt.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('cardFeeAmount').innerText = "₱" + cardFee.toLocaleString(undefined, {minimumFractionDigits: 2});
-            document.getElementById('cardTotalAmount').innerText = "₱" + totalWithCardFee.toLocaleString(undefined, {minimumFractionDigits: 2});
-        }
+// 1. Dito natin lilitimitahan sa 2 decimals ang calculation
+const cardFee = Math.round((baseAmt * 0.032) * 100) / 100; 
+const totalWithCardFee = baseAmt + cardFee;
+
+if(document.getElementById('cardBaseAmount')) {
+    // 2. Siguraduhin na maximumFractionDigits ay 2 rin sa display
+    document.getElementById('cardBaseAmount').innerText = "₱" + baseAmt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    document.getElementById('cardFeeAmount').innerText = "₱" + cardFee.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    document.getElementById('cardTotalAmount').innerText = "₱" + totalWithCardFee.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+}
         // --------------------------------------
 
         const banner = document.getElementById('statusBanner');
