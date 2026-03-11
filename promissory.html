@@ -40,19 +40,19 @@
     }
 
     /* 2. INPUT FIELDS (Para sa Screen) */
-    #addressInput {
+    .address-box {
         border: none;
         border-bottom: 1px solid black;
-        background: transparent;
+        background: #fffdf0; /* Manilaw-nilaw para halatang editable */
         font-family: 'Times New Roman', serif;
         font-size: inherit;
         font-weight: bold;
         text-transform: uppercase;
         outline: none;
-        padding: 0 5px;
-        min-width: 200px;
-        display: inline;
-        white-space: pre-wrap;
+        padding: 2px 8px;
+        min-width: 250px;
+        display: inline-block;
+        cursor: text;
     }
 
     #sig-canvas {
@@ -71,11 +71,11 @@
         top: 0;
         width: 8.5in;
         height: 13in;
-        padding: 0.7in 0.8in; 
+        padding: 0.6in 0.7in; 
         background: white;
         font-family: 'Times New Roman', serif;
-        font-size: 11.5px;      /* Professional legal size */
-        line-height: 1.4;       /* Balanced spacing */
+        font-size: 14px;      /* Professional legal size */
+        line-height: 1.6;       /* Balanced spacing */
         box-sizing: border-box;
         color: black;
         display: block;
@@ -153,11 +153,12 @@
     I, <span id="fullName" style="font-weight:bold; border-bottom:1px solid #000; display: inline-block; padding: 0 5px;">Loading...</span>, 
     with current billing address at 
    <span id="addressInput" 
+          class="address-box"
           contenteditable="true" 
           onfocus="if(this.innerText.trim() == '[ENTER FULL ADDRESS HERE]') this.innerText = '';" 
           onblur="if(this.innerText.trim() == '') this.innerText = '[ENTER FULL ADDRESS HERE]';">
         [ENTER FULL ADDRESS HERE]
-    </span> 
+    </span>
     hereby acknowledge my outstanding debt to JERRIC JHON DELA CRUZ amounting to 
     <span id="amountWords" style="font-weight:bold; text-transform:uppercase;">---</span> 
     <span id="amountNum" style="font-weight:bold;">(₱0.00)</span>.
@@ -265,18 +266,20 @@
     <p>I am fully aware that my account is severely overdue and that the unit mentioned above is already subject to repossession under our signed Collateral Agreement.</p>
 
     <p><strong>PROMISE TO PAY:</strong><br>
-    I hereby promise and commit to settle the full amount of <strong id="pdf-amount-num2"></strong> on or before <strong id="pdf-promise-date"></strong>.</p>
+    I hereby promise and commit to settle the full amount of ₱<strong id="pdf-amount-num2"></strong> on or before <strong id="pdf-promise-date"></strong>.</p>
 
     <p><strong>TERMS AND CONDITIONS:</strong></p>
     <ol>
     <li><strong>Full Settlement:</strong> I understand that this is the final extension granted to me.</li>
     <li><strong>Voluntary Surrender:</strong> If I fail to settle the full amount by the said date, I hereby agree to voluntarily surrender the unit mentioned above to JERRIC JHON DELA CRUZ without the need for further legal demand.</li>
-    <li><strong>Execution of Collateral:</strong> I acknowledge the absolute right of JERRIC JHON DELA CRUZ to proceed with the 30-day redemption period, and subsequent resale or liquidation of the unit to cover my total outstanding debt.</li>
+    <li><strong>Execution of Collateral:</strong> I acknowledge the absolute right of JERRIC JHON DELA CRUZ to proceed with the 30-day redemption period, and subsequent resale or liquidation of the unit to cover my total outstanding debt, including all accrued interest and penalties.</li>
 </ol>
 
     <div style="margin-top: 50px; text-align: center;">
-        <img id="pdf-sig-image" style="max-width: 300px; border-bottom: 1px solid black;"><br>
-        <strong><span id="pdf-footer-name"></span></strong><br>
+        <img id="pdf-sig-image" style="max-height: 80px; width: auto;"><br>
+<div style="border-top: 1px solid black; display: inline-block; min-width: 200px; margin-top: -10px;">
+    <strong><span id="pdf-footer-name"></span></strong>
+</div><br>
         <span>(Signature over Printed Name)</span>
     </div>
     
@@ -548,7 +551,9 @@
 
         // 3. I-POPULATE ANG HIDDEN PDF TEMPLATE
         document.getElementById('pdf-address-text').innerText = addr;
-        document.getElementById('pdf-promise-date').innerText = promiseDateInput.value;
+        const pDate = new Date(promiseDateInput.value);
+const pOptions = { month: 'long', day: 'numeric', year: 'numeric' };
+document.getElementById('pdf-promise-date').innerText = pDate.toLocaleDateString('en-US', pOptions).toUpperCase();
         document.getElementById('pdf-sig-image').src = sigImageData;
         
         // Sync Main Details
