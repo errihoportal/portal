@@ -464,13 +464,11 @@
     const addr = addrElement.innerText.trim();
     const promiseDateInput = document.getElementById('promiseDate');
     
-    // --- DATE VALIDATION LOGIC ---
+    // --- DATE VALIDATION (BACK-DATE & 20 DAYS) ---
     const selectedDate = new Date(promiseDateInput.value);
     selectedDate.setHours(0, 0, 0, 0);
-    
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
     const maxDate = new Date();
     maxDate.setDate(today.getDate() + 20);
 
@@ -481,53 +479,44 @@
     }
 
     if (selectedDate < today) {
-        alert("⚠️ Back-dating is NOT allowed. Please select today or a future date.");
+        alert("⚠️ Back-dating is NOT allowed.");
         return;
     }
 
     if (selectedDate > maxDate) {
-        alert("⚠️ Maximum extension is only 20 days from today.");
+        alert("⚠️ Maximum extension is 20 days only.");
         return;
     }
 
     const btn = document.getElementById('submitBtn');
     const letter = document.getElementById('promissory-note');
 
-    btn.innerText = "⏳ Submitting please wait...";
+    btn.innerText = "⏳ Submitting...";
     btn.disabled = true;
 
-    // --- SCREENSHOT LOGIC (NO CUTTING) ---
-    // Kinukuha ang saktong sukat ng element base sa mobile screen
-    const rect = letter.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-
+    // --- EXACT MOBILE CAPTURE ---
     html2canvas(letter, { 
-        scale: 3, // Sapat na ang 3 para malinaw pero hindi sobrang bigat
+        scale: 3, // Ito ang pampalinaw (3x resolution)
         useCORS: true,
         logging: false,
-        backgroundColor: "#ffffff",
-        width: width,
-        height: height,
-        x: 0,
-        y: 0,
-        scrollX: 0,
-        scrollY: -window.scrollY // Sinisiguro na hindi mapuputol kung naka-scroll ang user
+        // Hahayaan nating html2canvas ang kumuha ng natural width/height ng element
     }).then(canvas => {
         const imgData = canvas.toDataURL("image/jpeg", 1.0); 
         const { jsPDF } = window.jspdf;
         
-        // Kinakalibrate ang PDF sa ratio ng Mobile screen
-        const pdfWidth = 8.5; 
-        const pdfHeight = (height * pdfWidth) / width;
+        // --- ANG LOGIC PARA HINDI MASIRA ANG ITSURA ---
+        // Kinukuha ang pixels at ginagawang Inches (96 pixels = 1 inch)
+        const imgWidth = canvas.width / (3 * 96); 
+        const imgHeight = canvas.height / (3 * 96);
 
+        // Ang PDF paper size ay mag-aadjust sa laki ng mobile view mo
         const pdf = new jsPDF({ 
-            orientation: "portrait", 
+            orientation: imgWidth > imgHeight ? "landscape" : "portrait", 
             unit: "in", 
-            format: [pdfWidth, pdfHeight] 
+            format: [imgWidth, imgHeight] 
         });
 
-        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'NONE');
+        pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
         const pdfBase64 = pdf.output('datauristring').split(',')[1];
 
         const payload = {
@@ -545,7 +534,7 @@
         })
         .catch((err) => {
             console.error(err);
-            alert("❌ Error submitting.");
+            alert("❌ Error.");
             btn.innerText = "Submit Promissory Note";
             btn.disabled = false;
         });
