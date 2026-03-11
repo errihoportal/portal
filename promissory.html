@@ -198,7 +198,7 @@
             </p>
         </div>
 
-    </div> <div class="actions" style="margin-top: 30px; margin-bottom: 50px; text-align: center; display: flex; gap: 10px; justify-content: center;">
+     <div class="actions" style="margin-top: 30px; margin-bottom: 50px; text-align: center; display: flex; gap: 10px; justify-content: center;">
         <button class="btn-clear" onclick="clearSig()" style="background: #95a5a6; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
             Clear Signature
         </button>
@@ -439,44 +439,36 @@ if(document.getElementById('s-date-footer')) {
         return;
     }
 
-    const btn = document.getElementById('submitBtn');
-    btn.innerText = "SENDING TO EMAIL..."; 
-    btn.disabled = true;
-
-    // Update Security Date sa document
-    if(document.getElementById('s-date')) {
-        document.getElementById('s-date').innerText = new Date().toLocaleString();
-    }
-
-    const letter = document.getElementById('promissory-note');
-    const btn = document.getElementById('submitBtn');
+    const btn = document.getElementById('submitBtn'); // ISANG BESES LANG DAPAT ITO
     btn.innerText = "GENERATING ONE-PAGE PDF...";
     btn.disabled = true;
 
+    // Update Security Date sa document
+    const nowStr = new Date().toLocaleString();
+    if(document.getElementById('s-date')) document.getElementById('s-date').innerText = nowStr;
+    if(document.getElementById('s-date-footer')) document.getElementById('s-date-footer').innerText = nowStr;
+
+    const letter = document.getElementById('promissory-note');
+
     html2canvas(letter, { 
-        scale: 2, // Mataas na quality
+        scale: 2, 
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff",
-        windowWidth: 816, // Fixed width para sa standard 8.5in
+        windowWidth: 816, 
     }).then(canvas => {
         const imgData = canvas.toDataURL("image/png");
         
         const { jsPDF } = window.jspdf;
-        // Gagawa tayo ng LEGAL size document
         const pdf = new jsPDF({
             orientation: "portrait",
             unit: "in",
-            format: "legal" // 8.5" x 14"
+            format: "legal" 
         });
 
         const pdfWidth = 8.5;
         const pdfHeight = 14;
 
-        /* DITO ANG MAGIC: 
-           Imbes na imgHeight ang gamitin, i-force natin sa 8.5 x 14 
-           para siguradong ONE PAGE lang siya at walang putol.
-        */
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
         
         const pdfBase64 = pdf.output('datauristring').split(',')[1]; 
@@ -499,7 +491,8 @@ if(document.getElementById('s-date-footer')) {
             setTimeout(() => { window.location.href = "statement.html"; }, 1500);
         })
         .catch(err => {
-            alert("❌ Error. Try again.");
+            alert("❌ Error connecting to server. Try again.");
+            btn.innerText = "Submit Promissory Note";
             btn.disabled = false;
         });
     });
