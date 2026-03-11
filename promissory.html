@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-    /* Pang-display sa screen at General Font */
+    /* 1. SCREEN VIEW (Kung ano ang nakikita ng user sa phone) */
     body { 
         font-family: 'Times New Roman', serif; 
         background: #f4f4f4; 
@@ -17,10 +17,11 @@
     
     #promissory-note {
         background: white; 
-        width: 8.5in; 
+        width: 100%; /* Auto adjust sa phone */
+        max-width: 8.5in; 
         min-height: 13in; 
         margin: 0 auto; 
-        padding: 0.8in 1in; 
+        padding: 20px; 
         box-shadow: 0 0 10px rgba(0,0,0,0.1); 
         position: relative;
         box-sizing: border-box;
@@ -29,6 +30,7 @@
         line-height: 1.8; 
     }
 
+    /* Watermark */
     #promissory-note::after {
         content: "ERRIHO OFFICIAL";
         position: absolute; top: 50%; left: 50%;
@@ -37,136 +39,71 @@
         pointer-events: none;
     }
 
-    @media print {
-        header, footer, .actions, .back-link, #pwa-badge { display: none !important; }
-        body { background: white; padding: 0; }
-        #promissory-note { 
-            box-shadow: none !important; 
-            margin: 0 !important; 
-            width: 100% !important; 
-            padding: 0.8in 1in !important;
-        }
-    }
-
-    .content { 
-        font-size: 14px; 
-        text-align: justify; 
-    }
-
-    /* --- ANG FIX: Specific class para sa mga kailangang may underline --- */
-    .underline-field {
-        border-bottom: 1px solid black;
-        font-weight: bold;
-        padding: 0 5px;
-        display: inline-block;
-    }
-
-    /* Linisin ang input para magmukhang saktong underline lang */
+    /* 2. INPUT FIELDS (Para sa Screen) */
     #addressInput {
         border: none;
-        border-bottom: 1px solid black; /* Ang underline */
+        border-bottom: 1px solid black;
         background: transparent;
         font-family: 'Times New Roman', serif;
         font-size: inherit;
         font-weight: bold;
         text-transform: uppercase;
-        outline: none; /* Tinatanggal yung blue border pag clinick */
-        padding: 0 5px;
-        min-width: 200px; /* Haba ng underline */
-        display: inline; /* Para kasama siya sa agos ng text */
-        white-space: pre-wrap; /* Para kung mahaba ang address, mag-aadjust ang line height */
-    }
-
-    #promiseDate {
-        border: none;
-        border-bottom: 1px solid black;
-        font-family: 'Times New Roman', serif;
-        font-weight: bold;
         outline: none;
-        background: transparent;
-        width: auto;
-    }
-
-    /* --- Inalis ang general span underline para malinis ang footer --- */
-    #promissory-note span {
-        border-bottom: none; 
-    }
-
-    .sig-container {
-        margin-top: 50px;
-        text-align: center;
+        padding: 0 5px;
+        min-width: 200px;
+        display: inline;
+        white-space: pre-wrap;
     }
 
     #sig-canvas {
-        border: none; 
-        border-bottom: 1px solid #000; 
-        width: 300px;
-        height: 100px;
+        border: 1px dashed #ccc; 
         background: #fafafa;
         cursor: crosshair;
-    }
-
-    #security-info table {
         width: 100%;
-        border-collapse: collapse;
-        margin-top: 30px;
-        font-size: 10px;
-        color: #7f8c8d;
-        font-family: sans-serif;
+        max-width: 400px;
+        height: 150px;
     }
 
-    .document-footer {
-        margin-top: auto; 
-        text-align: center;
-        font-size: 11px;
-        color: #555;
-        padding-top: 20px;
+    /* 3. PDF RENDER AREA (Hidden Blueprint) */
+    #pdf-render-area {
+        position: absolute;
+        left: -9999px;
+        top: 0;
+        width: 8.5in;
+        height: 13in;
+        padding: 0.7in 0.8in; 
+        background: white;
+        font-family: 'Times New Roman', serif;
+        font-size: 11.5px;      /* Professional legal size */
+        line-height: 1.4;       /* Balanced spacing */
+        box-sizing: border-box;
+        color: black;
+        display: block;
     }
 
-    @media screen and (max-width: 8.5in) {
-        #promissory-note {
-            width: 100%;
-            height: auto;
-            padding: 20px;
-        }
-        #addressInput {
-            width: 90%; 
-        }
+    #pdf-render-area p {
+        margin-bottom: 12px;
+        text-align: justify;
     }
 
-    ::placeholder {
-        text-transform: none;
-        font-weight: normal;
-        color: #aaa;
+    #pdf-sig-image {
+        max-height: 70px; /* Mas maliit na para balance sa 11.5px font */
+        width: auto;
+        display: block;
+        margin: 0 auto;
     }
 
-    /* Ito ang kukunin ng html2canvas para sa PDF */
-#pdf-render-area {
-    position: absolute;
-    left: -9999px;
-    top: 0;
-    width: 8.5in;
-    height: 13in;
-    padding: 0.8in 1in;
-    background: white;
-    font-family: 'Times New Roman', serif;
-    font-size: 16px; /* Saktong laki para sa legal document */
-    line-height: 1.6;
-    box-sizing: border-box;
-    color: black;
-    display: block; /* Siguraduhing block ito habang kina-capture */
-}
+    #pdf-security-section {
+        margin-top: 20px;
+        font-size: 9px; /* Small audit trail */
+    }
 
-#pdf-sig-image {
-    max-height: 80px; /* Para hindi masyadong malaki ang pirma sa PDF */
-    width: auto;
-}
-
-/* Siguraduhin na ang text ay malinis sa PDF */
-#pdf-render-area p {
-    margin-bottom: 15px;
-    text-align: justify;
-}
+    /* 4. PRINT OVERRIDES */
+    @media print {
+        header, footer, .actions, .back-link, #pwa-badge { display: none !important; }
+        body { background: white; padding: 0; }
+        #promissory-note { box-shadow: none !important; margin: 0 !important; width: 100% !important; }
+    }
 </style>
 </head>
 <body>
@@ -599,53 +536,63 @@
         return;
     }
 
-    // --- KUNIN ANG SIGNATURE PARA SA PDF ---
-    const sigCanvas = document.getElementById('sig-canvas');
-    // Check kung blangko ang signature (optional but recommended)
-    const sigImageData = sigCanvas.toDataURL("image/png");
-
+    // --- START GENERATION PROCESS ---
     const btn = document.getElementById('submitBtn');
     btn.innerText = "⏳ Generating Official PDF...";
     btn.disabled = true;
 
-    // 2. I-POPULATE ANG IYONG CLEAN PDF TEMPLATE (Hidden Area)
-    // Siguraduhin na ang mga IDs na ito ay nasa HTML mo gaya ng pinag-usapan natin kanina
-    document.getElementById('pdf-address-text').innerText = addr;
-    document.getElementById('pdf-promise-date').innerText = promiseDateInput.value;
-    document.getElementById('pdf-sig-image').src = sigImageData;
-    
-    // 1-sync ang iba pang detalye
-    document.getElementById('pdf-date-today').innerText = document.getElementById('dateToday').innerText;
-    document.getElementById('pdf-unit-name').innerText = document.getElementById('unitName').innerText;
-    document.getElementById('pdf-full-name').innerText = document.getElementById('fullName').innerText;
-    document.getElementById('pdf-amount-words').innerText = document.getElementById('amountWords').innerText;
-    document.getElementById('pdf-amount-num').innerText = document.getElementById('amountNum').innerText;
-    document.getElementById('pdf-amount-num2').innerText = document.getElementById('amountNum2').innerText;
-    document.getElementById('pdf-footer-name').innerText = document.getElementById('footerName').innerText;
-    document.getElementById('pdf-security-section').innerHTML = document.getElementById('security-info').innerHTML;
+    try {
+        // 2. KUNIN ANG SIGNATURE
+        const sigCanvas = document.getElementById('sig-canvas');
+        const sigImageData = sigCanvas.toDataURL("image/png");
 
-    // 2. I-sync ang Security Audit Trail (Isa-isa para manatili ang magandang layout ng PDF)
-document.getElementById('pdf-s-name').innerText = document.getElementById('s-name').innerText;
-document.getElementById('pdf-s-acc').innerText = document.getElementById('s-acc').innerText;
-document.getElementById('pdf-s-ip').innerText = document.getElementById('s-ip').innerText;
-document.getElementById('pdf-s-date').innerText = document.getElementById('s-date').innerText;
-document.getElementById('pdf-s-mobile').innerText = document.getElementById('s-mobile').innerText;
-document.getElementById('pdf-s-email').innerText = document.getElementById('s-email').innerText;
+        // 3. I-POPULATE ANG HIDDEN PDF TEMPLATE
+        document.getElementById('pdf-address-text').innerText = addr;
+        document.getElementById('pdf-promise-date').innerText = promiseDateInput.value;
+        document.getElementById('pdf-sig-image').src = sigImageData;
+        
+        // Sync Main Details
+        document.getElementById('pdf-date-today').innerText = document.getElementById('dateToday').innerText;
+        document.getElementById('pdf-unit-name').innerText = document.getElementById('unitName').innerText;
+        document.getElementById('pdf-full-name').innerText = document.getElementById('fullName').innerText;
+        document.getElementById('pdf-amount-words').innerText = document.getElementById('amountWords').innerText;
+        document.getElementById('pdf-amount-num').innerText = document.getElementById('amountNum').innerText;
+        document.getElementById('pdf-amount-num2').innerText = document.getElementById('amountNum2').innerText;
+        document.getElementById('pdf-footer-name').innerText = document.getElementById('footerName').innerText;
 
-    // 3. CAPTURE THE HIDDEN TEMPLATE (Legal Size: 8.5 x 13)
-    const pdfArea = document.getElementById('pdf-render-area');
+        // Sync Security Audit Trail
+        document.getElementById('pdf-s-name').innerText = document.getElementById('s-name').innerText;
+        document.getElementById('pdf-s-acc').innerText = document.getElementById('s-acc').innerText;
+        document.getElementById('pdf-s-ip').innerText = document.getElementById('s-ip').innerText;
+        document.getElementById('pdf-s-date').innerText = document.getElementById('s-date').innerText;
+        document.getElementById('pdf-s-mobile').innerText = document.getElementById('s-mobile').innerText;
+        document.getElementById('pdf-s-email').innerText = document.getElementById('s-email').innerText;
 
-    html2canvas(pdfArea, { 
-        scale: 2, // 2 is enough for clear text and smaller file size
-        useCORS: true,
-        logging: false,
-        width: 816,  // 8.5in * 96dpi
-        height: 1248 // 13in * 96dpi
-    }).then(canvas => {
-        const imgData = canvas.toDataURL("image/jpeg", 0.9); 
+        // --- IMPORTANT: Hintayin mag-load ang signature sa hidden div para hindi blank sa PDF ---
+        await new Promise(resolve => {
+            const img = document.getElementById('pdf-sig-image');
+            if (img.complete) resolve();
+            else img.onload = resolve;
+        });
+
+        // 4. CAPTURE THE HIDDEN TEMPLATE
+        const pdfArea = document.getElementById('pdf-render-area');
+
+        const canvas = await html2canvas(pdfArea, { 
+            scale: 2, 
+            useCORS: true,
+            logging: false,
+            width: 816,  
+            height: 1248,
+            onclone: (clonedDoc) => {
+                // Siguraduhing "visible" sa canvas kahit nakatago sa screen
+                clonedDoc.getElementById('pdf-render-area').style.left = "0";
+            }
+        });
+
+        const imgData = canvas.toDataURL("image/jpeg", 0.8); 
         const { jsPDF } = window.jspdf;
         
-        // --- FORCE LEGAL SIZE PDF ---
         const pdf = new jsPDF({ 
             orientation: "portrait", 
             unit: "in", 
@@ -655,7 +602,7 @@ document.getElementById('pdf-s-email').innerText = document.getElementById('s-em
         pdf.addImage(imgData, 'JPEG', 0, 0, 8.5, 13);
         const pdfBase64 = pdf.output('datauristring').split(',')[1];
 
-        // 4. PAYLOAD FOR GOOGLE DRIVE & EMAIL
+        // 5. PAYLOAD FOR GOOGLE DRIVE
         const payload = {
             action: "promissory",
             image: pdfBase64, 
@@ -664,19 +611,22 @@ document.getElementById('pdf-s-email').innerText = document.getElementById('s-em
             name: data.name
         };
 
-        // 5. SEND TO YOUR GOOGLE SCRIPT
-        fetch(baseUrl, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
-        .then(() => {
-            alert("✅ SUBMITTED SUCCESSFULLY!");
-            setTimeout(() => { window.location.href = "statement.html"; }, 1500);
-        })
-        .catch((err) => {
-            console.error(err);
-            alert("❌ Error submitting to server.");
-            btn.innerText = "Submit Promissory Note";
-            btn.disabled = false;
+        // 6. SEND TO SERVER
+        const response = await fetch(baseUrl, { 
+            method: "POST", 
+            mode: "no-cors", 
+            body: JSON.stringify(payload) 
         });
-    });
+
+        alert("✅ SUBMITTED SUCCESSFULLY!");
+        setTimeout(() => { window.location.href = "statement.html"; }, 1500);
+
+    } catch (err) {
+        console.error(err);
+        alert("❌ Error: " + err.message);
+        btn.innerText = "Submit Promissory Note";
+        btn.disabled = false;
+    }
 }
 </script>
 </body>
