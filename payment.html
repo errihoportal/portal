@@ -139,8 +139,8 @@
 </head>
 <body>
 
-<div id="loader" class="loading-screen" style="text-align: center; font-family: 'Segoe UI', sans-serif;">
-    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;">
+<div id="loader" class="loading-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 9999; display: flex; align-items: center; justify-content: center; text-align: center; font-family: 'Segoe UI', sans-serif;">
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <img src="images/logo.png" style="width:180px; margin-bottom:10px; animation: pulse 2s infinite;" alt="Logo">
         
         <div style="font-size: 18px; font-weight: 800; color: #2c3e50; letter-spacing: 2px; margin-bottom: 12px;">
@@ -152,7 +152,7 @@
                 <span style="font-size: 12px;">🛡️</span>
                 <div style="text-align: left; line-height: 1.2;">
                     <b style="font-size: 11px; color: #333; letter-spacing: 0.5px; display: block; text-transform: uppercase;">SECURE PAYMENT GATEWAY</b>
-                    <span style="font-size: 9px; color: #27ae60; font-weight: 600; display: block; text-transform: uppercase;">Trusted & Encrypted</span>
+                    <span style="font-size: 9px; color: #27ae60; font-weight: 600; display: block; text-transform: uppercase;">Trusted & Encrypted Transaction</span>
                 </div>
             </div>
         </div>
@@ -187,6 +187,7 @@
     </div>
 
     <div id="statusBanner" class="status-banner">Loading...</div>
+    
     <div class="bill-card">
         <p>Customer: <b id="custName">---</b></p>
         <h2 id="billNumDisplay">Bill #---</h2>
