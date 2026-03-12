@@ -261,7 +261,7 @@
                 <img src="images/palawanpay.png" style="height: 30px; width: auto;" alt="PalawanPay">
             </div>
         </div>
-        <span>▼</span>
+        <span class="arrow-icon">▼</span> </div>
     </div>
 
     <div id="palawan-content" class="option-content">
@@ -311,7 +311,7 @@
             <img src="images/bdo.png" style="height: 50px; width: auto;" alt="BDO">
         </div>
     </div>
-    <span>▼</span>
+    <span class="arrow-icon">▼</span> </div>
 </div>
             
     <div id="bank-content" class="option-content">
@@ -372,7 +372,7 @@
             <img src="images/gpay.png" style="height: 50px; width: auto;" alt="GPay">
         </div>
     </div>
-    <span>▼</span>
+    <span class="arrow-icon">▼</span> </div>
 </div>
     
     <div id="card-content" class="option-content">
@@ -780,8 +780,8 @@ function toggleOption(id) {
     const targetContent = document.getElementById(id);
     const selectedOption = targetContent.closest('.option-item');
     
-    // Hanapin ang arrow span sa loob ng header ng piniling option
-    const arrow = selectedOption.querySelector('.option-header span:last-child');
+    // Hanapin ang arrow gamit ang specific class name
+    const arrow = selectedOption.querySelector('.arrow-icon');
     
     const isOpening = targetContent.style.display !== 'block';
 
@@ -796,7 +796,7 @@ function toggleOption(id) {
         // 2. Ipakita ang details
         targetContent.style.display = 'block';
         
-        // 3. GAWING UP ANG ARROW
+        // 3. Palitan ang arrow (Siguradong iisa lang ang mababago)
         if (arrow) {
             arrow.innerHTML = '▲'; 
         }
@@ -812,7 +812,7 @@ function toggleOption(id) {
         // 2. Itago ang details
         targetContent.style.display = 'none';
         
-        // 3. IBALIK SA DOWN ANG ARROW
+        // 3. Ibalik sa down ang arrow
         if (arrow) {
             arrow.innerHTML = '▼';
         }
