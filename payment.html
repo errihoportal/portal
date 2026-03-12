@@ -233,7 +233,7 @@
             (Scan via GCash, Maya, or any Bank App)
         </small>
     </div>
-    <span class="arrow-icon">▼</span> </div>
+    <span id="arrow-qrph" style="font-weight: bold;">▼</span>
 </div>
             <div id="qrph-content" class="option-content">
                 <img src="images/qrphdesign.png" style="width: 100%; max-width: 200px; margin-bottom: 10px;">
@@ -261,7 +261,7 @@
                 <img src="images/palawanpay.png" style="height: 30px; width: auto;" alt="PalawanPay">
             </div>
         </div>
-        <span class="arrow-icon">▼</span> </div>
+        <span id="arrow-palawan" style="font-weight: bold;">▼</span>
     </div>
 
     <div id="palawan-content" class="option-content">
@@ -311,7 +311,7 @@
             <img src="images/bdo.png" style="height: 50px; width: auto;" alt="BDO">
         </div>
     </div>
-    <span class="arrow-icon">▼</span> </div>
+    <span id="arrow-bank" style="font-weight: bold;">▼</span>
 </div>
             
     <div id="bank-content" class="option-content">
@@ -372,7 +372,7 @@
             <img src="images/gpay.png" style="height: 50px; width: auto;" alt="GPay">
         </div>
     </div>
-    <span class="arrow-icon">▼</span> </div>
+    <span id="arrow-card" style="font-weight: bold;">▼</span>
 </div>
     
     <div id="card-content" class="option-content">
@@ -775,36 +775,32 @@ if(document.getElementById('cardBaseAmount')) {
     setInterval(updateClock, 1000);
 }
 
-function toggleOption(id) {
+function toggleOption(contentId, arrowId) {
     const allOptions = document.querySelectorAll('.option-item');
-    const targetContent = document.getElementById(id);
+    const targetContent = document.getElementById(contentId);
     const selectedOption = targetContent.closest('.option-item');
+    const arrow = document.getElementById(arrowId);
     
-    // Hanapin ang arrow gamit ang specific class name
-    const arrow = selectedOption.querySelector('.arrow-icon');
-    
+    // Check kung kasalukuyang nakasara
     const isOpening = targetContent.style.display !== 'block';
 
     if (isOpening) {
-        // 1. Itago ang lahat ng ibang options
+        // 1. Itago lahat ng ibang boxes
         allOptions.forEach(option => {
-            if (option !== selectedOption) {
-                option.style.display = 'none';
-            }
+            option.style.display = 'none';
         });
 
-        // 2. Ipakita ang details
+        // 2. Ipakita ang piniling box at ang details nito
+        selectedOption.style.display = 'block';
         targetContent.style.display = 'block';
         
-        // 3. Palitan ang arrow (Siguradong iisa lang ang mababago)
-        if (arrow) {
-            arrow.innerHTML = '▲'; 
-        }
+        // 3. Palitan ang arrow gamit ang ID
+        if (arrow) arrow.innerHTML = '▲';
 
     } else {
-        // PAG ISASARA NA
+        // PAG I-C-CLOSE NA (Babalik sa listahan)
         
-        // 1. Ipakita ulit lahat ng options
+        // 1. Ipakita ulit lahat ng boxes
         allOptions.forEach(option => {
             option.style.display = 'block';
         });
@@ -813,12 +809,10 @@ function toggleOption(id) {
         targetContent.style.display = 'none';
         
         // 3. Ibalik sa down ang arrow
-        if (arrow) {
-            arrow.innerHTML = '▼';
-        }
+        if (arrow) arrow.innerHTML = '▼';
     }
 }
-
+    
 function copyText(elementId) {
     const textToCopy = document.getElementById(elementId).innerText;
     
