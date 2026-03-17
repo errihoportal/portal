@@ -599,10 +599,15 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
             banner.className = "status-banner bg-grace";
             graceArea.innerHTML = `
                 <div class="grace-period-box">
-                    <div id="liveTimer" style="font-weight:bold; font-size:14px;">ENDS IN: <span id="timerClock">--:--:--</span></div>
+                    <div style="color: #721c24; font-size: 12px; margin-bottom: 5px; font-weight: bold; text-transform: uppercase;">
+                        ⚠️ Status: ${data.daysLate} Days Overdue
+                    </div>
+                    <div id="liveTimer" style="font-weight:bold; font-size:16px; color: #155724;">
+                        ENDS IN: <span id="timerClock">--:--:--</span>
+                    </div>
+                    <hr style="border: 0; border-top: 1px dashed #c3e6cb; margin: 8px 0;">
                     <small>✨ Grace Period Applied: Late fees and interest are temporarily waived. Settle today to save!</small>
                 </div>`;
-            startLiveCountdown();
         } else {
             banner.innerText = "⚠️ ACCOUNT OVERDUE";
             banner.className = "status-banner bg-overdue blink-overdue";
