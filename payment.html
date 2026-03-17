@@ -755,21 +755,28 @@ if(document.getElementById('cardBaseAmount')) {
 
     function startLiveCountdown() {
     function updateClock() {
+        // Kunin ang deadline mula sa billData (dapat may data.graceUntil ka galing sa Sheets)
+        // Format dapat sa Sheets: "2026-03-20 23:59:59"
+        const deadline = new Date(billData.graceUntil || billData.dueDate); 
         const now = new Date();
-        const midnight = new Date();
-        midnight.setHours(23, 59, 59, 999);
 
-        const diff = midnight - now;
+        const diff = deadline - now;
+
         if (diff <= 0) {
-            document.getElementById('timerClock').innerText = "00:00:00";
+            const clockElem = document.getElementById('timerClock');
+            if (clockElem) clockElem.innerText = "EXPIRED";
             return;
         }
 
+        // Calculation para sa Days, Hours, Minutes, at Seconds
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
         const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
         const m = Math.floor((diff / (1000 * 60)) % 60);
         const s = Math.floor((diff / 1000) % 60);
 
-        const display = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        // Display format: 02d 10h 05m 30s
+        const display = `${d}d ${h.toString().padStart(2, '0')}h ${m.toString().padStart(2, '0')}m ${s.toString().padStart(2, '0')}s`;
+        
         const clockElem = document.getElementById('timerClock');
         if (clockElem) clockElem.innerText = display;
     }
@@ -777,7 +784,7 @@ if(document.getElementById('cardBaseAmount')) {
     updateClock();
     setInterval(updateClock, 1000);
 }
-
+    
 function toggleOption(contentId, arrowId) {
     const allOptions = document.querySelectorAll('.option-item');
     const targetContent = document.getElementById(contentId);
