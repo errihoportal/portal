@@ -602,11 +602,13 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
                     <div style="color: #721c24; font-size: 11px; margin-bottom: 5px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">
                         ⚠️ ACCOUNT IS ${data.daysLate} DAYS OVERDUE
                     </div>
+                    <div style="margin-bottom: 8px;">
+                        <small>✨ Grace Period Applied: Late fees and interest are temporarily waived. Settle today to save!</small>
+                    </div>
+                    <hr style="border: 0; border-top: 1px dashed #c3e6cb; margin: 8px 0;">
                     <div id="liveTimer" style="font-weight:bold; font-size:16px; color: #155724;">
                         ENDS IN: <span id="timerClock">--:--:--</span>
                     </div>
-                    <hr style="border: 0; border-top: 1px dashed #c3e6cb; margin: 8px 0;">
-                    <small>✨ Grace Period Applied: Late fees and interest are temporarily waived. Settle today to save!</small>
                 </div>`;
             
             // Siguraduhin na tatawag ang timer pagka-render ng HTML
