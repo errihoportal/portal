@@ -749,12 +749,21 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
 
     function startLiveCountdown() {
     function updateClock() {
-        // Safe Date Parsing
-        const rawDate = billData.graceUntil || billData.dueDate;
-        if (!rawDate) return;
+        if (!billData.dueDate) return;
 
-        // Ayusin ang format (Palitan ang '-' ng '/' para sa Safari/iOS compatibility)
-        const deadline = new Date(rawDate.replace(/-/g, "/"));
+        // 1. Kunin ang Due Date at i-parse nang tama
+        const dueDate = new Date(billData.dueDate.replace(/-/g, "/"));
+        
+        // 2. Kunin ang Grace Period Number (halimbawa data.graceDays ang pangalan sa JSON mo)
+        // Kung "3" ang nasa sheet, idadagdag natin ang 3 days sa Due Date.
+        const graceDays = parseInt(billData.gracePeriod) || 0; 
+        
+        // 3. Icompute ang Deadline (Due Date + Grace Days)
+        const deadline = new Date(dueDate);
+        deadline.setDate(deadline.getDate() + graceDays);
+        // Itakda sa dulo ng araw (11:59:59 PM)
+        deadline.setHours(23, 59, 59, 999);
+
         const now = new Date();
         const diff = deadline - now;
 
@@ -763,17 +772,13 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
 
         // KAPAG EXPIRED NA
         if (diff <= 0) {
-            clearInterval(window.graceInterval); // Patayin ang timer
+            clearInterval(window.graceInterval);
             clockElem.innerText = "EXPIRED";
             clockElem.style.color = "red";
 
-            // CHECK: Kung ang status ay GRACE pa rin sa data pero expired na sa clock, 
-            // doon lang tayo mag-re-refresh para maging "OVERDUE" status sa UI.
-            if (billData.isGracePeriod === "YES" || parseInt(billData.daysLate) === 0) {
-                setTimeout(() => {
-                    console.log("Grace period ended. Updating status...");
-                    location.reload(); 
-                }, 3000);
+            // Refresh lang kung kailangan i-update ang UI sa Overdue mode
+            if (billData.isGracePeriod === "YES") {
+                setTimeout(() => { location.reload(); }, 3000);
             }
             return;
         }
@@ -784,11 +789,9 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         const m = Math.floor((diff / (1000 * 60)) % 60);
         const s = Math.floor((diff / 1000) % 60);
 
-        // Maikling format para hindi humaba sa UI
         clockElem.innerText = `${d}d ${h}h ${m}m ${s}s`;
     }
     
-    // Siguraduhin na walang tumatakbong timer bago mag-start ng bago
     if(window.graceInterval) clearInterval(window.graceInterval);
     updateClock(); 
     window.graceInterval = setInterval(updateClock, 1000);
