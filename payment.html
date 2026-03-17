@@ -533,156 +533,135 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     }
 
     function renderData(data) {
-        document.getElementById('custName').innerText = data.name;
-        document.getElementById('billNumDisplay').innerText = "Bill #" + data.bill;
-        document.getElementById('itemName').innerText = data.item;
-        document.getElementById('totalAmount').innerText = data.amount;
-        document.getElementById('dueDateText').innerText = data.dueDate;
-        document.getElementById('qrImg').src = data.qrLink;
+    // 1. Basic Information Mapping
+    document.getElementById('custName').innerText = data.name;
+    document.getElementById('billNumDisplay').innerText = "Bill #" + data.bill;
+    document.getElementById('itemName').innerText = data.item;
+    document.getElementById('totalAmount').innerText = data.amount;
+    document.getElementById('dueDateText').innerText = data.dueDate;
+    document.getElementById('qrImg').src = data.qrLink;
 
-        // --- ADD THIS: Card Fee Calculation ---
-const baseAmt = parseFloat(data.amount.replace(/,/g, ''));
+    // 2. Card Fee Calculation
+    const baseAmt = parseFloat(data.amount.replace(/,/g, ''));
+    const cardFee = Math.round((baseAmt * 0.032) * 100) / 100; 
+    const totalWithCardFee = baseAmt + cardFee;
 
-// 1. Dito natin lilitimitahan sa 2 decimals ang calculation
-const cardFee = Math.round((baseAmt * 0.032) * 100) / 100; 
-const totalWithCardFee = baseAmt + cardFee;
-
-if(document.getElementById('cardBaseAmount')) {
-    // 2. Siguraduhin na maximumFractionDigits ay 2 rin sa display
-    document.getElementById('cardBaseAmount').innerText = "₱" + baseAmt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-    document.getElementById('cardFeeAmount').innerText = "₱" + cardFee.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-    document.getElementById('cardTotalAmount').innerText = "₱" + totalWithCardFee.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-}
-        // --------------------------------------
-
-        const banner = document.getElementById('statusBanner');
-        const graceArea = document.getElementById('gracePeriodArea');
-        const dNote = document.getElementById('dynamicNote');
-        const activeSec = document.getElementById('activeSection');
-        const status = data.status.toLowerCase();
-        const daysLate = parseInt(data.daysLate); // Positive kung overdue, Negative kung future
-        const isGrace = data.isGracePeriod === "YES";
-
-if (daysLate > 0) { 
-    if (isGrace) {
-        // LALABAS ANG TIMER (Green Mode)
-        banner.innerText = "✨ GRACE PERIOD ACTIVE";
-        banner.className = "status-banner bg-grace";
-        // ... timer HTML code ...
-    } else {
-        // LALABAS ANG FEES (Red Mode)
-        banner.innerText = "⚠️ ACCOUNT OVERDUE";
-        banner.className = "status-banner bg-overdue blink-overdue";
-        // Dito na ipapakita ang data.lateFee at data.dailyInterest
+    if(document.getElementById('cardBaseAmount')) {
+        const formatConfig = {minimumFractionDigits: 2, maximumFractionDigits: 2};
+        document.getElementById('cardBaseAmount').innerText = "₱" + baseAmt.toLocaleString(undefined, formatConfig);
+        document.getElementById('cardFeeAmount').innerText = "₱" + cardFee.toLocaleString(undefined, formatConfig);
+        document.getElementById('cardTotalAmount').innerText = "₱" + totalWithCardFee.toLocaleString(undefined, formatConfig);
     }
-}
 
-        // Reset classes
-        banner.className = "status-banner";
-        banner.style.animation = "none";
+    // 3. Elements and State Variables
+    const banner = document.getElementById('statusBanner');
+    const graceArea = document.getElementById('gracePeriodArea');
+    const dNote = document.getElementById('dynamicNote');
+    const activeSec = document.getElementById('activeSection');
+    const feesArea = document.getElementById('feesBreakdownArea');
+    
+    const status = data.status.toLowerCase();
+    const daysLate = parseInt(data.daysLate); 
+    const isGrace = data.isGracePeriod === "YES";
 
-        // --- IMPROVED LOGIC ENGINE ---
+    // INITIAL RESET (Importante: Linisin muna lahat bago mag-logic)
+    banner.className = "status-banner";
+    banner.style.animation = "none";
+    graceArea.innerHTML = "";
+    if (feesArea) feesArea.innerHTML = "";
 
-        if (status === "paid") {
-            banner.innerText = "STATUS: PAID";
-            banner.className = "status-banner bg-paid";
-            activeSec.style.display = 'none';
-            
-            // Ibalik natin ang "TOTAL PAID" label at kulay
-            const totalLabel = document.getElementById('totalLabel');
-            const totalAmt = document.querySelector('.total-amount');
-            const copyBtn = document.getElementById('copyBtnWrapper');
+    // 4. IMPROVED LOGIC ENGINE
+    if (status === "paid") {
+        banner.innerText = "STATUS: PAID";
+        banner.className = "status-banner bg-paid";
+        activeSec.style.display = 'none';
+        
+        const totalLabel = document.getElementById('totalLabel');
+        const totalAmt = document.querySelector('.total-amount');
+        const copyBtn = document.getElementById('copyBtnWrapper');
 
-            if (totalLabel) {
-                totalLabel.innerText = "TOTAL PAID";
-                totalLabel.style.color = "var(--success)";
-            }
-            if (totalAmt) {
-                totalAmt.style.color = "var(--success)";
-            }
-            if (copyBtn) {
-                copyBtn.style.display = 'none'; // Itago ang copy button pag bayad na
-            }
+        if (totalLabel) { totalLabel.innerText = "TOTAL PAID"; totalLabel.style.color = "var(--success)"; }
+        if (totalAmt) { totalAmt.style.color = "var(--success)"; }
+        if (copyBtn) copyBtn.style.display = 'none';
 
-            dNote.innerHTML = "🎉 Payment settled. Thank you!";
-        }
-        else if (status === "verifying") {
-            banner.innerText = "STATUS: VERIFYING";
-            banner.className = "status-banner bg-verifying";
-            activeSec.style.display = 'none';
-            dNote.innerText = "We are currently checking your proof. Wait for SMS/EMAIL confirmation.";
-        } 
-        else if (daysLate > 0) { 
-            // OVERDUE SCENARIO
-            if (isGrace) {
-                // GRACE PERIOD MODE (Green/Teal)
-                banner.innerText = "✨ GRACE PERIOD ACTIVE";
-                banner.className = "status-banner bg-grace";
-                graceArea.innerHTML = `
-                    <div class="grace-period-box" style="background:#e0faf4; border-color:#16a085; color:#16a085;">
-                        <div id="liveTimer" style="font-weight:bold; font-size:14px;">ENDS IN: <span id="timerClock">--:--:--</span></div>
-                        <small>✨ Grace Period Applied: Late fees and interest are temporarily waived. Settle today to save!</small>
-                    </div>`;
-                startLiveCountdown();
-            } else {
-                // REAL OVERDUE (Red)
-                banner.innerText = "⚠️ ACCOUNT OVERDUE";
-                banner.className = "status-banner bg-overdue blink-overdue";
-                document.getElementById('feesBreakdownArea').innerHTML = `
+        dNote.innerHTML = "🎉 Payment settled. Thank you!";
+    } 
+    else if (status === "verifying") {
+        banner.innerText = "STATUS: VERIFYING";
+        banner.className = "status-banner bg-verifying";
+        activeSec.style.display = 'none';
+        dNote.innerText = "We are currently checking your proof. Wait for SMS/EMAIL confirmation.";
+    } 
+    else if (daysLate > 0) { 
+        // OVERDUE SCENARIO
+        if (isGrace) {
+            banner.innerText = "✨ GRACE PERIOD ACTIVE";
+            banner.className = "status-banner bg-grace";
+            graceArea.innerHTML = `
+                <div class="grace-period-box">
+                    <div id="liveTimer" style="font-weight:bold; font-size:14px;">ENDS IN: <span id="timerClock">--:--:--</span></div>
+                    <small>✨ Grace Period Applied: Late fees and interest are temporarily waived. Settle today to save!</small>
+                </div>`;
+            startLiveCountdown();
+        } else {
+            banner.innerText = "⚠️ ACCOUNT OVERDUE";
+            banner.className = "status-banner bg-overdue blink-overdue";
+            if (feesArea) {
+                feesArea.innerHTML = `
                     <div class="fees-breakdown">
                         <div class="fee-item"><span>Principal:</span> <span>₱${data.principal}</span></div>
                         <div class="fee-item red"><span>Late Fee:</span> <span>+ ₱${data.lateFee}</span></div>
                         <div class="fee-item red"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}</span></div>
                     </div>`;
-                dNote.innerHTML = `<b style="color:var(--danger)">${daysLate} DAYS LATE:</b> Pay immediately to avoid additional daily interest.`;
             }
-        } 
-        else { 
-            // NOT YET OVERDUE (Upcoming/Due Today)
-            const daysUntil = Math.abs(daysLate); // absolute value
-
-            if (daysUntil === 0) { 
-                // DUE TODAY
-                banner.innerText = `🚨 BILL #${data.bill} DUE TODAY`;
-                banner.className = "status-banner bg-upcoming pulse-today";
-                graceArea.innerHTML = `
-                    <div class="grace-period-box" style="background:#fff3cd; color:#856404; border-color:#ffeeba;">
-                        <div id="liveTimer" style="font-weight:bold; font-size:14px;">TIME LEFT: <span id="timerClock">--:--:--</span></div>
-                        <small>Pay before midnight to avoid late fees.</small>
-                    </div>`;
-                startLiveCountdown();
-            } else {
-                // UPCOMING
-                banner.innerText = (daysUntil === 1) ? "⏳ DUE TOMORROW" : `⏳ DUE IN ${daysUntil} DAYS`;
-                banner.className = "status-banner bg-unpaid";
-                dNote.innerText = "Keep your account in good standing. Pay on or before the due date.";
-            }
+            dNote.innerHTML = `<b style="color:var(--danger)">${daysLate} DAYS LATE:</b> Pay immediately to avoid additional daily interest.`;
         }
-        
-        // 2. UNIVERSAL AUTO-EXIT TIMER (Ilagay ito sa DULO ng renderData function)
-        let exitSecs = 250; // 1 Minute
-        
-        // Gumawa tayo ng maliit na text sa baba ng card para sa timer
-        const timerDiv = document.createElement('div');
+    } 
+    else { 
+        // UPCOMING OR DUE TODAY
+        const daysUntil = Math.abs(daysLate);
+        if (daysUntil === 0) { 
+            banner.innerText = `🚨 BILL #${data.bill} DUE TODAY`;
+            banner.className = "status-banner bg-upcoming pulse-today";
+            graceArea.innerHTML = `
+                <div class="grace-period-box" style="background:#fff3cd; color:#856404; border-color:#ffeeba;">
+                    <div id="liveTimer" style="font-weight:bold; font-size:14px;">TIME LEFT: <span id="timerClock">--:--:--</span></div>
+                    <small>Pay before midnight to avoid late fees.</small>
+                </div>`;
+            startLiveCountdown();
+        } else {
+            banner.innerText = (daysUntil === 1) ? "⏳ DUE TOMORROW" : `⏳ DUE IN ${daysUntil} DAYS`;
+            banner.className = "status-banner bg-unpaid";
+            dNote.innerText = "Keep your account in good standing. Pay on or before the due date.";
+        }
+    }
+
+    // 5. UNIVERSAL AUTO-EXIT TIMER
+    let exitSecs = 250;
+    
+    // Check if session timer element exists, if not, create it
+    let timerDiv = document.getElementById('session-timer');
+    if (!timerDiv) {
+        timerDiv = document.createElement('div');
         timerDiv.id = "session-timer";
         timerDiv.style = "font-size: 11px; color: #94a3b8; text-align: center; margin-top: 15px; font-weight: 600;";
         document.querySelector('.bill-card').appendChild(timerDiv);
-
-        // Alisin ang "const" dito para magamit ang global variable sa taas
-        globalTimer = setInterval(() => { 
-            exitSecs--;
-            timerDiv.innerHTML = `<i class="fas fa-clock"></i> Session expires in ${exitSecs}s`;
-            
-            if (exitSecs <= 0) {
-                clearInterval(globalTimer);
-                sessionStorage.removeItem("erriho_authorized");
-                window.location.replace("index.html");
-            }
-        }, 1000);
-        
-        document.getElementById('loader').style.display = 'none';
-        document.getElementById('mainContainer').style.display = 'block';
     }
+
+    if (globalTimer) clearInterval(globalTimer);
+    globalTimer = setInterval(() => { 
+        exitSecs--;
+        timerDiv.innerHTML = `<i class="fas fa-clock"></i> Session expires in ${exitSecs}s`;
+        if (exitSecs <= 0) {
+            clearInterval(globalTimer);
+            sessionStorage.removeItem("erriho_authorized");
+            window.location.replace("index.html");
+        }
+    }, 1000);
+
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('mainContainer').style.display = 'block';
+}
 
     function updateFileName() {
         const fileInput = document.getElementById('fileInput');
