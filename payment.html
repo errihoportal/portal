@@ -563,6 +563,20 @@ if(document.getElementById('cardBaseAmount')) {
         const daysLate = parseInt(data.daysLate); // Positive kung overdue, Negative kung future
         const isGrace = data.isGracePeriod === "YES";
 
+if (daysLate > 0) { 
+    if (isGrace) {
+        // LALABAS ANG TIMER (Green Mode)
+        banner.innerText = "✨ GRACE PERIOD ACTIVE";
+        banner.className = "status-banner bg-grace";
+        // ... timer HTML code ...
+    } else {
+        // LALABAS ANG FEES (Red Mode)
+        banner.innerText = "⚠️ ACCOUNT OVERDUE";
+        banner.className = "status-banner bg-overdue blink-overdue";
+        // Dito na ipapakita ang data.lateFee at data.dailyInterest
+    }
+}
+
         // Reset classes
         banner.className = "status-banner";
         banner.style.animation = "none";
@@ -756,34 +770,41 @@ if(document.getElementById('cardBaseAmount')) {
 
     function startLiveCountdown() {
     function updateClock() {
-        // Kunin ang deadline mula sa billData (dapat may data.graceUntil ka galing sa Sheets)
-        // Format dapat sa Sheets: "2026-03-20 23:59:59"
+        // Kunin ang deadline (Grace Period or Due Date)
         const deadline = new Date(billData.graceUntil || billData.dueDate); 
         const now = new Date();
-
         const diff = deadline - now;
 
+        const clockElem = document.getElementById('timerClock');
+        if (!clockElem) return;
+
+        // KAPAG EXPIRED NA
         if (diff <= 0) {
-            const clockElem = document.getElementById('timerClock');
-            if (clockElem) clockElem.innerText = "EXPIRED";
+            clockElem.innerText = "EXPIRED";
+            clockElem.style.color = "red";
+            
+            // AUTO-RELOAD: Paglipas ng 2 seconds, i-refresh ang data
+            // para lumabas na ang "ACCOUNT OVERDUE" (Red Banner) at Fees.
+            setTimeout(() => {
+                location.reload(); 
+            }, 2000);
             return;
         }
 
-        // Calculation para sa Days, Hours, Minutes, at Seconds
+        // Calculation
         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
         const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
         const m = Math.floor((diff / (1000 * 60)) % 60);
         const s = Math.floor((diff / 1000) % 60);
 
-        // Display format: 02d 10h 05m 30s
-        const display = `${d}d ${h.toString().padStart(2, '0')}h ${m.toString().padStart(2, '0')}m ${s.toString().padStart(2, '0')}s`;
-        
-        const clockElem = document.getElementById('timerClock');
-        if (clockElem) clockElem.innerText = display;
+        // Display
+        clockElem.innerText = `${d}d ${h.toString().padStart(2, '0')}h ${m.toString().padStart(2, '0')}m ${s.toString().padStart(2, '0')}s`;
     }
     
     updateClock();
-    setInterval(updateClock, 1000);
+    // I-clear muna ang lumang interval para hindi mag-duplicate
+    if(window.graceInterval) clearInterval(window.graceInterval);
+    window.graceInterval = setInterval(updateClock, 1000);
 }
     
 function toggleOption(contentId, arrowId) {
