@@ -597,7 +597,7 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         if (isGrace) {
             banner.innerText = "✨ GRACE PERIOD ACTIVE";
             banner.className = "status-banner bg-grace";
-           graceArea.innerHTML = `
+            graceArea.innerHTML = `
                 <div class="grace-period-box">
                     <div style="color: #721c24; font-size: 11px; margin-bottom: 5px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">
                         ⚠️ ACCOUNT IS ${data.daysLate} DAYS OVERDUE
@@ -608,11 +608,9 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
                     <hr style="border: 0; border-top: 1px dashed #c3e6cb; margin: 8px 0;">
                     <small>✨ Grace Period Applied: Late fees and interest are temporarily waived. Settle today to save!</small>
                 </div>`;
-            // PAGKATAPOS ma-set ang HTML, saka natin patatakbuhin ang timer
-            setTimeout(() => {
-                startLiveCountdown();
-            }, 100); 
-        }
+            
+            // Siguraduhin na tatawag ang timer
+            setTimeout(() => { startLiveCountdown(); }, 100);
         } else {
             banner.innerText = "⚠️ ACCOUNT OVERDUE";
             banner.className = "status-banner bg-overdue blink-overdue";
