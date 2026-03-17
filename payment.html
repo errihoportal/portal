@@ -570,7 +570,7 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     graceArea.innerHTML = "";
     if (feesArea) feesArea.innerHTML = "";
 
-    // 4. IMPROVED LOGIC ENGINE
+   // 4. IMPROVED LOGIC ENGINE
     if (status === "paid") {
         banner.innerText = "STATUS: PAID";
         banner.className = "status-banner bg-paid";
@@ -609,7 +609,7 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
                     <small>✨ Grace Period Applied: Late fees and interest are temporarily waived. Settle today to save!</small>
                 </div>`;
             
-            // Siguraduhin na tatawag ang timer
+            // Siguraduhin na tatawag ang timer pagka-render ng HTML
             setTimeout(() => { startLiveCountdown(); }, 100);
         } else {
             banner.innerText = "⚠️ ACCOUNT OVERDUE";
@@ -636,14 +636,14 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
                     <div id="liveTimer" style="font-weight:bold; font-size:14px;">TIME LEFT: <span id="timerClock">--:--:--</span></div>
                     <small>Pay before midnight to avoid late fees.</small>
                 </div>`;
-            startLiveCountdown();
+            setTimeout(() => { startLiveCountdown(); }, 100);
         } else {
             banner.innerText = (daysUntil === 1) ? "⏳ DUE TOMORROW" : `⏳ DUE IN ${daysUntil} DAYS`;
             banner.className = "status-banner bg-unpaid";
             dNote.innerText = "Keep your account in good standing. Pay on or before the due date.";
         }
     }
-
+        
     // 5. UNIVERSAL AUTO-EXIT TIMER
     let exitSecs = 250;
     
