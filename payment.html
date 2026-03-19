@@ -571,27 +571,20 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         // 1. TANGGALIN ANG COPY BUTTON
         if (copyWrapper) copyWrapper.style.display = 'none';
 
-        // 2. PALITAN ANG SALITANG "DUE DATE" SA PAYMENT DATE
-        // Dahil ang "Due Date:" ay nasa loob ng <p> tag kasama ang date span,
-        // papalitan lang natin ang text content nang hindi nabubura ang span.
-        const dateDisplay = document.getElementById('dueDateText');
-        if (dateDisplay && dateDisplay.parentElement) {
-            const pTag = dateDisplay.parentElement;
-            // Pinapalitan lang ang "Due Date" text sa loob ng <p>
-            pTag.innerHTML = pTag.innerHTML.replace("Due Date:", "Payment Date:");
+        // 2. KUNIN ANG DATE MULA SA COLUMN T (data.paidDate)
+        let displayDate = (data.paidDate && data.paidDate !== "") ? data.paidDate : "Payment Confirmed";
+
+        // 3. UPDATE ANG PARAGRAPH (Label + Date)
+        // Dito natin tinitiyak na "Payment Date:" ang label AT "March 18" ang date
+        const pTag = dateDisplay.parentElement;
+        if (pTag) {
+            // Re-write ang buong loob ng <p> para malinis
+            pTag.innerHTML = `Payment Date: <span id="dueDateText" style="color: #27ae60; font-weight: bold;">${displayDate}</span>`;
             pTag.style.color = "#27ae60";
             pTag.style.fontWeight = "bold";
         }
 
-        // 3. I-SET ANG PAID DATE (Column T)
-        if (data.paidDate && data.paidDate !== "") {
-            dateDisplay.innerText = data.paidDate;
-            dateDisplay.style.color = "#27ae60";
-        } else {
-            dateDisplay.innerText = "Payment Confirmed";
-        }
-
-        // 4. PALITAN ANG TOTAL LABEL
+        // 4. UPDATE TOTAL LABEL
         const totalLabel = document.getElementById('totalLabel');
         if (totalLabel) { 
             totalLabel.innerText = "TOTAL PAID"; 
