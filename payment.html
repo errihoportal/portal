@@ -568,40 +568,32 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         banner.className = "status-banner bg-paid";
         activeSec.style.display = 'none';
 
-        // A. ALISIN ANG COPY BUTTON WRAPPER (Para hindi magpakita sa Paid status)
-        if (copyWrapper) {
-            copyWrapper.style.display = 'none'; 
-        }
+        // TANGGALIN ANG COPY BUTTON
+        if (copyWrapper) copyWrapper.style.display = 'none';
 
-        // B. PALITAN ANG LABEL (Due Date -> Payment Date)
-        // Hahanapin natin ang element na may "Due Date" kahit hindi <label> ang gamit
-        const allElements = document.querySelectorAll('label, span, div, p, b');
-        allElements.forEach(el => {
-            // Check kung ang mismong text content ay may "Due Date"
-            if (el.innerText && el.innerText.toUpperCase().includes("DUE DATE")) {
-                // Siguraduhin na hindi natin mapapalitan ang petsa, yung label lang
-                if (el.id !== "dueDateText") { 
-                    el.innerText = "Payment Date:";
-                    el.style.color = "#27ae60";
-                }
+        // PALITAN ANG LABEL (Due Date -> Payment Date)
+        // Naghahanap sa lahat ng tags para sigurado
+        const labels = document.querySelectorAll('label, span, b, p');
+        labels.forEach(lbl => {
+            if (lbl.innerText.toUpperCase().includes("DUE DATE") && lbl.id !== "dueDateText") {
+                lbl.innerText = "Payment Date:";
+                lbl.style.color = "#27ae60";
             }
         });
 
-        // C. IPALIT ANG PAID DATE (Mula sa Column T / val[19])
-        // Dito natin sinisigurado na hindi mag-1970
+        // IPALIT ANG PAID DATE (Column T)
         if (data.paidDate && data.paidDate !== "") {
             dateDisplay.innerText = data.paidDate;
             dateDisplay.style.color = "#27ae60";
             dateDisplay.style.fontWeight = "bold";
         } else {
-            // Fallback kung sakaling empty ang Column T pero Paid ang status
-            dateDisplay.innerText = "Confirmed"; 
+            dateDisplay.innerText = "Payment Confirmed";
         }
 
         const totalLabel = document.getElementById('totalLabel');
         if (totalLabel) { 
             totalLabel.innerText = "TOTAL PAID"; 
-            totalLabel.style.color = "var(--success)"; 
+            totalLabel.style.color = "#27ae60"; 
         }
         
         dNote.innerHTML = "🎉 Payment settled. Thank you!";
