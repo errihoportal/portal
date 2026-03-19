@@ -87,10 +87,12 @@
     }
 
     #pdf-sig-image {
-    max-height: 100px; /* Nilakihan ko para mas malinaw ang pirma */
+    height: 80px; /* Fixed height para hindi masyadong malaki */
     width: auto;
     display: block;
-    margin: 0 auto -15px auto; /* Binigyan ng negative margin sa ilalim para lumapit sa line */
+    margin: 0 auto -25px auto; /* Negative margin para pumatong sa pangalan */
+    position: relative;
+    z-index: 10; /* Sinisiguro na nasa ibabaw siya */
 }
 
     #pdf-security-section {
@@ -283,13 +285,13 @@
 
     <p>By signing this letter, I signify my understanding of these terms and my commitment to fulfill my financial obligation.</p>
 
-    <div style="margin-top: 50px; text-align: center; width: 100%;">
-    <div style="display: inline-block; width: 300px;">
-        <img id="pdf-sig-image" style="max-height: 100px; width: auto; margin-bottom: -15px;">
+    <div style="margin-top: 60px; text-align: center; width: 100%;">
+    <div style="display: inline-block; width: 300px; position: relative;">
+        <img id="pdf-sig-image" src="">
         <div style="border-top: 1.5px solid black; padding-top: 5px;">
             <strong style="text-transform: uppercase;"><span id="pdf-footer-name"></span></strong>
+            <div style="font-size: 11px;">(Signature over Printed Name)</div>
         </div>
-        <div style="font-size: 11px;">(Signature over Printed Name)</div>
     </div>
 </div>
     
@@ -481,11 +483,16 @@
     }
     result += helper(mainPart);
 
-    // DITO ANG PAGBABAGO:
-    let centStr = centPart > 0 ? ` AND ${centPart}/100` : " ONLY";
+    // DITO ANG PAGBABAGO: Dinagdag ang PESOS at ONLY sa tamang pwesto
+    let finalWords = result.trim() + " PESOS";
     
-    // Ginawang .toUpperCase() para ALL CAPS
-    return (result + centStr).toUpperCase().replace(/\s+/g, ' ').trim();
+    if (centPart > 0) {
+        finalWords += ` AND ${centPart}/100 ONLY`;
+    } else {
+        finalWords += " ONLY";
+    }
+    
+    return finalWords.toUpperCase().replace(/\s+/g, ' ').trim();
 }
 
     // --- SIGNATURE CANVAS LOGIC ---
@@ -601,16 +608,19 @@ document.getElementById('pdf-promise-date').innerText = pDate.toLocaleDateString
         const pdfArea = document.getElementById('pdf-render-area');
 
         const canvas = await html2canvas(pdfArea, { 
-            scale: 2, 
-            useCORS: true,
-            logging: false,
-            width: 816,  
-            height: 1248,
-            onclone: (clonedDoc) => {
-                // Siguraduhing "visible" sa canvas kahit nakatago sa screen
-                clonedDoc.getElementById('pdf-render-area').style.left = "0";
-            }
-        });
+    scale: 3, // Tinaasan ko sa 3 para mas malinaw ang pirma
+    useCORS: true,
+    logging: false,
+    backgroundColor: "#ffffff",
+    width: 816,  // 8.5in * 96dpi
+    height: 1248, // 13in * 96dpi
+    onclone: (clonedDoc) => {
+        // Siguraduhing visible ang element sa cloning process
+        const el = clonedDoc.getElementById('pdf-render-area');
+        el.style.left = "0";
+        el.style.position = "relative";
+    }
+});
 
         const imgData = canvas.toDataURL("image/jpeg", 0.8); 
         const { jsPDF } = window.jspdf;
