@@ -598,25 +598,28 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         banner.className = "status-banner bg-verifying";
         activeSec.style.display = 'none';
 
-        // 1. ITAGO ANG MGA PAYMENT CONTROLS
+        // 1. ITAGO ANG MGA HINDI KAILANGAN
         if (copyWrapper) copyWrapper.style.display = 'none';
-        
-        // 2. ITAGO ANG AMOUNT SECTION (Optional: Para malinis tingnan)
         const totalLabel = document.getElementById('totalLabel');
-        const amountDisplay = document.querySelector('.total-amount');
+        const amountDiv = document.querySelector('.total-amount');
         if (totalLabel) totalLabel.style.display = 'none';
-        if (amountDisplay) amountDisplay.style.display = 'none';
+        if (amountDiv) amountDiv.parentElement.style.display = 'none'; // Itatago pati ang presyo
 
-        // 3. PALITAN ANG DUE DATE LABEL -> "Date Submitted"
+        // 2. KUNIN ANG PETSA NGAYON (Today's Date)
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const today = new Date().toLocaleDateString('en-US', options);
+
+        // 3. I-UPDATE ANG LABEL AT DATE
         const pTag = dateDisplay.parentElement;
         if (pTag) {
-            // "Submission Date" o "Checking Date" ang magandang ipalit
-            pTag.innerHTML = `Date Submitted: <span id="dueDateText" style="color: #f39c12; font-weight: bold;">${data.dueDate}</span>`;
+            // "Date Checked:" o "As of Today:" ang lilitaw
+            pTag.innerHTML = `Date Processed: <span id="dueDateText" style="color: #f39c12; font-weight: bold;">${today}</span>`;
             pTag.style.color = "#7f8c8d";
+            pTag.style.fontSize = "14px";
         }
 
-        // 4. MAGANDANG NOTE NA MAY ANIMATION O ICON
-        dNote.innerHTML = "⏳ <b>Processing Payment...</b><br>We are currently checking your proof. Wait for SMS/EMAIL confirmation.";
+        // 4. MAGANDANG NOTE
+        dNote.innerHTML = "⏳ <b>We've received your proof.</b><br>Our team is currently validating your payment. Please wait for an SMS or Email update.";
     }
     else if (daysLate > 0) { 
         // OVERDUE SCENARIO
