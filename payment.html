@@ -578,7 +578,13 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         banner.className = "status-banner bg-paid";
         activeSec.style.display = 'none';
 
-        // 1. Force change the label text
+        // ALISIN ANG COPY BUTTON WRAPPER
+        const copyWrapper = document.getElementById('copyBtnWrapper');
+        if (copyWrapper) {
+            copyWrapper.style.display = 'none'; 
+        }
+
+        // PALITAN ANG LABEL NG DUE DATE
         const labels = document.querySelectorAll('label');
         labels.forEach(lbl => {
             if (lbl.innerText.toUpperCase().includes("DUE DATE")) {
@@ -587,23 +593,18 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
             }
         });
 
-        // 2. Ipakita ang Paid Date at alisin ang Copy Button
+        // IPALIT ANG PAID DATE (Galing sa Column T)
+        const dateDisplay = document.getElementById('dueDateText');
         if (data.paidDate && data.paidDate !== "") {
-            document.getElementById('dueDateText').innerText = data.paidDate;
-            document.getElementById('dueDateText').style.color = "#27ae60";
+            dateDisplay.innerText = data.paidDate;
+            dateDisplay.style.color = "#27ae60";
+            dateDisplay.style.fontWeight = "bold";
         }
 
-        // TANGGALIN ANG COPY BUTTON
-        const copyWrapper = document.getElementById('copyBtnWrapper');
-        if (copyWrapper) {
-            copyWrapper.remove(); // .remove() ay mas sigurado kaysa .display = 'none'
-        }
-
-        // UPDATE TOTAL LABEL
-        const tLabel = document.getElementById('totalLabel');
-        if (tLabel) { 
-            tLabel.innerText = "TOTAL PAID"; 
-            tLabel.style.color = "#27ae60";
+        const totalLabel = document.getElementById('totalLabel');
+        if (totalLabel) { 
+            totalLabel.innerText = "TOTAL PAID"; 
+            totalLabel.style.color = "var(--success)"; 
         }
         
         dNote.innerHTML = "🎉 Payment settled. Thank you!";
