@@ -578,39 +578,32 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         banner.className = "status-banner bg-paid";
         activeSec.style.display = 'none';
 
-        // 1. PALITAN ANG LABEL (DUE DATE -> PAYMENT DATE)
-        const labels = document.getElementsByTagName('label');
-        for (let lbl of labels) {
-            // Mas safe itong trim at toUpperCase para siguradong mahuli ang text
+        // 1. Force change the label text
+        const labels = document.querySelectorAll('label');
+        labels.forEach(lbl => {
             if (lbl.innerText.toUpperCase().includes("DUE DATE")) {
                 lbl.innerText = "Payment Date:";
-                lbl.style.color = "#27ae60"; 
+                lbl.style.color = "#27ae60";
             }
+        });
+
+        // 2. Ipakita ang Paid Date at alisin ang Copy Button
+        if (data.paidDate && data.paidDate !== "") {
+            document.getElementById('dueDateText').innerText = data.paidDate;
+            document.getElementById('dueDateText').style.color = "#27ae60";
         }
 
-        // 2. IPAKITA ANG PAID DATE AT ALISIN ANG COPY BUTTON
-        if (data.paidDate) {
-            const dateDisplay = document.getElementById('dueDateText');
-            dateDisplay.innerText = data.paidDate;
-            dateDisplay.style.color = "#27ae60";
-            dateDisplay.style.fontWeight = "bold";
+        // TANGGALIN ANG COPY BUTTON
+        const copyWrapper = document.getElementById('copyBtnWrapper');
+        if (copyWrapper) {
+            copyWrapper.remove(); // .remove() ay mas sigurado kaysa .display = 'none'
         }
 
-        // ALISIN ANG COPY BUTTON WRAPPER (Para hindi na clickable)
-        const copyBtn = document.getElementById('copyBtnWrapper');
-        if (copyBtn) {
-            copyBtn.style.display = 'none';
-        }
-
-        // 3. UPDATE TOTALS
-        const totalLabel = document.getElementById('totalLabel');
-        const totalAmt = document.querySelector('.total-amount');
-        if (totalLabel) { 
-            totalLabel.innerText = "TOTAL PAID"; 
-            totalLabel.style.color = "var(--success)"; 
-        }
-        if (totalAmt) { 
-            totalAmt.style.color = "var(--success)"; 
+        // UPDATE TOTAL LABEL
+        const tLabel = document.getElementById('totalLabel');
+        if (tLabel) { 
+            tLabel.innerText = "TOTAL PAID"; 
+            tLabel.style.color = "#27ae60";
         }
         
         dNote.innerHTML = "🎉 Payment settled. Thank you!";
