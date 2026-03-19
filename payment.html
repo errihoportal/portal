@@ -574,30 +574,31 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
 
    // 4. IMPROVED LOGIC ENGINE
     if (status === "paid") {
-        banner.innerText = "STATUS: PAID";
-        banner.className = "status-banner bg-paid";
-        activeSec.style.display = 'none';
+        banner.innerText = "STATUS: PAID";
+        banner.className = "status-banner bg-paid";
+        activeSec.style.display = 'none';
         
-        // --- ITO ANG DAGDAG/PALIT PARA SA PAYMENT DATE ---
-        const dueDateLabel = document.querySelector('label[for="dueDateText"]') || document.getElementById('dueDateLabel');
-        if (dueDateLabel) {
-            dueDateLabel.innerText = "Payment Date:";
+        // HANAPIN ANG LABEL AT PALITAN
+        // Sinisigurado nito na mahanap ang text na "Due Date" at palitan ng "Payment Date"
+        const labels = document.getElementsByTagName('label');
+        for (let lbl of labels) {
+            if (lbl.innerText.includes("Due Date")) {
+                lbl.innerText = "Payment Date:";
+            }
         }
-        // I-update ang date kung kailan na-paid (Dapat ay galing sa data.paidDate ang info na ito)
-        // Kung wala pang paidDate sa data, data.dueDate muna ang pansamantalang lalabas.
-        document.getElementById('dueDateText').innerText = data.paidDate || data.dueDate;
-        // ------------------------------------------------
 
-        const totalLabel = document.getElementById('totalLabel');
-        const totalAmt = document.querySelector('.total-amount');
-        const copyBtn = document.getElementById('copyBtnWrapper');
+        // IPALIT ANG PAID DATE SA DATING DUE DATE TEXT
+        if (data.paidDate) {
+            document.getElementById('dueDateText').innerText = data.paidDate;
+        }
 
-        if (totalLabel) { totalLabel.innerText = "TOTAL PAID"; totalLabel.style.color = "var(--success)"; }
-        if (totalAmt) { totalAmt.style.color = "var(--success)"; }
-        if (copyBtn) copyBtn.style.display = 'none';
-
-        dNote.innerHTML = "🎉 Payment settled. Thank you!";
-    }
+        const totalLabel = document.getElementById('totalLabel');
+        const totalAmt = document.querySelector('.total-amount');
+        if (totalLabel) { totalLabel.innerText = "TOTAL PAID"; totalLabel.style.color = "var(--success)"; }
+        if (totalAmt) { totalAmt.style.color = "var(--success)"; }
+        
+        dNote.innerHTML = "🎉 Payment settled. Thank you!";
+    }
     else if (status === "verifying") {
         banner.innerText = "STATUS: VERIFYING";
         banner.className = "status-banner bg-verifying";
