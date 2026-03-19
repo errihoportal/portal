@@ -578,24 +578,31 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         banner.className = "status-banner bg-paid";
         activeSec.style.display = 'none';
 
-        // 1. Hanapin lahat ng <label> at palitan ang text na "Due Date"
+        // 1. PALITAN ANG LABEL (DUE DATE -> PAYMENT DATE)
         const labels = document.getElementsByTagName('label');
         for (let lbl of labels) {
-            if (lbl.innerText.includes("Due Date")) {
+            // Mas safe itong trim at toUpperCase para siguradong mahuli ang text
+            if (lbl.innerText.toUpperCase().includes("DUE DATE")) {
                 lbl.innerText = "Payment Date:";
-                lbl.style.color = "#27ae60"; // Gawing Green para halatang Paid na
+                lbl.style.color = "#27ae60"; 
             }
         }
 
-        // 2. Ipakita ang Paid Date mula sa Sheet
+        // 2. IPAKITA ANG PAID DATE AT ALISIN ANG COPY BUTTON
         if (data.paidDate) {
             const dateDisplay = document.getElementById('dueDateText');
             dateDisplay.innerText = data.paidDate;
             dateDisplay.style.color = "#27ae60";
             dateDisplay.style.fontWeight = "bold";
         }
-        // ----------------------------------------------------
 
+        // ALISIN ANG COPY BUTTON WRAPPER (Para hindi na clickable)
+        const copyBtn = document.getElementById('copyBtnWrapper');
+        if (copyBtn) {
+            copyBtn.style.display = 'none';
+        }
+
+        // 3. UPDATE TOTALS
         const totalLabel = document.getElementById('totalLabel');
         const totalAmt = document.querySelector('.total-amount');
         if (totalLabel) { 
