@@ -563,47 +563,43 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     if (feesArea) feesArea.innerHTML = "";
 
     // 4. IMPROVED LOGIC ENGINE
-    if (status === "paid") {
+   if (status === "paid") {
         banner.innerText = "STATUS: PAID";
         banner.className = "status-banner bg-paid";
         activeSec.style.display = 'none';
 
-        // 1. ITAGO ANG COPY BUTTON WRAPPER
-        if (copyWrapper) {
-            copyWrapper.style.display = 'none';
-        }
+        // 1. TANGGALIN ANG COPY BUTTON
+        if (copyWrapper) copyWrapper.style.display = 'none';
 
-        // 2. PALITAN ANG LABEL (DUE DATE -> PAYMENT DATE)
-        // Hahanapin natin ang lahat ng label/span pero iiwasan ang mismong date value
-        const allLabels = document.querySelectorAll('label, span, b');
-        allLabels.forEach(lbl => {
-            // Isang matinding check: Kung may "DUE DATE" sa text pero HINDI ito ang date display
-            if (lbl.innerText.toUpperCase().includes("DUE DATE") && lbl.id !== "dueDateText") {
-                lbl.innerText = "Payment Date:";
-                lbl.style.color = "#27ae60";
-                lbl.style.fontWeight = "bold";
-            }
-        });
-
-        // 3. I-DISPLAY ANG PAID DATE (Dito na lalabas si March 18)
-        // Siguraduhin na ang "data.paidDate" ay galing sa Column T (val[19]) sa Apps Script
+        // 2. Tiyakin na ang dateDisplay ay malinis at lilitaw ang Paid Date
         if (data.paidDate && data.paidDate !== "") {
             dateDisplay.innerText = data.paidDate; 
             dateDisplay.style.color = "#27ae60";
             dateDisplay.style.fontWeight = "bold";
-            dateDisplay.style.display = "inline-block"; 
         } else {
-            // Fallback kung empty ang Column T
             dateDisplay.innerText = "Payment Confirmed";
-            dateDisplay.style.color = "#27ae60";
         }
 
-        // 4. PALITAN ANG TOTAL LABEL
+        // 3. TARGETED LABEL SWAP (Dito natin titiyakin na "Payment Date:" ang lilitaw)
+        // Hahanapin natin ang label na mismong katabi ng dueDateText
+        const parentRow = dateDisplay.parentElement;
+        if (parentRow) {
+            const labelsInRow = parentRow.querySelectorAll('label, span');
+            labelsInRow.forEach(lbl => {
+                // Kung ito ang label (hindi ang date mismo)
+                if (lbl !== dateDisplay && lbl.innerText.toUpperCase().includes("DUE DATE")) {
+                    lbl.innerText = "Payment Date:";
+                    lbl.style.color = "#27ae60";
+                    lbl.style.fontWeight = "bold";
+                }
+            });
+        }
+
+        // 4. TOTAL PAID UPDATE
         const totalLabel = document.getElementById('totalLabel');
         if (totalLabel) { 
             totalLabel.innerText = "TOTAL PAID"; 
             totalLabel.style.color = "#27ae60"; 
-            totalLabel.style.fontWeight = "bold";
         }
         
         dNote.innerHTML = "🎉 Payment settled. Thank you!";
