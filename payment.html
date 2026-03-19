@@ -571,31 +571,27 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         // 1. TANGGALIN ANG COPY BUTTON
         if (copyWrapper) copyWrapper.style.display = 'none';
 
-        // 2. Tiyakin na ang dateDisplay ay malinis at lilitaw ang Paid Date
+        // 2. PALITAN ANG SALITANG "DUE DATE" SA PAYMENT DATE
+        // Dahil ang "Due Date:" ay nasa loob ng <p> tag kasama ang date span,
+        // papalitan lang natin ang text content nang hindi nabubura ang span.
+        const dateDisplay = document.getElementById('dueDateText');
+        if (dateDisplay && dateDisplay.parentElement) {
+            const pTag = dateDisplay.parentElement;
+            // Pinapalitan lang ang "Due Date" text sa loob ng <p>
+            pTag.innerHTML = pTag.innerHTML.replace("Due Date:", "Payment Date:");
+            pTag.style.color = "#27ae60";
+            pTag.style.fontWeight = "bold";
+        }
+
+        // 3. I-SET ANG PAID DATE (Column T)
         if (data.paidDate && data.paidDate !== "") {
-            dateDisplay.innerText = data.paidDate; 
+            dateDisplay.innerText = data.paidDate;
             dateDisplay.style.color = "#27ae60";
-            dateDisplay.style.fontWeight = "bold";
         } else {
             dateDisplay.innerText = "Payment Confirmed";
         }
 
-        // 3. TARGETED LABEL SWAP (Dito natin titiyakin na "Payment Date:" ang lilitaw)
-        // Hahanapin natin ang label na mismong katabi ng dueDateText
-        const parentRow = dateDisplay.parentElement;
-        if (parentRow) {
-            const labelsInRow = parentRow.querySelectorAll('label, span');
-            labelsInRow.forEach(lbl => {
-                // Kung ito ang label (hindi ang date mismo)
-                if (lbl !== dateDisplay && lbl.innerText.toUpperCase().includes("DUE DATE")) {
-                    lbl.innerText = "Payment Date:";
-                    lbl.style.color = "#27ae60";
-                    lbl.style.fontWeight = "bold";
-                }
-            });
-        }
-
-        // 4. TOTAL PAID UPDATE
+        // 4. PALITAN ANG TOTAL LABEL
         const totalLabel = document.getElementById('totalLabel');
         if (totalLabel) { 
             totalLabel.innerText = "TOTAL PAID"; 
