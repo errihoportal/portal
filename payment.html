@@ -574,11 +574,16 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         }
 
         // B. PALITAN ANG LABEL (Due Date -> Payment Date)
-        const labels = document.querySelectorAll('label');
-        labels.forEach(lbl => {
-            if (lbl.innerText.toUpperCase().includes("DUE DATE")) {
-                lbl.innerText = "Payment Date:";
-                lbl.style.color = "#27ae60";
+        // Hahanapin natin ang element na may "Due Date" kahit hindi <label> ang gamit
+        const allElements = document.querySelectorAll('label, span, div, p, b');
+        allElements.forEach(el => {
+            // Check kung ang mismong text content ay may "Due Date"
+            if (el.innerText && el.innerText.toUpperCase().includes("DUE DATE")) {
+                // Siguraduhin na hindi natin mapapalitan ang petsa, yung label lang
+                if (el.id !== "dueDateText") { 
+                    el.innerText = "Payment Date:";
+                    el.style.color = "#27ae60";
+                }
             }
         });
 
