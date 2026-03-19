@@ -535,56 +535,45 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     }
 
     function renderData(data) {
-    // 1. Basic Information Mapping
-    document.getElementById('custName').innerText = data.name;
-    document.getElementById('billNumDisplay').innerText = "Bill #" + data.bill;
-    document.getElementById('itemName').innerText = data.item;
-    document.getElementById('totalAmount').innerText = data.amount;
-    document.getElementById('dueDateText').innerText = data.dueDate;
-    document.getElementById('qrImg').src = data.qrLink;
-
-    // 2. Card Fee Calculation
-    const baseAmt = parseFloat(data.amount.replace(/,/g, ''));
-    const cardFee = Math.round((baseAmt * 0.032) * 100) / 100; 
-    const totalWithCardFee = baseAmt + cardFee;
-
-    if(document.getElementById('cardBaseAmount')) {
-        const formatConfig = {minimumFractionDigits: 2, maximumFractionDigits: 2};
-        document.getElementById('cardBaseAmount').innerText = "₱" + baseAmt.toLocaleString(undefined, formatConfig);
-        document.getElementById('cardFeeAmount').innerText = "₱" + cardFee.toLocaleString(undefined, formatConfig);
-        document.getElementById('cardTotalAmount').innerText = "₱" + totalWithCardFee.toLocaleString(undefined, formatConfig);
-    }
-
-    // 3. Elements and State Variables
+    // 1. Elements Mapping
     const banner = document.getElementById('statusBanner');
     const graceArea = document.getElementById('gracePeriodArea');
     const dNote = document.getElementById('dynamicNote');
     const activeSec = document.getElementById('activeSection');
     const feesArea = document.getElementById('feesBreakdownArea');
+    const dateDisplay = document.getElementById('dueDateText'); // Ang text ng date
+    const copyWrapper = document.getElementById('copyBtnWrapper'); // Ang wrapper ng copy button
     
-    const status = data.status.toLowerCase();
+    const status = data.status.toLowerCase().trim();
     const daysLate = parseInt(data.daysLate); 
     const isGrace = data.isGracePeriod === "YES";
 
-    // INITIAL RESET (Importante: Linisin muna lahat bago mag-logic)
+    // 2. Basic Information Mapping (Initial)
+    document.getElementById('custName').innerText = data.name;
+    document.getElementById('billNumDisplay').innerText = "Bill #" + data.bill;
+    document.getElementById('itemName').innerText = data.item;
+    document.getElementById('totalAmount').innerText = data.amount;
+    document.getElementById('qrImg').src = data.qrLink;
+    dateDisplay.innerText = data.dueDate; // Default muna
+
+    // 3. INITIAL RESET
     banner.className = "status-banner";
     banner.style.animation = "none";
     graceArea.innerHTML = "";
     if (feesArea) feesArea.innerHTML = "";
 
-   // 4. IMPROVED LOGIC ENGINE
-   if (status === "paid") {
+    // 4. IMPROVED LOGIC ENGINE
+    if (status === "paid") {
         banner.innerText = "STATUS: PAID";
         banner.className = "status-banner bg-paid";
         activeSec.style.display = 'none';
 
-        // ALISIN ANG COPY BUTTON WRAPPER
-        const copyWrapper = document.getElementById('copyBtnWrapper');
+        // A. ALISIN ANG COPY BUTTON WRAPPER (Para hindi magpakita sa Paid status)
         if (copyWrapper) {
             copyWrapper.style.display = 'none'; 
         }
 
-        // PALITAN ANG LABEL NG DUE DATE
+        // B. PALITAN ANG LABEL (Due Date -> Payment Date)
         const labels = document.querySelectorAll('label');
         labels.forEach(lbl => {
             if (lbl.innerText.toUpperCase().includes("DUE DATE")) {
@@ -593,12 +582,15 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
             }
         });
 
-        // IPALIT ANG PAID DATE (Galing sa Column T)
-        const dateDisplay = document.getElementById('dueDateText');
+        // C. IPALIT ANG PAID DATE (Mula sa Column T / val[19])
+        // Dito natin sinisigurado na hindi mag-1970
         if (data.paidDate && data.paidDate !== "") {
             dateDisplay.innerText = data.paidDate;
             dateDisplay.style.color = "#27ae60";
             dateDisplay.style.fontWeight = "bold";
+        } else {
+            // Fallback kung sakaling empty ang Column T pero Paid ang status
+            dateDisplay.innerText = "Confirmed"; 
         }
 
         const totalLabel = document.getElementById('totalLabel');
@@ -613,7 +605,7 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         banner.innerText = "STATUS: VERIFYING";
         banner.className = "status-banner bg-verifying";
         activeSec.style.display = 'none';
-        dNote.innerText = "We are currently checking your proof. Wait for SMS/EMAIL confirmation.";
+        dNote.innerText = "We are currently checking your proof. Wait for confirmation.";
     } 
     else if (daysLate > 0) { 
         // OVERDUE SCENARIO
