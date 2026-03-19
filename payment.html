@@ -568,28 +568,36 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         banner.className = "status-banner bg-paid";
         activeSec.style.display = 'none';
 
-        // TANGGALIN ANG COPY BUTTON
-        if (copyWrapper) copyWrapper.style.display = 'none';
+        // 1. TANGGALIN ANG COPY BUTTON WRAPPER
+        if (copyWrapper) {
+            copyWrapper.style.display = 'none';
+        }
 
-        // PALITAN ANG LABEL (Due Date -> Payment Date)
-        // Naghahanap sa lahat ng tags para sigurado
-        const labels = document.querySelectorAll('label, span, b, p');
-        labels.forEach(lbl => {
+        // 2. PALITAN ANG LABEL (Due Date -> Payment Date)
+        // Gumamit tayo ng loop na iiwasan ang mismong date display (dueDateText)
+        const allLabels = document.querySelectorAll('label, span, b');
+        allLabels.forEach(lbl => {
+            // Kung ang text ay "Due Date" at HINDI ito ang lalagyan ng date value
             if (lbl.innerText.toUpperCase().includes("DUE DATE") && lbl.id !== "dueDateText") {
                 lbl.innerText = "Payment Date:";
                 lbl.style.color = "#27ae60";
+                lbl.style.fontWeight = "bold";
             }
         });
 
-        // IPALIT ANG PAID DATE (Column T)
+        // 3. I-DISPLAY ANG PAID DATE (Mula sa Column T / Index 19)
         if (data.paidDate && data.paidDate !== "") {
-            dateDisplay.innerText = data.paidDate;
+            dateDisplay.innerText = data.paidDate; // Dito lalabas ang March 18, 2026...
             dateDisplay.style.color = "#27ae60";
             dateDisplay.style.fontWeight = "bold";
+            dateDisplay.style.display = "inline-block"; // Siguradong lilitaw
         } else {
+            // Fallback kung walang laman ang Column T sa Sheet
             dateDisplay.innerText = "Payment Confirmed";
+            dateDisplay.style.color = "#27ae60";
         }
 
+        // 4. PALITAN ANG TOTAL LABEL
         const totalLabel = document.getElementById('totalLabel');
         if (totalLabel) { 
             totalLabel.innerText = "TOTAL PAID"; 
