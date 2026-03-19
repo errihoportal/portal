@@ -574,20 +574,30 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
 
    // 4. IMPROVED LOGIC ENGINE
     if (status === "paid") {
-        banner.innerText = "STATUS: PAID";
-        banner.className = "status-banner bg-paid";
-        activeSec.style.display = 'none';
+        banner.innerText = "STATUS: PAID";
+        banner.className = "status-banner bg-paid";
+        activeSec.style.display = 'none';
         
-        const totalLabel = document.getElementById('totalLabel');
-        const totalAmt = document.querySelector('.total-amount');
-        const copyBtn = document.getElementById('copyBtnWrapper');
+        // --- ITO ANG DAGDAG/PALIT PARA SA PAYMENT DATE ---
+        const dueDateLabel = document.querySelector('label[for="dueDateText"]') || document.getElementById('dueDateLabel');
+        if (dueDateLabel) {
+            dueDateLabel.innerText = "Payment Date:";
+        }
+        // I-update ang date kung kailan na-paid (Dapat ay galing sa data.paidDate ang info na ito)
+        // Kung wala pang paidDate sa data, data.dueDate muna ang pansamantalang lalabas.
+        document.getElementById('dueDateText').innerText = data.paidDate || data.dueDate;
+        // ------------------------------------------------
 
-        if (totalLabel) { totalLabel.innerText = "TOTAL PAID"; totalLabel.style.color = "var(--success)"; }
-        if (totalAmt) { totalAmt.style.color = "var(--success)"; }
-        if (copyBtn) copyBtn.style.display = 'none';
+        const totalLabel = document.getElementById('totalLabel');
+        const totalAmt = document.querySelector('.total-amount');
+        const copyBtn = document.getElementById('copyBtnWrapper');
 
-        dNote.innerHTML = "🎉 Payment settled. Thank you!";
-    } 
+        if (totalLabel) { totalLabel.innerText = "TOTAL PAID"; totalLabel.style.color = "var(--success)"; }
+        if (totalAmt) { totalAmt.style.color = "var(--success)"; }
+        if (copyBtn) copyBtn.style.display = 'none';
+
+        dNote.innerHTML = "🎉 Payment settled. Thank you!";
+    }
     else if (status === "verifying") {
         banner.innerText = "STATUS: VERIFYING";
         banner.className = "status-banner bg-verifying";
