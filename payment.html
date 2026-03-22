@@ -623,12 +623,12 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         dNote.innerHTML = "⏳ <b>We've received your proof.</b><br>Our team is currently validating your payment. Please wait for an SMS or Email update.";
     }
     else if (daysLate > 0) { 
-        // OVERDUE SCENARIO
+        // --- 1. BANNER LOGIC (Dito lang magbabago ang Text ng Banner) ---
         if (offer && offer !== "" && offer !== "NONE") {
-            // Baguhin ang Banner base sa Offer pero panatilihin ang Fees Breakdown sa baba
-            banner.innerText = "✨ SPECIAL OFFER ACTIVE"; 
-            banner.className = "status-banner bg-grace"; // Kulay green/gold gaya ng grace period
-
+            banner.innerText = "✨ SPECIAL OFFER ACTIVE";
+            banner.className = "status-banner bg-grace"; 
+            
+            // Dito mo i-customize ang dNote base sa Offer
             if (offer === "WAIVE_ALL") {
                 dNote.innerHTML = "🎁 <b>OFFER:</b> All penalties waived! Pay the principal only.";
             } else if (offer === "WAIVE_PENALTY") {
@@ -655,25 +655,24 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         } else {
             banner.innerText = "⚠️ ACCOUNT OVERDUE";
             banner.className = "status-banner bg-overdue blink-overdue";
-            if (feesArea) {
-                feesArea.innerHTML = `
-                    <div class="fees-breakdown">
-                        <div class="fee-item"><span>Principal:</span> <span>₱${data.principal}</span></div>
-                        <div class="fee-item red"><span>Late Fee:</span> <span>+ ₱${data.lateFee}</span></div>
-                        <div class="fee-item red"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}</span></div>
-                    </div>`;
-            }
-            // Kung walang offer, ipakita ang original dNote
-        if (!offer || offer === "NONE") {
             dNote.innerHTML = `<b style="color:var(--danger)">${daysLate} DAY/S LATE:</b> Pay immediately to avoid additional daily interest.`;
         }
-        
-        // I-trigger ang timer kung Grace o may Offer
-        if (isGrace || (offer && offer !== "")) {
-             setTimeout(() => { startLiveCountdown(); }, 100);
+          // --- 2. FEES BREAKDOWN (HINDI DAPAT MABAGO ANG TEXT NAMES DITO) ---
+        // Nilabas natin ito sa if/else para laging visible ang breakdown
+        if (feesArea) {
+            feesArea.innerHTML = `
+                <div class="fees-breakdown">
+                    <div class="fee-item"><span>Principal:</span> <span>₱${data.principal}</span></div>
+                    <div class="fee-item red"><span>Late Fee:</span> <span>+ ₱${data.lateFee}</span></div>
+                    <div class="fee-item red"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}</span></div>
+                </div>`;
         }
-    } 
-    else {
+
+        // --- 3. TIMER TRIGGER ---
+        if (isGrace || (offer && offer !== "" && offer !== "NONE")) {
+            setTimeout(() => { startLiveCountdown(); }, 100);
+        }
+    } else {
         // UPCOMING OR DUE TODAY
         const daysUntil = Math.abs(daysLate);
         if (daysUntil === 0) { 
