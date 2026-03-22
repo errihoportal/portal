@@ -548,6 +548,7 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     const daysLate = parseInt(data.daysLate); 
     const isGrace = data.isGracePeriod === "YES";
     const offer = data.offerType; // <--- DAGDAG: Para mabasa ang Column W
+    const deadline = data.offerDeadline;
 
     // 2. Basic Information Mapping (Initial)
     document.getElementById('custName').innerText = data.name;
@@ -631,19 +632,21 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
             if (offer === "WAIVE_ALL") {
                 dNote.innerHTML = "🎁 <b>OFFER:</b> All penalties waived! Pay the principal only.";
             } else if (offer === "WAIVE_PENALTY") {
-                dNote.innerHTML = "🎁 <b>OFFER:</b> Late Payment Fee (₱50) has been waived.";
+                dNote.innerHTML = "🎁 <b>OFFER:</b> Late Payment Fee has been waived.";
             } else if (offer === "WAIVE_DAILY") {
                 // --- DAGDAG ITO ---
                 dNote.innerHTML = "⚡ <b>OFFER:</b> All accumulated daily interest charges are waived.";
             } else if (offer === "DISCOUNT_50") {
                 dNote.innerHTML = "🎁 <b>OFFER:</b> You have a 50% discount on all total penalties.";
             } else if (offer === "LEGAL_NOTICE") {
-                // --- DAGDAG ITO (BLACK BANNER) ---
-                banner.innerText = "⚠️ FINAL LEGAL NOTICE";
-                banner.className = "status-banner bg-overdue"; // O kaya gumawa ka ng black class
-                banner.style.backgroundColor = "#1a202c"; // Dark/Formal look
-                dNote.innerHTML = "<b style='color:#e53e3e'>FINAL DEMAND:</b> Settle immediately to avoid asset repossession and legal action.";
-            }
+    banner.innerText = "⚠️ REPOSSESSION NOTICE"; // Mas matapang na text
+    banner.className = "status-banner bg-overdue"; 
+    banner.style.backgroundColor = "#000000"; // Black background
+    banner.style.color = "#ffffff";
+    banner.style.border = "2px solid #ff0000"; // Red border para sa urgency
+    
+    dNote.innerHTML = `<b style='color:#e53e3e'>FINAL DEMAND:</b> Settle on or before <b>${deadline || 'today'}</b> to avoid legal action and asset recovery.`;
+}
         } else if (isGrace) {
             banner.innerText = "✨ GRACE PERIOD ACTIVE";
             banner.className = "status-banner bg-grace";
@@ -676,10 +679,16 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
                 </div>`;
         }
 
-        // --- 3. TIMER TRIGGER ---
-        if (isGrace || (offer && offer !== "" && offer !== "NONE")) {
-            setTimeout(() => { startLiveCountdown(); }, 100);
-        }
+        // --- 3. UNIVERSAL TIMER TRIGGER ---
+setTimeout(() => { 
+    if (deadline && deadline !== "") {
+        // Kung may deadline sa Col X, doon mag-count down
+        startLiveCountdown(new Date(deadline)); 
+    } else {
+        // Default: Midnight today
+        startLiveCountdown(); 
+    }
+}, 100);
     } else {
         // UPCOMING OR DUE TODAY
         const daysUntil = Math.abs(daysLate);
