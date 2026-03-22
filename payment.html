@@ -541,245 +541,176 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     const dNote = document.getElementById('dynamicNote');
     const activeSec = document.getElementById('activeSection');
     const feesArea = document.getElementById('feesBreakdownArea');
-    const dateDisplay = document.getElementById('dueDateText'); // Ang text ng date
-    const copyWrapper = document.getElementById('copyBtnWrapper'); // Ang wrapper ng copy button
+    const dateDisplay = document.getElementById('dueDateText'); 
+    const copyWrapper = document.getElementById('copyBtnWrapper'); 
     
-    const status = data.status.toLowerCase().trim();
-    const daysLate = parseInt(data.daysLate); 
+    // Safety check para sa status
+    const status = (data.status || "").toLowerCase().trim();
+    const daysLate = parseInt(data.daysLate) || 0; 
     const isGrace = data.isGracePeriod === "YES";
-    const offer = data.offerType; // <--- DAGDAG: Para mabasa ang Column W
+    const offer = data.offerType; 
     const deadline = data.offerDeadline;
 
-    // 2. Basic Information Mapping (Initial)
-    document.getElementById('custName').innerText = data.name;
-    document.getElementById('billNumDisplay').innerText = "Bill #" + data.bill;
-    document.getElementById('itemName').innerText = data.item;
-    document.getElementById('qrImg').src = data.qrLink;
-    dateDisplay.innerText = data.dueDate;
+    // 2. Basic Information Mapping
+    document.getElementById('custName').innerText = data.name || "Customer";
+    document.getElementById('billNumDisplay').innerText = "Bill #" + (data.bill || "---");
+    document.getElementById('itemName').innerText = data.item || "Product";
+    document.getElementById('qrImg').src = data.qrLink || "";
+    dateDisplay.innerText = data.dueDate || "No Date";
 
-    // --- MENTARYO: DITO NATIN I-CALCULATE ANG TOTOO DAPAT BAYARAN ---
-    let displayTotal = parseFloat(data.amount); // Default na galing sa sheet
+    // --- CALCULATION LOGIC ---
+    let displayTotal = parseFloat(data.amount) || 0;
 
     if (daysLate > 0) {
+        let principal = parseFloat(data.principal) || 0;
+        let lateFee = parseFloat(data.lateFee) || 0;
+        let dailyInterest = parseFloat(data.dailyInterest) || 0;
+
         if (offer === "WAIVE_ALL" || isGrace) {
-            // Bayad lang ay ang Principal (Tanggal lahat ng penalties)
-            displayTotal = parseFloat(data.principal);
+            displayTotal = principal;
         } else if (offer === "WAIVE_PENALTY") {
-            // Principal + Daily Interest lang (Tanggal ang 10% Late Fee)
-            displayTotal = parseFloat(data.principal) + parseFloat(data.dailyInterest);
+            displayTotal = principal + dailyInterest;
         } else if (offer === "WAIVE_DAILY") {
-            // Principal + Late Fee lang (Tanggal ang Daily Interest)
-            displayTotal = parseFloat(data.principal) + parseFloat(data.lateFee);
+            displayTotal = principal + lateFee;
         } else if (offer === "DISCOUNT_50") {
-            // Principal + (Kalahati ng lahat ng penalties)
-            let totalPenalties = parseFloat(data.lateFee) + parseFloat(data.dailyInterest);
-            displayTotal = parseFloat(data.principal) + (totalPenalties * 0.5);
+            displayTotal = principal + ((lateFee + dailyInterest) * 0.5);
         }
     }
 
-    // I-render ang final calculated amount
     document.getElementById('totalAmount').innerText = displayTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
     // 3. INITIAL RESET
     banner.className = "status-banner";
     banner.style.animation = "none";
+    banner.style.backgroundColor = ""; 
+    banner.style.color = "";
+    banner.style.border = "";
     graceArea.innerHTML = "";
     if (feesArea) feesArea.innerHTML = "";
 
     // 4. IMPROVED LOGIC ENGINE
-   if (status === "paid") {
+    if (status === "paid") {
         banner.innerText = "STATUS: PAID";
         banner.className = "status-banner bg-paid";
         activeSec.style.display = 'none';
-
-        // 1. TANGGALIN ANG COPY BUTTON
         if (copyWrapper) copyWrapper.style.display = 'none';
 
-        // 2. KUNIN ANG DATE MULA SA COLUMN T (data.paidDate)
         let displayDate = (data.paidDate && data.paidDate !== "") ? data.paidDate : "Payment Confirmed";
-
-        // 3. UPDATE ANG PARAGRAPH (Label + Date)
-        // Dito natin tinitiyak na "Payment Date:" ang label AT "March 18" ang date
         const pTag = dateDisplay.parentElement;
         if (pTag) {
-            // Re-write ang buong loob ng <p> para malinis
             pTag.innerHTML = `Payment Date: <span id="dueDateText" style="color: #27ae60; font-weight: bold;">${displayDate}</span>`;
             pTag.style.color = "#27ae60";
-            pTag.style.fontWeight = "bold";
         }
-
-        // 4. UPDATE TOTAL LABEL
         const totalLabel = document.getElementById('totalLabel');
         if (totalLabel) { 
             totalLabel.innerText = "TOTAL PAID"; 
             totalLabel.style.color = "#27ae60"; 
         }
-        
         dNote.innerHTML = "🎉 Payment settled. Thank you!";
     }
     else if (status === "verifying") {
         banner.innerText = "STATUS: VERIFYING";
         banner.className = "status-banner bg-verifying";
         activeSec.style.display = 'none';
-
-        // 1. ITAGO ANG MGA HINDI KAILANGAN
         if (copyWrapper) copyWrapper.style.display = 'none';
-        const totalLabel = document.getElementById('totalLabel');
+        
         const amountDiv = document.querySelector('.total-amount');
-        if (totalLabel) totalLabel.style.display = 'none';
-        if (amountDiv) amountDiv.parentElement.style.display = 'none'; // Itatago pati ang presyo
+        if (amountDiv) amountDiv.parentElement.style.display = 'none';
 
-        // 2. KUNIN ANG PETSA NGAYON (Today's Date)
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        const today = new Date().toLocaleDateString('en-US', options);
-
-        // 3. I-UPDATE ANG LABEL AT DATE
+        const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
         const pTag = dateDisplay.parentElement;
         if (pTag) {
-            // "Date Checked:" o "As of Today:" ang lilitaw
             pTag.innerHTML = `Date Processed: <span id="dueDateText" style="color: #f39c12; font-weight: bold;">${today}</span>`;
-            pTag.style.color = "#7f8c8d";
-            pTag.style.fontSize = "14px";
         }
-
-        // 4. MAGANDANG NOTE
-        dNote.innerHTML = "⏳ <b>We've received your proof.</b><br>Our team is currently validating your payment. Please wait for an SMS or Email update.";
+        dNote.innerHTML = "⏳ <b>We've received your proof.</b><br>Our team is currently validating your payment.";
     }
     else if (daysLate > 0) { 
-        // --- 1. SPECIAL OFFER LOGIC (BANK STYLE BOXES) ---
         if (offer && offer !== "" && offer !== "NONE") {
             banner.innerText = "✨ SPECIAL OFFER ACTIVE";
             banner.className = "status-banner bg-grace"; 
-            
-            // Reusable Deadline string para hindi paulit-ulit
             const deadlineText = deadline ? `<p style="margin: 8px 0 0 0; font-weight: bold; font-size: 11px;">📅 VALID UNTIL: ${deadline}</p>` : "";
 
             if (offer === "WAIVE_ALL") {
-                dNote.innerHTML = `
-                <div style="background-color: #fffaf0; border: 1px dashed #dd6b20; padding: 12px; margin: 10px 0; border-radius: 8px; text-align: left;">
+                dNote.innerHTML = `<div style="background-color: #fffaf0; border: 1px dashed #dd6b20; padding: 12px; margin: 10px 0; border-radius: 8px;">
                     <p style="margin: 0; color: #9c4221; font-weight: bold; font-size: 13px; text-transform: uppercase;">🏆 Clean Slate Program</p>
-                    <p style="margin: 5px 0 0 0; color: #7b341e; font-size: 12px; line-height: 1.4;">All penalties waived. Pay the <b>original principal balance</b> only to clear your record.</p>
-                    <div style="color: #9c4221;">${deadlineText}</div>
-                </div>`;
+                    <p style="margin: 5px 0 0 0; color: #7b341e; font-size: 12px; line-height: 1.4;">All penalties waived. Pay principal only.</p>
+                    ${deadlineText}</div>`;
             } else if (offer === "WAIVE_PENALTY") {
-                dNote.innerHTML = `
-                <div style="background-color: #ebf8ff; border: 1px dashed #3182ce; padding: 12px; margin: 10px 0; border-radius: 8px; text-align: left;">
+                dNote.innerHTML = `<div style="background-color: #ebf8ff; border: 1px dashed #3182ce; padding: 12px; margin: 10px 0; border-radius: 8px;">
                     <p style="margin: 0; color: #2c5282; font-weight: bold; font-size: 13px; text-transform: uppercase;">💼 10% Surcharge Waived</p>
-                    <p style="margin: 5px 0 0 0; color: #2a4365; font-size: 12px; line-height: 1.4;">The 10% late payment fee has been removed. Principal and daily interest still apply.</p>
-                    <div style="color: #2c5282;">${deadlineText}</div>
-                </div>`;
+                    <p style="margin: 5px 0 0 0; color: #2a4365; font-size: 12px; line-height: 1.4;">Late payment fee removed. Principal and interest apply.</p>
+                    ${deadlineText}</div>`;
             } else if (offer === "WAIVE_DAILY") {
-                dNote.innerHTML = `
-                <div style="background-color: #e6fffa; border: 1px dashed #38b2ac; padding: 12px; margin: 10px 0; border-radius: 8px; text-align: left;">
+                dNote.innerHTML = `<div style="background-color: #e6fffa; border: 1px dashed #38b2ac; padding: 12px; margin: 10px 0; border-radius: 8px;">
                     <p style="margin: 0; color: #234e52; font-weight: bold; font-size: 13px; text-transform: uppercase;">💹 Daily Interest Waived</p>
-                    <p style="margin: 5px 0 0 0; color: #285e61; font-size: 12px; line-height: 1.4;">All accumulated daily interest is waived. Pay the principal plus the one-time late fee.</p>
-                    <div style="color: #234e52;">${deadlineText}</div>
-                </div>`;
+                    ${deadlineText}</div>`;
             } else if (offer === "DISCOUNT_50") {
-                dNote.innerHTML = `
-                <div style="background-color: #fff5f5; border: 1px dashed #e53e3e; padding: 12px; margin: 10px 0; border-radius: 8px; text-align: left;">
+                dNote.innerHTML = `<div style="background-color: #fff5f5; border: 1px dashed #e53e3e; padding: 12px; margin: 10px 0; border-radius: 8px;">
                     <p style="margin: 0; color: #c53030; font-weight: bold; font-size: 13px; text-transform: uppercase;">📉 50% Penalty Reduction</p>
-                    <p style="margin: 5px 0 0 0; color: #9b2c2c; font-size: 12px; line-height: 1.4;">You are eligible for a 50% discount on all accumulated penalties. Settle before the deadline.</p>
-                    <div style="color: #c53030;">${deadlineText}</div>
-                </div>`;
+                    ${deadlineText}</div>`;
             } else if (offer === "LEGAL_NOTICE") {
                 banner.innerText = "⚠️ REPOSSESSION NOTICE";
-                banner.className = "status-banner";
-                banner.style.backgroundColor = "#000000";
-                banner.style.color = "#ffffff";
-                banner.style.border = "2px solid #ff0000";
-                
-                dNote.innerHTML = `
-                <div style="background-color: #ffffff; border: 2px solid #1a202c; padding: 12px; margin: 10px 0; border-radius: 4px; text-align: left;">
-                    <p style="margin: 0; color: #1a202c; font-weight: bold; font-size: 13px; text-transform: uppercase;">🚨 NOTICE OF PENDING ACTION</p>
-                    <p style="margin: 5px 0 0 0; color: #1a202c; font-size: 12px; line-height: 1.4;">Failure to settle may result in <b>asset recovery</b> and credit reporting.</p>
-                    <div style="margin-top: 10px; background: #f7fafc; padding: 5px; text-align: center; border: 1px solid #1a202c; font-weight: bold;">
-                        DEMAND DEADLINE: ${deadline || 'IMMEDIATE'}
-                    </div>
-                </div>`;
-            } // Dulo ng Special Offer (if offer)
+                banner.style.backgroundColor = "#000"; banner.style.color = "#fff"; banner.style.border = "2px solid red";
+                dNote.innerHTML = `<div style="border: 2px solid #1a202c; padding: 12px; margin: 10px 0;">🚨 NOTICE OF PENDING ACTION<br><small>Final Deadline: ${deadline || 'IMMEDIATE'}</small></div>`;
+            }
+        } 
         else if (isGrace) {
             banner.innerText = "✨ GRACE PERIOD ACTIVE";
             banner.className = "status-banner bg-grace";
-            graceArea.innerHTML = `
-                <div class="grace-period-box">
-                    <div style="color: #721c24; font-size: 11px; margin-bottom: 5px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">
-                        ⚠️ ACCOUNT IS ${data.daysLate} DAY/S OVERDUE
-                    </div>
-                    <div style="margin-bottom: 8px;">
-                        <small>✨ Grace Period Applied: Late fees and interest are temporarily waived. Settle today to save!</small>
-                    </div>
-                    <hr style="border: 0; border-top: 1px dashed #c3e6cb; margin: 8px 0;">
-                    <div id="liveTimer" style="font-weight:bold; font-size:16px; color: #155724;">
-                        ENDS IN: <span id="timerClock">--:--:--</span>
-                    </div>
-                </div>`;
+            graceArea.innerHTML = `<div class="grace-period-box">⚠️ OVERDUE: ${daysLate} DAYS<br><div id="liveTimer">ENDS IN: <span id="timerClock">--:--:--</span></div></div>`;
         } else {
             banner.innerText = "⚠️ ACCOUNT OVERDUE";
             banner.className = "status-banner bg-overdue blink-overdue";
-            dNote.innerHTML = `<b style="color:var(--danger)">${daysLate} DAY/S LATE:</b> Pay immediately to avoid additional daily interest.`;
+            dNote.innerHTML = `<b style="color:var(--danger)">${daysLate} DAY/S LATE:</b> Pay now to avoid more interest.`;
         }
 
-        // --- 2. DYNAMIC FEES BREAKDOWN (Dapat isa lang ito para hindi mawala ang text) ---
         if (feesArea) {
-            // Dito natin tinitiyak na mag-ga-guhit (line-through) ang fees kapag may offer o grace period
-            let lateFeeStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_PENALTY" || isGrace) ? "text-decoration: line-through; color: #a0aec0;" : "color: #e53e3e;";
-            let interestStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_DAILY" || isGrace) ? "text-decoration: line-through; color: #a0aec0;" : "color: #e53e3e;";
-            let discountText = (offer === "DISCOUNT_50") ? "<br><small style='color:#38a169'>(-50% Discount Applied)</small>" : "";
-
+            let lateStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_PENALTY" || isGrace) ? "text-decoration:line-through; color:#a0aec0;" : "color:#e53e3e;";
+            let intStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_DAILY" || isGrace) ? "text-decoration:line-through; color:#a0aec0;" : "color:#e53e3e;";
+            let discountText = (offer === "DISCOUNT_50") ? "<br><small style='color:#38a169'>(-50% Applied)</small>" : "";
+            
             feesArea.innerHTML = `
                 <div class="fees-breakdown">
                     <div class="fee-item"><span>Principal:</span> <span>₱${data.principal}</span></div>
-                    <div class="fee-item" style="${lateFeeStyle}"><span>Late Fee (10%):</span> <span>+ ₱${data.lateFee}</span></div>
-                    <div class="fee-item" style="${interestStyle}"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}${discountText}</span></div>
+                    <div class="fee-item" style="${lateStyle}"><span>Late Fee (10%):</span> <span>+ ₱${data.lateFee}</span></div>
+                    <div class="fee-item" style="${intStyle}"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}${discountText}</span></div>
                 </div>`;
-           } // Dulo ng feesArea logic
+        }
         
-        // --- 3. UNIVERSAL TIMER TRIGGER (Nasa loob pa rin ng Overdue) ---
         setTimeout(() => { 
-            if (deadline && deadline !== "") {
-                startLiveCountdown(new Date(deadline)); 
-            } else {
-                startLiveCountdown(); 
-            }
+            startLiveCountdown(deadline ? new Date(deadline) : null); 
         }, 100);
-
-    } // <--- ITO ANG NAGSASARA NG "else if (daysLate > 0)"
+    } 
     else { 
-        // 4. UPCOMING OR DUE TODAY (Dito lang dapat ang 'else' na ito)
         const daysUntil = Math.abs(daysLate);
         if (daysUntil === 0) { 
             banner.innerText = `🚨 BILL #${data.bill} DUE TODAY`;
             banner.className = "status-banner bg-upcoming pulse-today";
-            graceArea.innerHTML = `
-                <div class="grace-period-box" style="background:#fff3cd; color:#856404; border-color:#ffeeba;">
-                    <div id="liveTimer" style="font-weight:bold; font-size:14px;">TIME LEFT: <span id="timerClock">--:--:--</span></div>
-                    <small>Pay before midnight to avoid late fees.</small>
-                </div>`;
+            graceArea.innerHTML = `<div class="grace-period-box" style="background:#fff3cd;">TIME LEFT: <span id="timerClock">--:--:--</span></div>`;
             setTimeout(() => { startLiveCountdown(); }, 100);
         } else {
             banner.innerText = (daysUntil === 1) ? "⏳ DUE TOMORROW" : `⏳ DUE IN ${daysUntil} DAYS`;
             banner.className = "status-banner bg-unpaid";
-            dNote.innerText = "Keep your account in good standing. Pay on or before the due date.";
+            dNote.innerText = "Keep your account in good standing.";
         }
-    } // Dulo ng Upcoming/Due Today
-        
-    // 5. UNIVERSAL AUTO-EXIT TIMER
+    } 
+
+    // 5. AUTO-EXIT TIMER
     let exitSecs = 250;
-    let timerDiv = document.getElementById('session-timer');
-    if (!timerDiv) {
-        timerDiv = document.createElement('div');
-        timerDiv.id = "session-timer";
+    let timerDiv = document.getElementById('session-timer') || document.createElement('div');
+    timerDiv.id = "session-timer";
+    timerDiv.className = "session-timer-style"; // Ensure you have CSS for this or keep inline style
+    if (!document.getElementById('session-timer')) {
         timerDiv.style = "font-size: 11px; color: #94a3b8; text-align: center; margin-top: 15px; font-weight: 600;";
         document.querySelector('.bill-card').appendChild(timerDiv);
     }
 
-    if (globalTimer) clearInterval(globalTimer);
-    globalTimer = setInterval(() => { 
+    if (window.globalTimer) clearInterval(window.globalTimer);
+    window.globalTimer = setInterval(() => { 
         exitSecs--;
         timerDiv.innerHTML = `<i class="fas fa-clock"></i> Session expires in ${exitSecs}s`;
         if (exitSecs <= 0) {
-            clearInterval(globalTimer);
+            clearInterval(window.globalTimer);
             sessionStorage.removeItem("erriho_authorized");
             window.location.replace("index.html");
         }
