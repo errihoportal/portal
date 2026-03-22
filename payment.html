@@ -733,7 +733,10 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
                     <div class="fee-item" style="${lateFeeStyle}"><span>Late Fee (10%):</span> <span>+ ₱${data.lateFee}</span></div>
                     <div class="fee-item" style="${interestStyle}"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}${discountText}</span></div>
                 </div>`;
-        }
+           } // Dulo ng feesArea
+    } // <--- DAGDAGAN MO NG ISA PANG GANITO DITO para isara ang "else if (daysLate > 0)"
+    else { 
+        // UPCOMING OR DUE TODAY
         // --- 3. UNIVERSAL TIMER TRIGGER ---
 setTimeout(() => { 
     if (deadline && deadline !== "") {
