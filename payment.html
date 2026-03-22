@@ -647,28 +647,80 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     }
     else if (daysLate > 0) { 
         // --- 1. BANNER LOGIC (Dito lang magbabago ang Text ng Banner) ---
+        else if (daysLate > 0) { 
+        // --- 1. SPECIAL OFFER LOGIC (BANK STYLE BOXES) ---
         if (offer && offer !== "" && offer !== "NONE") {
             banner.innerText = "✨ SPECIAL OFFER ACTIVE";
             banner.className = "status-banner bg-grace"; 
             
+            // Reusable Deadline string para hindi paulit-ulit
+            const deadlineText = deadline ? `<p style="margin: 8px 0 0 0; font-weight: bold; font-size: 11px;">📅 VALID UNTIL: ${deadline}</p>` : "";
+
             if (offer === "WAIVE_ALL") {
-                dNote.innerHTML = "🎁 <b>OFFER:</b> All penalties waived! Pay the principal only.";
+                dNote.innerHTML = `
+                <div style="background-color: #fffaf0; border: 1px dashed #dd6b20; padding: 12px; margin: 10px 0; border-radius: 8px; text-align: left;">
+                    <p style="margin: 0; color: #9c4221; font-weight: bold; font-size: 13px; text-transform: uppercase;">🏆 Clean Slate Program</p>
+                    <p style="margin: 5px 0 0 0; color: #7b341e; font-size: 12px; line-height: 1.4;">All penalties waived. Pay the <b>original principal balance</b> only to clear your record.</p>
+                    <div style="color: #9c4221;">${deadlineText}</div>
+                </div>`;
             } else if (offer === "WAIVE_PENALTY") {
-                dNote.innerHTML = "🎁 <b>OFFER:</b> Late Payment Fee has been waived.";
+                dNote.innerHTML = `
+                <div style="background-color: #ebf8ff; border: 1px dashed #3182ce; padding: 12px; margin: 10px 0; border-radius: 8px; text-align: left;">
+                    <p style="margin: 0; color: #2c5282; font-weight: bold; font-size: 13px; text-transform: uppercase;">💼 10% Surcharge Waived</p>
+                    <p style="margin: 5px 0 0 0; color: #2a4365; font-size: 12px; line-height: 1.4;">The 10% late payment fee has been removed. Principal and daily interest still apply.</p>
+                    <div style="color: #2c5282;">${deadlineText}</div>
+                </div>`;
             } else if (offer === "WAIVE_DAILY") {
-                // --- DAGDAG ITO ---
-                dNote.innerHTML = "⚡ <b>OFFER:</b> All accumulated daily interest charges are waived.";
+                dNote.innerHTML = `
+                <div style="background-color: #e6fffa; border: 1px dashed #38b2ac; padding: 12px; margin: 10px 0; border-radius: 8px; text-align: left;">
+                    <p style="margin: 0; color: #234e52; font-weight: bold; font-size: 13px; text-transform: uppercase;">💹 Daily Interest Waived</p>
+                    <p style="margin: 5px 0 0 0; color: #285e61; font-size: 12px; line-height: 1.4;">All accumulated daily interest is waived. Pay the principal plus the one-time late fee.</p>
+                    <div style="color: #234e52;">${deadlineText}</div>
+                </div>`;
             } else if (offer === "DISCOUNT_50") {
-                dNote.innerHTML = "🎁 <b>OFFER:</b> You have a 50% discount on all total penalties.";
+                dNote.innerHTML = `
+                <div style="background-color: #fff5f5; border: 1px dashed #e53e3e; padding: 12px; margin: 10px 0; border-radius: 8px; text-align: left;">
+                    <p style="margin: 0; color: #c53030; font-weight: bold; font-size: 13px; text-transform: uppercase;">📉 50% Penalty Reduction</p>
+                    <p style="margin: 5px 0 0 0; color: #9b2c2c; font-size: 12px; line-height: 1.4;">You are eligible for a 50% discount on all accumulated penalties. Settle before the deadline.</p>
+                    <div style="color: #c53030;">${deadlineText}</div>
+                </div>`;
             } else if (offer === "LEGAL_NOTICE") {
-    banner.innerText = "⚠️ REPOSSESSION NOTICE"; // Mas matapang na text
-    banner.className = "status-banner bg-overdue"; 
-    banner.style.backgroundColor = "#000000"; // Black background
-    banner.style.color = "#ffffff";
-    banner.style.border = "2px solid #ff0000"; // Red border para sa urgency
-    
-    dNote.innerHTML = `<b style='color:#e53e3e'>FINAL DEMAND:</b> Settle on or before <b>${deadline || 'today'}</b> to avoid legal action and asset recovery.`;
-}
+                banner.innerText = "⚠️ REPOSSESSION NOTICE";
+                banner.className = "status-banner";
+                banner.style.backgroundColor = "#000000";
+                banner.style.color = "#ffffff";
+                banner.style.border = "2px solid #ff0000";
+                
+                dNote.innerHTML = `
+                <div style="background-color: #ffffff; border: 2px solid #1a202c; padding: 12px; margin: 10px 0; border-radius: 4px; text-align: left;">
+                    <p style="margin: 0; color: #1a202c; font-weight: bold; font-size: 13px; text-transform: uppercase;">🚨 NOTICE OF PENDING ACTION</p>
+                    <p style="margin: 5px 0 0 0; color: #1a202c; font-size: 12px; line-height: 1.4;">Failure to settle may result in <b>asset recovery</b> and credit reporting.</p>
+                    <div style="margin-top: 10px; background: #f7fafc; padding: 5px; text-align: center; border: 1px solid #1a202c; font-weight: bold;">
+                        DEMAND DEADLINE: ${deadline || 'IMMEDIATE'}
+                    </div>
+                </div>`;
+            }
+        } else if (isGrace) {
+            // ... (Your existing Grace logic)
+        } else {
+            banner.innerText = "⚠️ ACCOUNT OVERDUE";
+            banner.className = "status-banner bg-overdue blink-overdue";
+            dNote.innerHTML = `<b style="color:var(--danger)">${daysLate} DAY/S LATE:</b> Pay immediately to avoid additional daily interest.`;
+        }
+
+        // --- 2. DYNAMIC FEES BREAKDOWN (Mananatili ito para sa transparency) ---
+        if (feesArea) {
+            let lateFeeStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_PENALTY") ? "text-decoration: line-through; color: #a0aec0;" : "color: #e53e3e;";
+            let interestStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_DAILY") ? "text-decoration: line-through; color: #a0aec0;" : "color: #e53e3e;";
+            let discountText = (offer === "DISCOUNT_50") ? "<br><small style='color:#38a169'>(-50% Discount Applied)</small>" : "";
+
+            feesArea.innerHTML = `
+                <div class="fees-breakdown">
+                    <div class="fee-item"><span>Principal:</span> <span>₱${data.principal}</span></div>
+                    <div class="fee-item" style="${lateFeeStyle}"><span>Late Fee (10%):</span> <span>+ ₱${data.lateFee}</span></div>
+                    <div class="fee-item" style="${interestStyle}"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}${discountText}</span></div>
+                </div>`;
+        }
         } else if (isGrace) {
             banner.innerText = "✨ GRACE PERIOD ACTIVE";
             banner.className = "status-banner bg-grace";
