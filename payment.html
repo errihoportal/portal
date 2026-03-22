@@ -547,6 +547,7 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     const status = data.status.toLowerCase().trim();
     const daysLate = parseInt(data.daysLate); 
     const isGrace = data.isGracePeriod === "YES";
+    const offer = data.offerType; // <--- DAGDAG: Para mabasa ang Column W
 
     // 2. Basic Information Mapping (Initial)
     document.getElementById('custName').innerText = data.name;
@@ -623,7 +624,19 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     }
     else if (daysLate > 0) { 
         // OVERDUE SCENARIO
-        if (isGrace) {
+        if (offer && offer !== "" && offer !== "NONE") {
+            // Baguhin ang Banner base sa Offer pero panatilihin ang Fees Breakdown sa baba
+            banner.innerText = "✨ SPECIAL OFFER ACTIVE"; 
+            banner.className = "status-banner bg-grace"; // Kulay green/gold gaya ng grace period
+
+            if (offer === "WAIVE_ALL") {
+                dNote.innerHTML = "🎁 <b>OFFER:</b> All penalties waived! Pay the principal only.";
+            } else if (offer === "WAIVE_PENALTY") {
+                dNote.innerHTML = "🎁 <b>OFFER:</b> Late Payment Fee (₱50) has been waived.";
+            } else if (offer === "DISCOUNT_50") {
+                dNote.innerHTML = "🎁 <b>OFFER:</b> You have a 50% discount on total penalties.";
+            }
+        } else if (isGrace) {
             banner.innerText = "✨ GRACE PERIOD ACTIVE";
             banner.className = "status-banner bg-grace";
             graceArea.innerHTML = `
@@ -639,9 +652,6 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
                         ENDS IN: <span id="timerClock">--:--:--</span>
                     </div>
                 </div>`;
-            
-            // Siguraduhin na tatawag ang timer pagka-render ng HTML
-            setTimeout(() => { startLiveCountdown(); }, 100);
         } else {
             banner.innerText = "⚠️ ACCOUNT OVERDUE";
             banner.className = "status-banner bg-overdue blink-overdue";
@@ -653,10 +663,17 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
                         <div class="fee-item red"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}</span></div>
                     </div>`;
             }
+            // Kung walang offer, ipakita ang original dNote
+        if (!offer || offer === "NONE") {
             dNote.innerHTML = `<b style="color:var(--danger)">${daysLate} DAY/S LATE:</b> Pay immediately to avoid additional daily interest.`;
         }
+        
+        // I-trigger ang timer kung Grace o may Offer
+        if (isGrace || (offer && offer !== "")) {
+             setTimeout(() => { startLiveCountdown(); }, 100);
+        }
     } 
-    else { 
+    else {
         // UPCOMING OR DUE TODAY
         const daysUntil = Math.abs(daysLate);
         if (daysUntil === 0) { 
