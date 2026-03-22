@@ -646,8 +646,6 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         dNote.innerHTML = "⏳ <b>We've received your proof.</b><br>Our team is currently validating your payment. Please wait for an SMS or Email update.";
     }
     else if (daysLate > 0) { 
-        // --- 1. BANNER LOGIC (Dito lang magbabago ang Text ng Banner) ---
-        else if (daysLate > 0) { 
         // --- 1. SPECIAL OFFER LOGIC (BANK STYLE BOXES) ---
         if (offer && offer !== "" && offer !== "NONE") {
             banner.innerText = "✨ SPECIAL OFFER ACTIVE";
