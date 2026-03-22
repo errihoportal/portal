@@ -807,17 +807,16 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     function updateClock() {
         if (!billData.dueDate) return;
 
-        // 1. Kunin ang Due Date at i-parse nang tama
-        const dueDate = new Date(billData.dueDate.replace(/-/g, "/"));
+        // 1. Ayusin ang pag-parse ng date (para gumana sa lahat ng browsers)
+        const dueDate = new Date(billData.dueDate); 
         
-        // 2. Kunin ang Grace Period Number (halimbawa data.graceDays ang pangalan sa JSON mo)
-        // Kung "3" ang nasa sheet, idadagdag natin ang 3 days sa Due Date.
+        // 2. Deadline Calculation
+        // Kung may Offer Type, 24 hours lang ang binibigay natin (o hanggang midnight)
+        // Pero para simple, susunod pa rin tayo sa Grace Period logic mo
         const graceDays = parseInt(billData.gracePeriod) || 0; 
         
-        // 3. Icompute ang Deadline (Due Date + Grace Days)
         const deadline = new Date(dueDate);
         deadline.setDate(deadline.getDate() + graceDays);
-        // Itakda sa dulo ng araw (11:59:59 PM)
         deadline.setHours(23, 59, 59, 999);
 
         const now = new Date();
@@ -826,26 +825,28 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         const clockElem = document.getElementById('timerClock');
         if (!clockElem) return;
 
-        // KAPAG EXPIRED NA
+        // 3. KAPAG EXPIRED NA
         if (diff <= 0) {
             clearInterval(window.graceInterval);
             clockElem.innerText = "EXPIRED";
             clockElem.style.color = "red";
 
-            // Refresh lang kung kailangan i-update ang UI sa Overdue mode
-            if (billData.isGracePeriod === "YES") {
+            // REFRESH LOGIC: Kung nawala na ang Grace o ang Offer, kailangan mag-reload
+            // para bumalik sa original price ang portal (penalty included)
+            if (billData.isGracePeriod === "YES" || (billData.offerType && billData.offerType !== "NONE")) {
                 setTimeout(() => { location.reload(); }, 3000);
             }
             return;
         }
 
-        // Calculation
+        // 4. Calculation (D-H-M-S)
         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
         const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
         const m = Math.floor((diff / (1000 * 60)) % 60);
         const s = Math.floor((diff / 1000) % 60);
 
-        clockElem.innerText = `${d}d ${h}h ${m}m ${s}s`;
+        // Display format
+        clockElem.innerText = (d > 0) ? `${d}d ${h}h ${m}m ${s}s` : `${h}h ${m}m ${s}s`;
     }
     
     if(window.graceInterval) clearInterval(window.graceInterval);
