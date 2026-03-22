@@ -554,9 +554,31 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     document.getElementById('custName').innerText = data.name;
     document.getElementById('billNumDisplay').innerText = "Bill #" + data.bill;
     document.getElementById('itemName').innerText = data.item;
-    document.getElementById('totalAmount').innerText = data.amount;
     document.getElementById('qrImg').src = data.qrLink;
-    dateDisplay.innerText = data.dueDate; // Default muna
+    dateDisplay.innerText = data.dueDate;
+
+    // --- MENTARYO: DITO NATIN I-CALCULATE ANG TOTOO DAPAT BAYARAN ---
+    let displayTotal = parseFloat(data.amount); // Default na galing sa sheet
+
+    if (daysLate > 0) {
+        if (offer === "WAIVE_ALL" || isGrace) {
+            // Bayad lang ay ang Principal (Tanggal lahat ng penalties)
+            displayTotal = parseFloat(data.principal);
+        } else if (offer === "WAIVE_PENALTY") {
+            // Principal + Daily Interest lang (Tanggal ang 10% Late Fee)
+            displayTotal = parseFloat(data.principal) + parseFloat(data.dailyInterest);
+        } else if (offer === "WAIVE_DAILY") {
+            // Principal + Late Fee lang (Tanggal ang Daily Interest)
+            displayTotal = parseFloat(data.principal) + parseFloat(data.lateFee);
+        } else if (offer === "DISCOUNT_50") {
+            // Principal + (Kalahati ng lahat ng penalties)
+            let totalPenalties = parseFloat(data.lateFee) + parseFloat(data.dailyInterest);
+            displayTotal = parseFloat(data.principal) + (totalPenalties * 0.5);
+        }
+    }
+
+    // I-render ang final calculated amount
+    document.getElementById('totalAmount').innerText = displayTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
     // 3. INITIAL RESET
     banner.className = "status-banner";
