@@ -734,9 +734,6 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
                     <div class="fee-item" style="${interestStyle}"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}${discountText}</span></div>
                 </div>`;
            } // Dulo ng feesArea
-    } // <--- DAGDAGAN MO NG ISA PANG GANITO DITO para isara ang "else if (daysLate > 0)"
-    else { 
-        // UPCOMING OR DUE TODAY
         // --- 3. UNIVERSAL TIMER TRIGGER ---
 setTimeout(() => { 
     if (deadline && deadline !== "") {
@@ -747,8 +744,9 @@ setTimeout(() => {
         startLiveCountdown(); 
     }
 }, 100);
-    } else {
-        // UPCOMING OR DUE TODAY
+    } 
+       else {
+        // 4. UPCOMING OR DUE TODAY (Dito lang dapat ang 'else' na ito)
         const daysUntil = Math.abs(daysLate);
         if (daysUntil === 0) { 
             banner.innerText = `🚨 BILL #${data.bill} DUE TODAY`;
