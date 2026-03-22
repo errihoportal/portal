@@ -628,13 +628,21 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
             banner.innerText = "✨ SPECIAL OFFER ACTIVE";
             banner.className = "status-banner bg-grace"; 
             
-            // Dito mo i-customize ang dNote base sa Offer
             if (offer === "WAIVE_ALL") {
                 dNote.innerHTML = "🎁 <b>OFFER:</b> All penalties waived! Pay the principal only.";
             } else if (offer === "WAIVE_PENALTY") {
                 dNote.innerHTML = "🎁 <b>OFFER:</b> Late Payment Fee (₱50) has been waived.";
+            } else if (offer === "WAIVE_DAILY") {
+                // --- DAGDAG ITO ---
+                dNote.innerHTML = "⚡ <b>OFFER:</b> All accumulated daily interest charges are waived.";
             } else if (offer === "DISCOUNT_50") {
-                dNote.innerHTML = "🎁 <b>OFFER:</b> You have a 50% discount on total penalties.";
+                dNote.innerHTML = "🎁 <b>OFFER:</b> You have a 50% discount on all total penalties.";
+            } else if (offer === "LEGAL_NOTICE") {
+                // --- DAGDAG ITO (BLACK BANNER) ---
+                banner.innerText = "⚠️ FINAL LEGAL NOTICE";
+                banner.className = "status-banner bg-overdue"; // O kaya gumawa ka ng black class
+                banner.style.backgroundColor = "#1a202c"; // Dark/Formal look
+                dNote.innerHTML = "<b style='color:#e53e3e'>FINAL DEMAND:</b> Settle immediately to avoid asset repossession and legal action.";
             }
         } else if (isGrace) {
             banner.innerText = "✨ GRACE PERIOD ACTIVE";
