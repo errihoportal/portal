@@ -697,29 +697,8 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
                         DEMAND DEADLINE: ${deadline || 'IMMEDIATE'}
                     </div>
                 </div>`;
-            }
-        } else if (isGrace) {
-            // ... (Your existing Grace logic)
-        } else {
-            banner.innerText = "⚠️ ACCOUNT OVERDUE";
-            banner.className = "status-banner bg-overdue blink-overdue";
-            dNote.innerHTML = `<b style="color:var(--danger)">${daysLate} DAY/S LATE:</b> Pay immediately to avoid additional daily interest.`;
-        }
-
-        // --- 2. DYNAMIC FEES BREAKDOWN (Mananatili ito para sa transparency) ---
-        if (feesArea) {
-            let lateFeeStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_PENALTY") ? "text-decoration: line-through; color: #a0aec0;" : "color: #e53e3e;";
-            let interestStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_DAILY") ? "text-decoration: line-through; color: #a0aec0;" : "color: #e53e3e;";
-            let discountText = (offer === "DISCOUNT_50") ? "<br><small style='color:#38a169'>(-50% Discount Applied)</small>" : "";
-
-            feesArea.innerHTML = `
-                <div class="fees-breakdown">
-                    <div class="fee-item"><span>Principal:</span> <span>₱${data.principal}</span></div>
-                    <div class="fee-item" style="${lateFeeStyle}"><span>Late Fee (10%):</span> <span>+ ₱${data.lateFee}</span></div>
-                    <div class="fee-item" style="${interestStyle}"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}${discountText}</span></div>
-                </div>`;
-        }
-        } else if (isGrace) {
+            } // Dulo ng Special Offer (if offer)
+        else if (isGrace) {
             banner.innerText = "✨ GRACE PERIOD ACTIVE";
             banner.className = "status-banner bg-grace";
             graceArea.innerHTML = `
@@ -740,17 +719,21 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
             banner.className = "status-banner bg-overdue blink-overdue";
             dNote.innerHTML = `<b style="color:var(--danger)">${daysLate} DAY/S LATE:</b> Pay immediately to avoid additional daily interest.`;
         }
-          // --- 2. FEES BREAKDOWN (HINDI DAPAT MABAGO ANG TEXT NAMES DITO) ---
-        // Nilabas natin ito sa if/else para laging visible ang breakdown
+
+        // --- 2. DYNAMIC FEES BREAKDOWN (Dapat isa lang ito para hindi mawala ang text) ---
         if (feesArea) {
+            // Dito natin tinitiyak na mag-ga-guhit (line-through) ang fees kapag may offer o grace period
+            let lateFeeStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_PENALTY" || isGrace) ? "text-decoration: line-through; color: #a0aec0;" : "color: #e53e3e;";
+            let interestStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_DAILY" || isGrace) ? "text-decoration: line-through; color: #a0aec0;" : "color: #e53e3e;";
+            let discountText = (offer === "DISCOUNT_50") ? "<br><small style='color:#38a169'>(-50% Discount Applied)</small>" : "";
+
             feesArea.innerHTML = `
                 <div class="fees-breakdown">
                     <div class="fee-item"><span>Principal:</span> <span>₱${data.principal}</span></div>
-                    <div class="fee-item red"><span>Late Fee:</span> <span>+ ₱${data.lateFee}</span></div>
-                    <div class="fee-item red"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}</span></div>
+                    <div class="fee-item" style="${lateFeeStyle}"><span>Late Fee (10%):</span> <span>+ ₱${data.lateFee}</span></div>
+                    <div class="fee-item" style="${interestStyle}"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}${discountText}</span></div>
                 </div>`;
         }
-
         // --- 3. UNIVERSAL TIMER TRIGGER ---
 setTimeout(() => { 
     if (deadline && deadline !== "") {
