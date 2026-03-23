@@ -1058,22 +1058,27 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
     banner.innerText = "STATUS: PAID";
     banner.className = "status-banner bg-paid";
     
-    // 1. ITAGO ANG MGA SECTIONS NA HINDI NA KAILANGAN
-    activeSec.style.display = 'none'; // Tinatago ang payment methods
-    if (copyWrapper) copyWrapper.style.display = 'none'; // Tinatago ang copy button
-    if (totalLabel) totalLabel.style.display = 'none'; // Tinatago ang "Total Payable" label
-    if (amountDiv) amountDiv.parentElement.style.display = 'none'; // Tinatago ang malaking amount sa taas
-    
-    // Itago rin ang original due date display sa taas
-    const dueDateDisplay = document.querySelector('.due-date-section'); // I-check ang class name ng wrapper ng due date mo
-    if (dueDateDisplay) dueDateDisplay.style.display = 'none';
+    // 1. ITAGO ANG LAHAT NG PAYMENT-RELATED ELEMENTS
+    activeSec.style.display = 'none'; 
+    if (copyWrapper) copyWrapper.style.display = 'none'; 
+    if (totalLabel) totalLabel.style.display = 'none'; 
+    if (amountDiv) amountDiv.parentElement.style.display = 'none';
 
-    // 2. DATA MAPPING PARA SA RECEIPT
+    // 2. ITAGO ANG DUE DATE (Yung specific element na dateDisplay)
+    if (dateDisplay) {
+        // Itatago ang buong container ng Due Date para malinis
+        dateDisplay.parentElement.style.display = 'none'; 
+    }
+
+    // Siguraduhin ding nakatago ang Fees Breakdown Area kung meron man
+    if (feesArea) feesArea.style.display = 'none';
+
+    // 3. DATA MAPPING PARA SA RECEIPT
     const pAmount = parseFloat(data.amountPaid) || 0;
     const pRef = data.refNumber || "N/A";
-    const pDate = data.paidDate || "N/A"; // Galing sa Column T
+    const pDate = data.paidDate || "N/A";
 
-    // 3. DIGITAL RECEIPT DISPLAY (Dito na lalabas ang details sa baba)
+    // 4. DIGITAL RECEIPT DISPLAY
     dNote.innerHTML = `
         <div style="padding: 20px; border: 1px solid #2ecc71; background: #fafffa; border-radius: 12px; text-align: center;">
             <h2 style="color: #2ecc71; margin-top: 0; font-size: 18px;">🎉 PAYMENT RECEIVED</h2>
@@ -1097,7 +1102,7 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
             </div>
 
             <div style="margin-top: 15px; padding: 8px; background: #e8f5e9; border-radius: 6px;">
-                <small style="color: #2e7d32; font-weight: 600;">OFFICIAL DIGITAL RECEIPT</small>
+                <small style="color: #2e7d32; font-weight: 700; letter-spacing: 1px;">✓ TRANSACTION COMPLETED</small>
             </div>
         </div>
     `;
