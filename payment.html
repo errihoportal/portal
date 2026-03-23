@@ -1112,8 +1112,38 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
     else if (status === "verifying") {
         banner.innerText = "STATUS: VERIFYING";
         banner.className = "status-banner bg-verifying";
-        activeSec.style.display = 'none';
-        dNote.innerHTML = "⏳ <b>Verification in progress...</b>";
+        
+        // 1. ITAGO ANG MGA SECTIONS (Katulad ng sa Paid logic)
+        activeSec.style.display = 'none'; 
+        if (copyWrapper) copyWrapper.style.display = 'none'; 
+        if (totalLabel) totalLabel.style.display = 'none'; 
+        if (amountDiv) amountDiv.parentElement.style.display = 'none';
+        
+        // Itago ang Due Date para malinis ang screen
+        if (dateDisplay) {
+            dateDisplay.parentElement.style.display = 'none'; 
+        }
+
+        // 2. PROFESSIONAL MESSAGE PARA SA VERIFICATION
+        dNote.innerHTML = `
+            <div style="padding: 25px 15px; border: 1px solid #3498db; background: #f0f7ff; border-radius: 12px; text-align: center;">
+                <div style="font-size: 40px; margin-bottom: 10px;">⏳</div>
+                <h3 style="color: #2980b9; margin: 0 0 10px 0; font-size: 18px;">PAYMENT UNDER REVIEW</h3>
+                <p style="color: #5d6d7e; font-size: 13px; line-height: 1.5; margin-bottom: 15px;">
+                    Hi <b>${data.name}</b>, we've received your payment proof. Our team is currently validating your transaction.
+                </p>
+                
+                <div style="background: white; padding: 12px; border-radius: 8px; border: 1px dashed #3498db; display: inline-block; width: 100%; box-sizing: border-box;">
+                    <span style="color: #7f8c8d; font-size: 12px; display: block; margin-bottom: 5px;">Estimated Wait Time:</span>
+                    <b style="color: #2980b9; font-size: 14px;">15 - 30 Minutes</b>
+                </div>
+
+                <p style="font-size: 11px; color: #95a5a6; margin-top: 15px; font-style: italic; line-height: 1.4;">
+    To ensure a smooth process, please avoid resubmitting your proof.<br>
+    A confirmation will be sent via <b>SMS and Email</b> once verified.
+</p>
+            </div>
+        `;
     }
     else if (daysLate > 0) {
         // OVERDUE LOGIC
