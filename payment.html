@@ -194,19 +194,27 @@
     <div id="statusBanner" class="status-banner">Loading...</div>
     
     <div class="bill-card">
-    <p>Customer: <b id="custName">---</b></p>
-    <h2 id="billNumDisplay">Bill #---</h2>
-    <p>Item: <span id="itemName">---</span></p>
-    
-    <div class="amount-section">
-        <div class="total-label" id="totalLabel">TOTAL PAYABLE</div>
-        <div class="total-amount">₱<span id="totalAmount">0.00</span></div>
-        <p>Due Date: <span id="dueDateText">---</span></p>
+    <div class="bill-header">
+        <h2 id="billNumDisplay">Bill #---</h2>
+        <p class="bill-customer">👤 <b id="custName">---</b></p>
     </div>
 
-    <div id="gracePeriodArea"></div>
-    <div id="feesBreakdownArea"></div>
-    <p id="dynamicNote" class="note"></p>
+    <div class="bill-body">
+        <p class="bill-item">📦 Item: <span id="itemName" style="font-weight: 500;">---</span></p>
+        
+        <div class="amount-section">
+            <div class="total-label" id="totalLabel">TOTAL PAYABLE</div>
+            <div class="total-amount">₱<span id="totalAmount">0.00</span></div>
+            <div class="due-date-wrapper">
+                📅 Due Date: <span id="dueDateText">---</span>
+            </div>
+        </div>
+
+        <div id="gracePeriodArea"></div>
+        <div id="feesBreakdownArea"></div>
+        
+        <div id="dynamicNote" class="note-container"></div>
+    </div>
 </div>
 
     <div id="activeSection">
