@@ -777,56 +777,48 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     function updateClock() {
         let targetDate;
 
-        // 1. DETERMINING THE TARGET
-        try {
-            if (customDeadline && !isNaN(new Date(customDeadline).getTime())) {
-                targetDate = new Date(customDeadline);
-            } else if (data.dueDate) { // Ginawa nating 'data' o 'billData' depende sa gamit mo
-                const graceDays = parseInt(data.gracePeriod) || 0;
-                targetDate = new Date(data.dueDate);
-                targetDate.setDate(targetDate.getDate() + graceDays);
-                targetDate.setHours(23, 59, 59, 999);
+        // 1. CLEANING THE DATE INPUT
+        if (customDeadline) {
+            // Sinisiguro nito na kahit ISO String (may T at Z), babasahin ito nang tama
+            targetDate = new Date(customDeadline).getTime();
+        } 
+        
+        // Fallback kung walang custom deadline o invalid ang format
+        if (!targetDate || isNaN(targetDate)) {
+            if (window.billData && window.billData.dueDate) {
+                const graceDays = parseInt(window.billData.gracePeriod) || 0;
+                let fallback = new Date(window.billData.dueDate);
+                fallback.setDate(fallback.getDate() + graceDays);
+                fallback.setHours(23, 59, 59, 999);
+                targetDate = fallback.getTime();
             } else {
-                return; 
+                return;
             }
-        } catch (e) {
-            console.log("Date error:", e);
-            return;
         }
 
-        const now = new Date();
+        const now = new Date().getTime();
         const diff = targetDate - now;
         const clockElem = document.getElementById('timerClock');
         if (!clockElem) return;
 
-        // 2. KAPAG EXPIRED NA
+        // 2. CHECK IF EXPIRED
         if (diff <= 0) {
             clearInterval(window.graceInterval);
             clockElem.innerText = "OFFER EXPIRED";
             clockElem.style.color = "red";
             
-            // Reload para bumalik sa original price (papasok na ang penalty)
-            // Tinitiyak nito na hindi "naka-stuck" sa discounted price ang portal
-            if (data.offerType && data.offerType !== "NONE") {
+            // Auto-reload para bumalik sa original price (penalty included)
+            if (window.billData && window.billData.offerType && window.billData.offerType !== "NONE") {
                 setTimeout(() => { location.reload(); }, 3000);
             }
             return;
         }
 
-        // 3. CALCULATION
+        // 3. DISPLAY LOGIC (D-H-M-S)
         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        const m = Math.floor((diff / (1000 * 60)) % 60);
-        const s = Math.floor((diff / 1000) % 60);
-
-        // 4. DISPLAY & URGENCY STYLE
-        if (diff < (1000 * 60 * 60)) { // Less than 1 hour
-            clockElem.style.color = "#e74c3c";
-            clockElem.classList.add("blink-overdue"); // Siguraduhing may CSS class ka nito
-        } else {
-            clockElem.style.color = "#2c3e50";
-            clockElem.classList.remove("blink-overdue");
-        }
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
 
         clockElem.innerText = (d > 0) ? `${d}d ${h}h ${m}m ${s}s` : `${h}h ${m}m ${s}s`;
     }
