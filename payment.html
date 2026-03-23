@@ -13,154 +13,966 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
+
         :root { --primary: #e67e22; --success: #2ecc71; --danger: #e74c3c; --dark: #2c3e50; }
+
         body { font-family: 'Poppins', sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+
         .container { width: 100%; max-width: 450px; background: white; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.1); position: relative; padding-bottom: 80px; display: none; }
+
         .loading-screen { width: 100%; max-width: 450px; height: 100vh; background: white; display: flex; justify-content: center; align-items: center; text-align: center; }
+
         .header { text-align: center; padding: 20px; background: white; }
+
         .logo { width: 120px; height: auto; }
+
         .status-banner { padding: 10px; text-align: center; font-weight: bold; color: white; text-transform: uppercase; letter-spacing: 1px; }
+
         .bg-unpaid { background-color: #f39c12; }
+
         .bg-overdue { background-color: var(--danger); }
+
         .bg-verifying { background-color: #3498db; }
+
         .bg-paid { background-color: var(--success); }
+
         .bill-card { margin: 20px; padding: 20px; border-radius: 15px; background: #fff; border: 1px solid #eee; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+
         .bill-card h2 { margin: 0; font-size: 18px; color: var(--dark); }
+
         .bill-card p { margin: 5px 0; color: #7f8c8d; font-size: 14px; }
+
         .amount-section { text-align: center; margin: 20px 0; border-top: 1px dashed #ddd; border-bottom: 1px dashed #ddd; padding: 15px 0; }
+
         .total-label { font-size: 14px; color: #95a5a6; }
+
         .total-amount { font-size: 32px; font-weight: 600; color: var(--dark); margin: 5px 0; }
+
         .fees-breakdown { font-size: 13px; background: #fff5f5; padding: 10px; border-radius: 8px; margin-bottom: 15px; }
+
         .fee-item { display: flex; justify-content: space-between; margin: 3px 0; }
+
         .fee-item.red { color: var(--danger); font-weight: 600; }
+
         .qr-section { text-align: center; margin: 20px; }
+
         .qr-code { width: 100%; max-width: 250px; border: 5px solid #fff; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
         .note { font-size: 12px; color: #7f8c8d; text-align: center; padding: 0 20px; line-height: 1.4; }
+
         
+
         .upload-section { margin: 20px; }
+
         .custom-file-upload { display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8f9fa; border: 2px dashed #ccc; border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; }
+
         .custom-file-upload input[type="file"] { display: none; }
+
         
+
         #previewContainer { display: none; margin-top: 15px; text-align: center; }
+
         #imagePreview { max-width: 100%; max-height: 150px; border-radius: 8px; border: 1px solid #ddd; }
 
+
+
         .btn-submit { display: block; width: calc(100% - 40px); margin: 20px auto; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+
         .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+
         
+
         .messenger-fab { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: #0084ff; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 100; }
+
         .messenger-fab img { width: 35px; height: 35px; }
+
         
+
         #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.98); z-index: 1000; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 10px; }
+
         .success-icon { font-size: 45px; color: var(--success); margin-bottom: 10px; }
+
         .close-overlay { position: absolute; top: 20px; right: 20px; font-size: 30px; font-weight: bold; color: #95a5a6; cursor: pointer; }
+
         
-        .grace-period-box { background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; text-align: center; margin: 10px 0; font-size: 13px; border: 1px solid #c3e6cb; }
+
+        .grace-period-box { background:#f0fdf4; color:#16a085; padding:12px; border-radius:10px; border:1px solid #bbf7d0; text-align:center; font-size:13px; margin:10px 0; }
+
+        #timerClock { font-family: monospace; font-weight: 800; background: #fff; padding: 2px 6px; border-radius: 4px; border: 1px solid #16a085; }
+
+        
 
         #instrModal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; }
+
         .modal-content { background: white; width: 85%; max-width: 380px; padding: 20px; border-radius: 15px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+
         .step { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; text-align: left; }
+
         .step-num { background: var(--primary); color: white; min-width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 11px; flex-shrink: 0; }
+
         .step-text { font-size: 13px; line-height: 1.4; }
+
         .close-instr { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; color: #95a5a6; }
+
         .btn-how-to { background: none; border: 1px solid var(--primary); color: var(--primary); padding: 5px 15px; border-radius: 20px; font-size: 12px; cursor: pointer; font-weight: 600; }
 
+
+
         /* Animation Effects */
+
 @keyframes blink-red { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; background-color: #ff0000; } }
+
 @keyframes pulse-blue { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+
 @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); } }
 
+
+
 /* Theme Classes */
+
 .bg-grace { background: linear-gradient(135deg, #16a085, #2ecc71) !important; color: white !important; }
+
 .bg-upcoming { background: linear-gradient(135deg, #2980b9, #3498db) !important; color: white !important; }
+
 .blink-overdue { animation: blink-red 2s infinite; }
+
 .pulse-today { animation: pulse-blue 1.5s infinite; }
+
+
+
+/* Payment Options Styling */
+
+.payment-options { margin: 20px; }
+
+.option-item { 
+
+    border: 1px solid #ddd; 
+
+    border-radius: 10px; 
+
+    margin-bottom: 10px; 
+
+    overflow: hidden; 
+
+    transition: 0.3s;
+
+}
+
+.option-header { 
+
+    padding: 15px; 
+
+    background: #fff; 
+
+    display: flex; 
+
+    justify-content: space-between; 
+
+    align-items: center; 
+
+    cursor: pointer; 
+
+    font-weight: 600;
+
+    font-size: 13px;
+
+}
+
+.option-header:hover { background: #f8f9fa; }
+
+.option-content { 
+
+    display: none; 
+
+    padding: 15px; 
+
+    background: #fafafa; 
+
+    border-top: 1px solid #eee; 
+
+    text-align: center; 
+
+}
+
+.fee-badge { 
+
+    font-size: 10px; 
+
+    padding: 2px 8px; 
+
+    border-radius: 10px; 
+
+    margin-left: 5px; 
+
+}
+
+.bg-free { background: #d4edda; color: #155724; }
+
+.bg-with-fee { background: #fff3cd; color: #856404; }
+
+.bank-details { text-align: left; font-size: 13px; background: white; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
+
+
+
+           /* Animation para sa Logo sa Loading Screen */
+
+@keyframes pulse {
+
+    0% { transform: scale(1); opacity: 1; }
+
+    50% { transform: scale(0.95); opacity: 0.7; }
+
+    100% { transform: scale(1); opacity: 1; }
+
+}
+
+
+
+/* Siguraduhin na ang loading screen ay laging nasa gitna */
+
+.loading-screen {
+
+    position: fixed;
+
+    top: 0;
+
+    left: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    background: #ffffff;
+
+    z-index: 9999;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}  
     
     </style>
 </head>
+
 <body>
 
-<div id="loader" class="loading-screen">
-    <div>
-        <img src="images/logo.png" style="width:80px; margin-bottom:10px;"><br>
-        <span>Data loading please wait...</span>
+
+
+<div id="loader" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #ffffff; z-index: 99999; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; text-align: center; font-family: 'Segoe UI', Arial, sans-serif; overflow: hidden;">
+
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 400px; margin: auto;">
+
+        
+
+        <img src="images/logoportal.png" style="width:180px; height:auto; margin-bottom:15px; animation: pulse 2s infinite;" alt="Logo">
+
+
+
+        <div style="display: inline-block; padding: 8px 15px; background: #f8f9fa; border-radius: 50px; border: 1px solid #e9ecef; margin-bottom: 20px; min-width: 250px;">
+
+            <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+
+                <span style="font-size: 14px;">🛡️</span>
+
+                <div style="text-align: left; line-height: 1.2;">
+
+                    <b style="font-size: 11px; color: #333; letter-spacing: 0.5px; display: block; text-transform: uppercase;">SECURE PAYMENT GATEWAY</b>
+
+                    <span style="font-size: 9px; color: #27ae60; font-weight: 600; display: block; text-transform: uppercase; white-space: nowrap;">Trusted & Encrypted Transaction</span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div style="font-size: 12px; color: #7f8c8d; letter-spacing: 1px; font-weight: 500;">
+
+            Data loading please wait...
+
+        </div>
+
     </div>
+
 </div>
 
+
+
 <div class="container" id="mainContainer">
-    <div class="header">
-        <img src="images/logo.png" class="logo" alt="Erriho Logo">
+
+    <div class="header" style="text-align: center; padding: 50px 0; background: #fff; border-bottom: 1px solid #f0f0f0;">
+
+        <img src="images/logo.png" class="logo" style="height: 100px; width: auto; margin-bottom: 1px;" alt="Erriho Logo">
+
+
+
+        <div style="font-size: 16px; font-weight: 800; color: #2c3e50; letter-spacing: 2px; margin-bottom: 1px; font-family: 'Segoe UI', Roboto, sans-serif;">
+
+            ERRIHO PORTAL
+
+        </div>
+
+
+
+        <div style="margin-bottom: 3px;">
+
+            <a href="https://errihoportal.flavideal.com" style="text-decoration: none; color: #3498db; font-size: 12px; font-weight: 600; font-family: 'Segoe UI', sans-serif;">
+
+                🌐 errihoportal.flavideal.com
+
+            </a>
+
+        </div>    
+
+
+
+        <div style="display: inline-block; padding: 8px 15px; background: #f8f9fa; border-radius: 50px; border: 1px solid #e9ecef;">
+
+            <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+
+                <span style="font-size: 12px;">🛡️</span>
+
+                <div style="text-align: left; line-height: 1.2;">
+
+                    <b style="font-size: 11px; color: #333; letter-spacing: 0.5px; display: block; text-transform: uppercase;">
+
+                        SECURE PAYMENT GATEWAY
+
+                    </b>
+
+                    <span style="font-size: 9px; color: #27ae60; font-weight: 600; display: block; text-transform: uppercase;">
+
+                        Trusted & Encrypted Transaction
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
+
+
 
     <div id="statusBanner" class="status-banner">Loading...</div>
 
+    
+
     <div class="bill-card">
-        <p>Customer: <b id="custName">---</b></p>
-        <h2 id="billNumDisplay">Bill #---</h2>
-        <p>Item: <span id="itemName">---</span></p>
-        
-        <div class="amount-section">
-            <div class="total-label" id="totalLabel">TOTAL PAYABLE</div>
-            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <div class="total-amount">₱<span id="totalAmount">0.00</span></div>
-                <span id="copyBtnWrapper">
-                    <button onclick="copyAmount()" style="background: none; border: 1px solid #ccc; border-radius: 5px; cursor: pointer; padding: 5px 8px; color: #7f8c8d; font-size: 12px;">
-                        📋 Copy Amount
-                    </button>
-                </span>
-            </div>
-            <p>Due Date: <span id="dueDateText">---</span></p>
+
+    <div class="bill-header">
+
+        <div class="bill-top-info">
+
+            <h2 id="billNumDisplay">BILL #---</h2>
+
+            <p class="customer-tag">👤 <span id="custName">---</span></p>
+
         </div>
+
+    </div>
+
+
+
+    <div class="bill-body">
+
+        <p class="bill-item">📦 Item: <b id="itemName">---</b></p>
+
+        
+
+        <div class="amount-section">
+
+            <div class="total-label" id="totalLabel">TOTAL PAYABLE</div>
+
+            
+
+            <div class="amount-container">
+
+                <div class="total-amount">₱<span id="totalAmount">0.00</span></div>
+
+                <button onclick="copyAmount()" class="premium-copy-btn" title="Copy Amount">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+
+                        <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+
+                        <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+
+                    </svg>
+
+                    <span>COPY</span>
+
+                </button>
+
+            </div>
+
+
+
+            <div class="due-date-wrapper">
+
+                📅 Due Date: <span id="dueDateText" style="font-weight: 700;">---</span>
+
+            </div>
+
+        </div>
+
+
 
         <div id="gracePeriodArea"></div>
+
         <div id="feesBreakdownArea"></div>
-        <p id="dynamicNote" class="note"></p>
+
+        
+
+        <div id="dynamicNote" class="note-container"></div>
+
     </div>
 
-    <div id="activeSection">
-        <div class="qr-section">
-            <img src="images/qrphdesign.png" style="width: 300px; margin-bottom: 10px;" alt="Design Icon">
-            <br>
-            <button class="btn-how-to" onclick="toggleModal(true)">❓ How to pay using QR?</button>
-            <br><br>
-            <img src="" id="qrImg" class="qr-code">
-            <p style="font-size: 11px; margin-top: 10px;">Long press image to save QR</p>
-        </div>
-
-        <div id="instrModal">
-            <div class="modal-content">
-                <span class="close-instr" onclick="toggleModal(false)">&times;</span>
-                <h3 style="color: var(--primary); margin-top: 0; font-size: 18px;">💡 How to Pay via QRPh</h3>
-                <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 15px;">
-                <div class="step"><div class="step-num">1</div><div class="step-text"><b>Long Press</b> ang QR code at i-save sa gallery.</div></div>
-                <div class="step"><div class="step-num">2</div><div class="step-text">Buksan ang iyong <b>GCash, Maya, o Bank App</b>.</div></div>
-                <div class="step"><div class="step-num">3</div><div class="step-text">Piliin ang <b>"Scan QR"</b> at i-click ang <b>"Upload from Gallery"</b>.</div></div>
-                <div class="step"><div class="step-num">4</div><div class="step-text">Bayaran ang amount at <b>mag-screenshot</b>.</div></div>
-                <div class="step"><div class="step-num">5</div><div class="step-text">I-upload ang screenshot sa <b>Proof of Payment</b> section.</div></div>
-                <button class="btn-submit" style="width: 100%; margin: 15px 0 0 0;" onclick="toggleModal(false)">Got it!</button>
-            </div>
-        </div>
-
-        <div class="upload-section">
-            <label class="custom-file-upload">
-                <input type="file" id="fileInput" onchange="updateFileName()" accept="image/*">
-                <span id="fileLabel">📸 Tap to upload Proof of Payment</span>
-                <div id="previewContainer"><img id="imagePreview" src=""></div>
-            </label>
-        </div>
-        <button class="btn-submit" id="submitBtn" onclick="uploadFile()">SUBMIT PAYMENT</button>
-    </div>
 </div>
 
+
+
+    <div id="activeSection">
+
+    <div class="payment-options">
+
+        <p style="font-size: 13px; font-weight: 600; color: var(--dark); margin-bottom: 15px;">SELECT PAYMENT METHOD:</p>
+
+
+
+        <div class="option-item">
+
+        <div class="option-header" onclick="toggleOption('qrph-content')">
+
+    <div style="display: flex; flex-direction: column; align-items: flex-start;">
+
+        <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
+
+            <span style="font-size: 14px;">🟢</span>
+
+            <img src="images/qrph.png" style="height: 50px; width: auto; vertical-align: middle;" alt="QRPH">
+
+            
+
+            <span style="font-size: 8px; font-weight: 800; background: #2ecc71; color: white; padding: 1px 5px; border-radius: 3px; letter-spacing: 0.5px;">RECOMMENDED</span>
+
+            
+
+            <span class="fee-badge bg-free" style="font-size: 9px;">ZERO FEES</span>
+
+        </div>
+
+        
+
+        <small style="font-size: 10px; color: #7f8c8d; font-weight: 400; margin-top: 2px;">
+
+            (Scan via GCash, Maya, or any Bank App)
+
+        </small>
+
+    </div>
+
+    <span id="arrow-qrph" style="font-weight: bold;">▼</span>
+
+</div>
+
+            <div id="qrph-content" class="option-content">
+
+                <img src="images/qrphdesign.png" style="width: 100%; max-width: 300px; margin-bottom: 10px;">
+
+                <br>
+
+                <img src="" id="qrImg" class="qr-code">
+
+                <p style="margin-top: 10px; font-size: 11px; color: #636e72; font-style: italic;">
+
+                    👆 <b>Long press</b> the QR code to <b>Save</b> or <b>Download</b>
+
+                </p>
+
+                <p style="font-size: 11px; margin-top: 10px; color: #7f8c8d;">Scan via GCash, Maya, or any Bank App</p>
+
+                <button class="btn-how-to" onclick="toggleModal(true)">❓ How to pay?</button>
+
+                <div style="margin-top: 15px; padding: 10px; background: #fff9db; border-radius: 8px; border: 1px solid #fab005;">
+
+    <p style="margin: 0; font-size: 11px; color: #856404; line-height: 1.4;">
+
+        <b>⚠️ IMPORTANT:</b> After your successful transaction, please <b>take a screenshot</b> of the confirmation and <b>upload it below</b> in the "Tap to upload Proof of Payment" section to verify your payment.
+
+    </p>
+
+</div>
+
+    </div>
+
+</div>
+
+
+
+       <div class="option-item" id="palawanPaySection">
+
+    <div class="option-header" onclick="toggleOption('palawan-content')" style="display: flex; justify-content: space-between; align-items: center;">
+
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+
+            <span style="font-size: 14px; font-weight: bold;">
+
+                🟢 PALAWAN BRANCH (CASH-IN) 
+
+                <span class="fee-badge bg-free" style="font-size: 9px; vertical-align: middle;">ZERO FEES</span>
+
+            </span>
+
+            
+
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+
+                <img src="images/palawanpay.png" style="height: 30px; width: auto;" alt="PalawanPay">
+
+            </div>
+
+        </div>
+
+        <span id="arrow-palawan" style="font-weight: bold;">▼</span>
+
+    </div>
+
+
+
+    <div id="palawan-content" class="option-content">
+
+        <div class="bank-details">
+
+            <div style="background: #eef2f7; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #00529b;">
+
+                <p style="margin: 0; font-size: 11px; color: #333; line-height: 1.5;">
+
+                    <b>🚫 STRICTLY NO REGULAR PADALA:</b><br>
+
+                    Do <b>NOT</b> send as a "Regular Remittance" (yung may Claim Code/Control Number). We will not claim it at any branch.
+
+                    <br><br>
+
+                    <b>✅ CORRECT METHOD:</b><br>
+
+                    Go to any Palawan branch and tell the <b>Cashier</b>: 
+
+                    <i style="color: #00529b; font-weight: bold;">"Mag-Cash-in po ako via PalawanPay"</i>
+
+                </p>
+
+            </div>
+
+
+
+            <div style="margin-bottom: 15px;">
+
+                <b style="color: #333; font-size: 11px;">ACCOUNT NAME:</b><br>
+
+                <span style="font-size: 13px;">JERRIC JHON DELA CRUZ</span><br>
+
+                
+
+                <div style="margin-top: 10px;">
+
+                    <b style="color: #333; font-size: 11px;">PALAWANPAY NUMBER:</b>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 5px;">
+
+                        <code id="palawanAcc" style="font-size: 15px; font-weight: bold; background: #f4f4f4; padding: 2px 5px; border-radius: 4px;">09127430456</code>
+
+                        <button onclick="copyText('palawanAcc')" style="background: #00529b; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 11px; cursor: pointer;">📋 Copy</button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div style="margin-top: 15px; padding: 10px; background: #fff9db; border-radius: 8px; border: 1px solid #fab005;">
+
+                <p style="margin: 0; font-size: 11px; color: #856404; line-height: 1.4;">
+
+                    <b>⚠️ IMPORTANT:</b> After your transaction at the branch, please <b>take a photo of the receipt</b> and <b>upload it below</b> in the "Tap to upload Proof of Payment" section to verify your payment.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+        <div class="option-item">
+
+    <div class="option-header" onclick="toggleOption('bank-content')" style="display: flex; justify-content: space-between; align-items: center;">
+
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+
+        <span style="font-size: 14px; font-weight: bold;">
+
+            🟢 BANK DEPOSIT / TRANSFER 
+
+            <span class="fee-badge bg-free" style="font-size: 9px; vertical-align: middle;">ZERO FEES</span>
+
+        </span>
+
+        
+
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+
+            <img src="images/bpi.png" style="height: 50px; width: auto;" alt="BPI">
+
+            <img src="images/bdo.png" style="height: 50px; width: auto;" alt="BDO">
+
+        </div>
+
+    </div>
+
+    <span id="arrow-bank" style="font-weight: bold;">▼</span>
+
+</div>
+
+            
+
+    <div id="bank-content" class="option-content">
+
+        <div class="bank-details">
+
+            <div style="background: #eef2f7; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #00529b;">
+
+                <p style="margin: 0; font-size: 12px; color: #333; line-height: 1.4;">
+
+                    <b>💡 Recommended for Large Amounts:</b><br>
+
+                    To avoid high service fees and cash-in limits from E-wallets, we recommend an <b>Over-the-Counter (OTC)</b> deposit at any BPI/BDO branch. This method is 100% free of charge.
+
+                </p>
+
+            </div>
+
+
+
+            <div style="margin-bottom: 15px;">
+
+                <b style="color: #b31f24;">BANK: BPI (Savings)</b><br>
+
+                <span style="font-size: 12px;">Name: JERRIC JHON DELA CRUZ</span><br>
+
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 5px;">
+
+                    <code id="bpiAcc" style="font-size: 15px; font-weight: bold; background: #f4f4f4; padding: 2px 5px; border-radius: 4px;">4559378092</code>
+
+                    <button onclick="copyText('bpiAcc')" style="background: #00529b; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 11px; cursor: pointer;">📋 Copy</button>
+
+                </div>
+
+            </div>
+
+
+
+            <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
+
+
+
+            <div style="margin-bottom: 15px;">
+
+                <b style="color: #2980b9;">BANK: BDO (Savings)</b><br>
+
+                <span style="font-size: 12px;">Name: JERRIC JHON DELA CRUZ</span><br>
+
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 5px;">
+
+                    <code id="bdoAcc" style="font-size: 15px; font-weight: bold; background: #f4f4f4; padding: 2px 5px; border-radius: 4px;">004456001979</code>
+
+                    <button onclick="copyText('bdoAcc')" style="background: #00529b; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 11px; cursor: pointer;">📋 Copy</button>
+
+                </div>
+
+            </div>
+
+
+
+            <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
+
+            
+
+            <p style="font-size: 11px; color: #666; line-height: 1.5; margin: 0;">
+
+                <b>Online Transfer via Instapay:</b><br>
+
+                You may also use GCash, Maya, or other Bank Apps. 
+
+                <br><span style="color: var(--danger);">*Please note that your bank or e-wallet provider may charge an Instapay convenience fee.</span>
+
+            </p>
+
+            <div style="margin-top: 15px; padding: 10px; background: #fff9db; border-radius: 8px; border: 1px solid #fab005;">
+
+    <p style="margin: 0; font-size: 11px; color: #856404; line-height: 1.4;">
+
+        <b>⚠️ REMINDER:</b> Please <b>upload a photo</b> of your Deposit Slip or Transaction Receipt in the <b>Tap to upload Proof of Payment</b> section below to verify your payment.
+
+    </p>
+
+</div>
+
+</div> </div> </div> 
+
+    
+
+<div class="option-item">
+
+    
+
+    <div class="option-header" onclick="toggleOption('card-content')" style="display: flex; justify-content: space-between; align-items: center;">
+
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+
+        <span style="font-size: 14px; font-weight: bold;">
+
+            🟠 CREDIT / DEBIT CARD
+
+            <span class="fee-badge bg-with-fee" style="font-size: 9px; vertical-align: middle;">WITH FEES</span>
+
+        </span>
+
+        
+
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+
+            <img src="images/visa.png" style="height: 50px; width: auto;" alt="Visa">
+
+            <img src="images/mc.png" style="height: 50px; width: auto;" alt="Mastercard">
+
+            <img src="images/gpay.png" style="height: 50px; width: auto;" alt="GPay">
+
+        </div>
+
+    </div>
+
+    <span id="arrow-card" style="font-weight: bold;">▼</span>
+
+</div>
+
+    
+
+    <div id="card-content" class="option-content">
+
+        <div class="bank-details" style="text-align: left;">
+
+            <div style="background: #fff5f5; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #e74c3c;">
+
+                <p style="margin: 0; font-size: 11px; color: #c0392b; line-height: 1.4;">
+
+                    <b>⚠️ Card Payment Notice:</b> Card transactions are processed via <b>GCash for Business (Tap to Pay)</b> terminals at our authorized Hubs. 
+
+                    A <b>3.20% Convenience Fee</b> is applied by the payment provider. This fee does not go to Erriho.
+
+                </p>
+
+            </div>
+
+
+
+            <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 15px; border: 1px solid #eee;">
+
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+
+                    <span>Bill Amount:</span> 
+
+                    <span id="cardBaseAmount" style="font-weight: 600;">₱0.00</span>
+
+                </div>
+
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #e74c3c;">
+
+                    <span>Convenience Fee (3.20%):</span> 
+
+                    <span id="cardFeeAmount">+ ₱0.00</span>
+
+                </div>
+
+                <hr style="border:0; border-top:1px solid #ddd; margin: 8px 0;">
+
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 15px; color: #2c3e50;">
+
+                    <span>Total to Tap:</span> 
+
+                    <span id="cardTotalAmount">₱0.00</span>
+
+                </div>
+
+            </div>
+
+
+
+            <div style="font-size: 12px; line-height: 1.6;">
+
+                <b style="color: #2980b9;">📍 AUTHORIZED HUBS:</b><br>
+
+                
+
+                <div style="margin-top: 8px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+
+                   <b>• Butuan Hub (Main)</b> <span style="color: #e67e22; font-size: 10px;">(Open 10:00 AM - 5:00 PM)</span><br>
+
+                    <span style="color: #555;">Address: P8 Taurus Street, South Montilla Boulevard, Brgy. J.p Rizal 25, Agusan Del Norte, Butuan 8600</span><br>
+
+                    Person-in-charge: <b>Jerric Jhon Dela Cruz</b><br>
+
+                    Contact: <b>0917-130-1470</b>
+
+                </div>
+
+
+
+                <div style="margin-top: 8px; color: #95a5a6;">
+
+                    <i>• Caloocan Hub - (Coming Soon)</i><br>
+
+                    <i>• Masbate Hub - (Coming Soon)</i>
+
+                </div>
+
+            </div>
+
+
+
+            <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
+
+
+
+<label style="display: flex; gap: 10px; font-size: 12px; cursor: pointer; align-items: center; background: #fdfdfd; padding: 10px; border-radius: 5px; border: 1px solid #f0f0f0; margin-bottom: 10px;">
+
+    <input type="checkbox" id="feeAgree" style="transform: scale(1.2);">
+
+    <span style="color: #444;">I agree to the <b>3.20% Convenience Fee</b>.</span>
+
+</label>
+
+
+
+<div style="background: #fff9db; padding: 12px; border-radius: 8px; border: 1px solid #fab005; margin-bottom: 15px;">
+
+    <p style="margin: 0; font-size: 11px; color: #856404; line-height: 1.5; text-align: left;">
+
+        <b>⚠️ IMPORTANT REMINDER:</b><br>
+
+        After swiping or tapping your card at the Hub, please check your <b>Email Inbox</b>. 
+
+        GCash for Business will send your official receipt there. 
+
+        <b>Please upload a screenshot of that email receipt</b> in the "Tap to upload Proof of Payment" section below to verify your payment.
+
+    </p>
+
+</div>
+
+    <div style="text-align: center; margin-top: 20px; padding-bottom: 10px; opacity: 0.7;">
+
+        <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+
+            <img src="images/g4b.png" style="height: 50px; width: auto; vertical-align: middle;" alt="GCash for Business">
+
+        </div>
+
+        <span style="font-size: 10px; color: #7f8c8d; display: block; margin-top: 5px; font-weight: 500; letter-spacing: 0.3px;">
+
+            Securely powered by <b>GCash for Business</b>
+
+        </span>
+
+    </div> </div> </div> </div>
+
+        
+
+    <div id="instrModal">
+
+        <div class="modal-content">
+
+            <span class="close-instr" onclick="toggleModal(false)">&times;</span>
+
+            <h3 style="color: var(--primary); margin-top: 0; font-size: 18px;">💡 How to Pay via QRPh</h3>
+
+            <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 15px;">
+
+            <div class="step"><div class="step-num">1</div><div class="step-text"><b>Long Press</b> ang QR code at i-save sa gallery.</div></div>
+
+            <div class="step"><div class="step-num">2</div><div class="step-text">Buksan ang iyong <b>GCash, Maya, o Bank App</b>.</div></div>
+
+            <div class="step"><div class="step-num">3</div><div class="step-text">Piliin ang <b>"Scan QR"</b> at i-click ang <b>"Upload from Gallery"</b>.</div></div>
+
+            <div class="step"><div class="step-num">4</div><div class="step-text">Bayaran ang amount at <b>mag-screenshot</b>.</div></div>
+
+            <div class="step"><div class="step-num">5</div><div class="step-text">I-upload ang screenshot sa <b>Proof of Payment</b> section.</div></div>
+
+            <button class="btn-submit" style="width: 100%; margin: 15px 0 0 0;" onclick="toggleModal(false)">Got it!</button>
+
+        </div>
+
+    </div>
+
+
+
+        <div class="upload-section">
+
+            <label class="custom-file-upload">
+
+                <input type="file" id="fileInput" onchange="updateFileName()" accept="image/*">
+
+                <span id="fileLabel">📸 Tap to upload Proof of Payment</span>
+
+                <div id="previewContainer"><img id="imagePreview" src=""></div>
+
+            </label>
+
+        </div>
+
+        <button class="btn-submit" id="submitBtn" onclick="uploadFile()" disabled style="opacity: 0.5;">
+
+    SUBMIT PAYMENT
+
+</button>
+
+    </div>
+
+</div>
+
+
+
 <a href="https://m.me/errihopersonalfinance" target="_blank" class="messenger-fab">
+
     <img src="https://upload.wikimedia.org/wikipedia/commons/b/be/Facebook_Messenger_logo_2020.svg" alt="Chat">
+
 </a>
 
+
+
 <div id="overlay">
+
     <div class="close-overlay" onclick="window.location.reload()">×</div>
+
     <div class="success-icon">✓</div>
+
     <h2 id="overlayTitle" style="font-size: 20px; margin: 10px 0;">Payment Submitted</h2>
+
     <p id="overlayMsg" style="color: #7f8c8d;"></p>
+
     <p style="font-size: 10px; color: #bdc3c7;">Automatic refresh for updated status</p>
+
 </div>
 
 <script>
