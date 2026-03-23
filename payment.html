@@ -696,9 +696,19 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
             </div>`;
         }
         
-        // I-set ang countdown sa deadline kung meron, kung wala ay sa original due date
-        setTimeout(() => { startLiveCountdown(deadline ? new Date(deadline) : null); }, 100);
-    }
+        // --- COUNTDOWN TRIGGER ---
+        // Kung may deadline sa Column X, iyon ang ipapasa natin sa timer.
+        // Kung wala, susubukan ng timer na mag-fallback sa default grace period.
+        if (deadline && deadline !== "") {
+            setTimeout(() => { 
+                startLiveCountdown(deadline); 
+            }, 100);
+        } else {
+            // Default behavior kung walang Column X
+            setTimeout(() => { 
+                startLiveCountdown(null); 
+            }, 100);
+        }
     // E. UPCOMING
     else {
         const daysUntil = Math.abs(daysLate);
