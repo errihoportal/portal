@@ -608,31 +608,18 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     if (cardFeeElem) cardFeeElem.innerText = "+ ₱" + cardFee.toLocaleString('en-US', {minimumFractionDigits: 2});
     if (cardTotalElem) cardTotalElem.innerText = "₱" + cardTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
 
-    // --- 6. SMART COUNTDOWN LOGIC (EXACT TIME) ---
-    let finalDeadline = null;
-
-    // 1. KUNG MAY EXPLICIT DEADLINE SA SHEETS (Offer man o Grace Period Deadline)
+    // --- 6. SEPARATED TIMER LOGIC ---
+    const clockElem = document.getElementById('timerClock');
+    
+    // CASE A: May Special Offer o Grace Deadline (PABABA ANG RELO)
     if (deadline && deadline !== "" && deadline !== "NONE") {
-        // Ito ang susundin ng relo (e.g., 2026-03-22T16:00:00.000Z)
-        finalDeadline = deadline;
+        // Countdown mode: Gaano na lang katagal bago mawala ang offer?
+        startLiveCountdown(deadline, "OFFER"); 
     } 
-    // 2. KUNG WALANG DEADLINE PERO DUE TODAY O GRACE (Fallback lang ito)
-    else if (isGrace || daysLate === 0) {
-        let dueDateObj = new Date(data.dueDate);
-        let graceDays = parseInt(data.gracePeriod) || 0;
-        
-        dueDateObj.setDate(dueDateObj.getDate() + graceDays);
-        // Default fallback kung walang oras na nilagay sa Sheets
-        dueDateObj.setHours(23, 59, 59, 999); 
-        finalDeadline = dueDateObj.toISOString();
-    }
-
-    // Isalang sa Clock
-    if (finalDeadline) {
-        startLiveCountdown(finalDeadline);
-    } else {
-        const clockElem = document.getElementById('timerClock');
-        if (clockElem) clockElem.innerText = "OVERDUE";
+    // CASE B: Walang Offer, Standard Due Date lang (PATAAS O PABABA DEPENDE KUNG LATE)
+    else {
+        // Standard mode: Due Today o Overdue na?
+        startLiveCountdown(data.dueDate, "STANDARD");
     }
 
     // --- 7. STATUS & BANNER LOGIC (KASUNOD) ---
@@ -817,34 +804,47 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         navigator.clipboard.writeText(amountText).then(() => { alert("Amount successfully copied: ₱" + amountText); });
     }
 
-    function startLiveCountdown(targetTime) {
+    ffunction startLiveCountdown(targetTime, mode) {
     if (window.graceInterval) clearInterval(window.graceInterval);
     const clockElem = document.getElementById('timerClock');
     if (!clockElem) return;
 
     function updateClock() {
         const now = new Date().getTime();
-        const target = new Date(targetTime).getTime();
-        const diff = target - now;
-
-        if (diff <= 0) {
-            clearInterval(window.graceInterval);
-            clockElem.innerText = "EXPIRED";
-            clockElem.style.color = "red";
-            
-            // Kung Due Today ito, mag-reload para lumitaw ang Overdue status sa 12:01 AM
-            if (window.billData && window.billData.daysLate <= 0) {
-                setTimeout(() => { location.reload(); }, 2000);
-            }
-            return;
+        let target = new Date(targetTime);
+        
+        // Gawing dulo ng araw kung date lang ang nilagay sa Sheets
+        if (target.getHours() === 0 && target.getMinutes() === 0) {
+            target.setHours(23, 59, 59, 999);
         }
+        
+        const diff = target.getTime() - now;
+        const absDiff = Math.abs(diff);
+        
+        // Math for D-H-M-S
+        const d = Math.floor(absDiff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((absDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((absDiff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((absDiff % (1000 * 60)) / 1000);
+        const format = (n) => n.toString().padStart(2, '0');
+        const timeStr = `${d > 0 ? d + 'd ' : ''}${format(h)}:${format(m)}:${format(s)}`;
 
-        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const s = Math.floor((diff % (1000 * 60)) / 1000);
-
-        const format = (num) => num.toString().padStart(2, '0');
-        clockElem.innerHTML = `${format(h)}h ${format(m)}m ${format(s)}s`;
+        if (mode === "OFFER") {
+            if (diff > 0) {
+                clockElem.innerHTML = `<span style="color: #e67e22;">✨ OFFER ENDS IN: ${timeStr}</span>`;
+            } else {
+                clockElem.innerHTML = `<span style="color: red;">❌ OFFER EXPIRED</span>`;
+                // Kapag expired ang offer, i-reload para bumalik sa standard price (may penalties)
+                setTimeout(() => location.reload(), 3000);
+            }
+        } else {
+            // STANDARD MODE
+            if (diff > 0) {
+                clockElem.innerHTML = `<span style="color: #3498db;">⏳ DUE IN: ${timeStr}</span>`;
+            } else {
+                clockElem.innerHTML = `<span style="color: #ff4d4d;">⚠️ OVERDUE: ${timeStr}</span>`;
+            }
+        }
     }
 
     updateClock();
