@@ -467,7 +467,9 @@
                 <div id="previewContainer"><img id="imagePreview" src=""></div>
             </label>
         </div>
-        <button class="btn-submit" id="submitBtn" onclick="uploadFile()">SUBMIT PAYMENT</button>
+        <button class="btn-submit" id="submitBtn" onclick="uploadFile()" disabled style="opacity: 0.5;">
+    SUBMIT PAYMENT
+</button>
     </div>
 </div>
 
@@ -852,41 +854,39 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
 function toggleOption(contentId) {
     const allOptions = document.querySelectorAll('.option-item');
     const targetContent = document.getElementById(contentId);
+    const submitBtn = document.getElementById('submitBtn'); // Kunin ang button
+    const feeAgree = document.getElementById('feeAgree'); // Kunin ang checkbox
     
-    // Automatic na hanapin ang arrow base sa prefix (e.g., 'qrph' mula sa 'qrph-content')
     const prefix = contentId.split('-')[0]; 
     const arrow = document.getElementById('arrow-' + prefix);
-    
-    // Check kung kasalukuyang nakasara (gamit ang computed style para sigurado)
     const isOpening = window.getComputedStyle(targetContent).display === 'none';
 
     if (isOpening) {
-        // 1. Itago muna ang lahat (Para magmukhang "focused" ang pinili)
-        allOptions.forEach(option => {
-            option.style.display = 'none';
-        });
-
-        // 2. Ipakita ang magulang na box at ang mismong details
+        allOptions.forEach(option => { option.style.display = 'none'; });
         const selectedOption = targetContent.closest('.option-item');
         selectedOption.style.display = 'block';
         targetContent.style.display = 'block';
-        
-        // 3. Palitan ang arrow
         if (arrow) arrow.innerHTML = '▲';
 
-    } else {
-        // PAG I-C-CLOSE NA (Babalik sa main list)
-        
-        // 1. Ipakita ulit lahat ng boxes
-        allOptions.forEach(option => {
-            option.style.display = 'block';
-        });
+        // --- DAGDAG NA LOGIC PARA SA BUTTON ---
+        if (prefix === 'card') {
+            // Kung CARD ang pinili, i-disable ang button base sa checkbox
+            submitBtn.disabled = !feeAgree.checked;
+            submitBtn.style.opacity = feeAgree.checked ? "1" : "0.5";
+        } else {
+            // Kung ibang payment, automatic ENABLE ang button
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = "1";
+        }
 
-        // 2. Itago ang details ng pinili
+    } else {
+        allOptions.forEach(option => { option.style.display = 'block'; });
         targetContent.style.display = 'none';
-        
-        // 3. Ibalik sa down ang arrow
         if (arrow) arrow.innerHTML = '▼';
+
+        // I-disable ang button kapag binalik sa listahan (walang napiling method)
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = "0.5";
     }
 }
     
@@ -904,6 +904,23 @@ function copyText(elementId) {
     // Simple Alert for confirmation
     alert("Account Number Copied: " + textToCopy);
 }
+
+// Bantayan ang pag-click sa checkbox
+document.addEventListener('DOMContentLoaded', function() {
+    const feeAgree = document.getElementById('feeAgree');
+    const submitBtn = document.getElementById('submitBtn');
+    const cardContent = document.getElementById('card-content');
+
+    if (feeAgree) {
+        feeAgree.addEventListener('change', function() {
+            // I-enable lang ang button kung ang card option ay kasalukuyang naka-open
+            if (cardContent.style.display === 'block') {
+                submitBtn.disabled = !this.checked;
+                submitBtn.style.opacity = this.checked ? "1" : "0.5";
+            }
+        });
+    }
+});
 </script>
 </body>
 </html>
