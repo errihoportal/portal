@@ -194,27 +194,31 @@
     <div id="statusBanner" class="status-banner">Loading...</div>
     
     <div class="bill-card">
-        <p>Customer: <b id="custName">---</b></p>
-        <h2 id="billNumDisplay">Bill #---</h2>
-        <p>Item: <span id="itemName">---</span></p>
-        
-        <div class="amount-section">
-            <div class="total-label" id="totalLabel">TOTAL PAYABLE</div>
-            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <div class="total-amount">₱<span id="totalAmount">0.00</span></div>
-                <span id="copyBtnWrapper">
-                    <button onclick="copyAmount()" style="background: none; border: 1px solid #ccc; border-radius: 5px; cursor: pointer; padding: 5px 8px; color: #7f8c8d; font-size: 12px;">
-                        📋 Copy Amount
-                    </button>
-                </span>
-            </div>
-            <p>Due Date: <span id="dueDateText">---</span></p>
+    <p>Customer: <b id="custName">---</b></p>
+    <h2 id="billNumDisplay">Bill #---</h2>
+    <p>Item: <span id="itemName">---</span></p>
+    
+    <div class="amount-section">
+        <div id="countdownWrapper" style="margin-bottom: 10px; font-size: 14px; font-weight: bold; color: #e67e22;">
+            ⏳ <span id="timerClock">--:--:--</span>
         </div>
 
-        <div id="gracePeriodArea"></div>
-        <div id="feesBreakdownArea"></div>
-        <p id="dynamicNote" class="note"></p>
+        <div class="total-label" id="totalLabel">TOTAL PAYABLE</div>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <div class="total-amount">₱<span id="totalAmount">0.00</span></div>
+            <span id="copyBtnWrapper">
+                <button onclick="copyAmount()" style="background: none; border: 1px solid #ccc; border-radius: 5px; cursor: pointer; padding: 5px 8px; color: #7f8c8d; font-size: 12px;">
+                    📋 Copy Amount
+                </button>
+            </span>
+        </div>
+        <p>Due Date: <span id="dueDateText">---</span></p>
     </div>
+
+    <div id="gracePeriodArea"></div>
+    <div id="feesBreakdownArea"></div>
+    <p id="dynamicNote" class="note"></p>
+</div>
 
     <div id="activeSection">
     <div class="payment-options">
