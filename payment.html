@@ -860,63 +860,34 @@
             <div class="step"><div class="step-num">3</div><div class="step-text">Piliin ang <b>"Scan QR"</b> at i-click ang <b>"Upload from Gallery"</b>.</div></div>
 
             <div class="step"><div class="step-num">4</div><div class="step-text">Bayaran ang amount at <b>mag-screenshot</b>.</div></div>
-
             <div class="step"><div class="step-num">5</div><div class="step-text">I-upload ang screenshot sa <b>Proof of Payment</b> section.</div></div>
-
             <button class="btn-submit" style="width: 100%; margin: 15px 0 0 0;" onclick="toggleModal(false)">Got it!</button>
-
         </div>
-
     </div>
-
-
 
         <div class="upload-section">
-
             <label class="custom-file-upload">
-
                 <input type="file" id="fileInput" onchange="updateFileName()" accept="image/*">
-
                 <span id="fileLabel">📸 Tap to upload Proof of Payment</span>
-
                 <div id="previewContainer"><img id="imagePreview" src=""></div>
-
             </label>
-
         </div>
-
         <button class="btn-submit" id="submitBtn" onclick="uploadFile()" disabled style="opacity: 0.5;">
-
     SUBMIT PAYMENT
-
 </button>
-
     </div>
-
 </div>
-
-
-
+    
 <a href="https://m.me/errihopersonalfinance" target="_blank" class="messenger-fab">
-
     <img src="https://upload.wikimedia.org/wikipedia/commons/b/be/Facebook_Messenger_logo_2020.svg" alt="Chat">
-
 </a>
 
-
-
 <div id="overlay">
-
     <div class="close-overlay" onclick="window.location.reload()">×</div>
-
     <div class="success-icon">✓</div>
-
     <h2 id="overlayTitle" style="font-size: 20px; margin: 10px 0;">Payment Submitted</h2>
-
     <p id="overlayMsg" style="color: #7f8c8d;"></p>
-
     <p style="font-size: 10px; color: #bdc3c7;">Automatic refresh for updated status</p>
-
 </div>
 
 <script>
@@ -1192,6 +1163,11 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
                 <div style="font-size: 13px; color: ${boxColor}; font-weight: 800; text-transform: uppercase; margin-bottom: 8px;">
                     ${offerTitle}
                 </div>
+                
+                <div style="font-size: 11px; background: #ffeaea; color: #d63031; display: inline-block; padding: 2px 10px; border-radius: 20px; font-weight: 700; margin-bottom: 10px;">
+            ACCOUNT IS ${daysLate} DAY/S OVERDUE
+        </div>
+        
                 <p style="font-size: 14px; color: #2c3e50; margin-bottom: 15px;">${subMessage}</p>
                 <div style="padding: 10px 0; border-top: 1.5px dashed ${boxColor}; border-bottom: 1.5px dashed ${boxColor};">
                     <span style="font-size: 11px; color: #636e72; font-weight: 700;">FINAL DEADLINE: ${deadlineDisplay}</span>
