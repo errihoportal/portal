@@ -199,19 +199,8 @@
     <p>Item: <span id="itemName">---</span></p>
     
     <div class="amount-section">
-        <div id="countdownWrapper" style="margin-bottom: 10px; font-size: 14px; font-weight: bold; color: #e67e22;">
-            ⏳ <span id="timerClock">--:--:--</span>
-        </div>
-
         <div class="total-label" id="totalLabel">TOTAL PAYABLE</div>
-        <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-            <div class="total-amount">₱<span id="totalAmount">0.00</span></div>
-            <span id="copyBtnWrapper">
-                <button onclick="copyAmount()" style="background: none; border: 1px solid #ccc; border-radius: 5px; cursor: pointer; padding: 5px 8px; color: #7f8c8d; font-size: 12px;">
-                    📋 Copy Amount
-                </button>
-            </span>
-        </div>
+        <div class="total-amount">₱<span id="totalAmount">0.00</span></div>
         <p>Due Date: <span id="dueDateText">---</span></p>
     </div>
 
@@ -608,20 +597,6 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     if (cardFeeElem) cardFeeElem.innerText = "+ ₱" + cardFee.toLocaleString('en-US', {minimumFractionDigits: 2});
     if (cardTotalElem) cardTotalElem.innerText = "₱" + cardTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
 
-  // --- SECTION 6: DEADLINE-BASED TIMER ---
-const clockElem = document.getElementById('timerClock');
-
-if (deadline && deadline !== "" && deadline !== "NONE") {
-    // DITO PAPASOK ANG GRACE PERIOD (Naka-base sa Deadline Date)
-    // Ang mode ay "OFFER" para pababa ang countdown
-    startLiveCountdown(deadline, "OFFER"); 
-} 
-else {
-    // STANDARD DUE DATE (Dito ang basehan kung walang palugit)
-    // Kung past due na, "STANDARD" mode ang mag-o-overdue aging (pataas)
-    startLiveCountdown(data.dueDate, "STANDARD");
-}
-
     // --- 7. STATUS & BANNER LOGIC (KASUNOD) ---
     // (Dito mo itutuloy ang mga if(status === 'unpaid') etc. mo...)
     
@@ -654,48 +629,91 @@ else {
         activeSec.style.display = 'none';
         dNote.innerHTML = "⏳ <b>We've received your proof.</b><br>Our team is currently validating your payment.";
     }
-    // D. OVERDUE / GRACE PERIOD / OFFERS
-    else if (daysLate > 0) {
-        if (offer !== "NONE" && offer !== "" && offer !== "GRACE") {
-            banner.innerText = offer === "LEGAL_NOTICE" ? "⚠️ REPOSSESSION NOTICE" : "✨ SPECIAL OFFER ACTIVE";
-            banner.className = "status-banner bg-grace";
-            if (offer === "LEGAL_NOTICE") {
-                banner.style.backgroundColor = "#000"; banner.style.color = "#fff"; banner.style.border = "2px solid red";
-                dNote.innerHTML = `<div style="padding:10px; border:2px solid black;">🚨 <b>NOTICE:</b> Final demand. Deadline: ${deadline || 'IMMEDIATE'}</div>`;
-            } else {
-                dNote.innerHTML = `<div style="padding:10px; border:1px dashed orange;">✨ <b>OFFER:</b> Pay before ${deadline || 'midnight'}.</div>`;
-            }
-        } 
-        else if (offer === "GRACE") {
-            banner.innerText = "✨ GRACE PERIOD ACTIVE";
-            banner.className = "status-banner bg-grace";
-            const displayDeadline = deadline ? deadline : "Midnight Today";
-            graceArea.innerHTML = `<div class="grace-period-box" style="border: 2px dashed #f39c12; background: #fffcf5; padding: 15px; border-radius: 8px;"><b style="color: #e67e22;">⚠️ OVERDUE: ${daysLate} DAY/S</b><br><span>Grace Period Applied. No extra fees yet!</span><br><div style="margin-top: 5px; font-weight: bold;">Deadline: <span style="color:red;">${displayDeadline}</span></div></div>`;
-        } 
-        else {
-            banner.innerText = "⚠️ ACCOUNT OVERDUE";
-            banner.className = "status-banner bg-overdue blink-overdue";
-            dNote.innerHTML = `<b style="color:red">${daysLate} DAY/S LATE:</b> Pay now to stop daily interest.`;
-        }
-
-        if (feesArea) {
-            let lateStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_PENALTY" || offer === "GRACE") ? "text-decoration: line-through; color: gray;" : "color: red;";
-            let intStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_DAILY" || offer === "GRACE") ? "text-decoration: line-through; color: gray;" : "color: red;";
-            feesArea.innerHTML = `<div class="fees-breakdown"><div class="fee-item"><span>Principal:</span> <span>₱${data.principal}</span></div><div class="fee-item" style="${lateStyle}"><span>Late Fee (10%):</span> <span>+ ₱${data.lateFee}</span></div><div class="fee-item" style="${intStyle}"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}</span></div></div>`;
-        }
-    } 
-    // E. UPCOMING
-    else {
-        const daysUntil = Math.abs(daysLate);
-        if (daysUntil === 0) {
-            banner.innerText = `🚨 DUE TODAY`;
-            banner.className = "status-banner bg-upcoming pulse-today";
+    // --- D. OVERDUE / GRACE PERIOD / OFFERS ---
+else if (daysLate > 0) {
+    if (offer !== "NONE" && offer !== "" && offer !== "GRACE") {
+        banner.innerText = offer === "LEGAL_NOTICE" ? "⚠️ REPOSSESSION NOTICE" : "✨ SPECIAL OFFER ACTIVE";
+        banner.className = "status-banner bg-grace";
+        
+        if (offer === "LEGAL_NOTICE") {
+            banner.style.backgroundColor = "#000"; banner.style.color = "#fff"; banner.style.border = "2px solid red";
+            dNote.innerHTML = `
+                <div style="padding:15px; border:2px solid black; background:#fff;">
+                    🚨 <b>NOTICE:</b> Final demand. Deadline: <span style="color:red;">${deadline || 'IMMEDIATE'}</span>
+                    <div id="timerClock" style="font-size: 20px; font-weight: bold; color: red; margin-top: 10px;"></div>
+                </div>`;
         } else {
-            banner.innerText = `⏳ DUE IN ${daysUntil} DAYS`;
-            banner.className = "status-banner bg-unpaid";
-            dNote.innerText = "Keep your account in good standing.";
+            dNote.innerHTML = `
+                <div style="padding:15px; border:1px dashed orange; background:#fffcf5;">
+                    ✨ <b>OFFER:</b> Pay before ${deadline || 'midnight'}.
+                    <div id="timerClock" style="font-size: 18px; font-weight: bold; color: #e67e22; margin-top: 10px;"></div>
+                </div>`;
         }
+        // TRIGGER: Countdown para sa Offer/Notice
+        startLiveCountdown(deadline, "OFFER"); 
+    } 
+    else if (offer === "GRACE") {
+        banner.innerText = "✨ GRACE PERIOD ACTIVE";
+        banner.className = "status-banner bg-grace";
+        const displayDeadline = deadline ? deadline : "Midnight Today";
+        
+        // DITO ANG GRACE BOX: Kasama ang timer sa loob
+        graceArea.innerHTML = `
+            <div class="grace-period-box" style="border: 2px dashed #f39c12; background: #fffcf5; padding: 15px; border-radius: 8px;">
+                <b style="color: #e67e22;">⚠️ OVERDUE: ${daysLate} DAY/S</b><br>
+                <span>Grace Period Applied. No extra fees yet!</span><br>
+                <div style="margin-top: 10px; font-weight: bold;">
+                    Deadline: <span style="color:red;">${displayDeadline}</span>
+                </div>
+                <div id="timerClock" style="font-size: 22px; color: #e67e22; margin-top: 10px; font-family: monospace; font-weight: bold;"></div>
+            </div>`;
+        
+        // TRIGGER: Countdown pababa para sa Grace
+        startLiveCountdown(deadline, "OFFER"); 
+    } 
+    else {
+        banner.innerText = "⚠️ ACCOUNT OVERDUE";
+        banner.className = "status-banner bg-overdue blink-overdue";
+        
+        dNote.innerHTML = `
+            <div style="padding:10px;">
+                <b style="color:red">${daysLate} DAY/S LATE:</b> Pay now to stop daily interest.
+                <div id="timerClock" style="font-size: 18px; margin-top: 10px; color: #ff4d4d; font-weight: bold;"></div>
+            </div>`;
+        
+        // TRIGGER: Aging pataas mula sa Due Date
+        startLiveCountdown(data.dueDate, "STANDARD");
     }
+
+    if (feesArea) {
+        let lateStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_PENALTY" || offer === "GRACE") ? "text-decoration: line-through; color: gray;" : "color: red;";
+        let intStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_DAILY" || offer === "GRACE") ? "text-decoration: line-through; color: gray;" : "color: red;";
+        feesArea.innerHTML = `
+            <div class="fees-breakdown">
+                <div class="fee-item"><span>Principal:</span> <span>₱${data.principal}</span></div>
+                <div class="fee-item" style="${lateStyle}"><span>Late Fee (10%):</span> <span>+ ₱${data.lateFee}</span></div>
+                <div class="fee-item" style="${intStyle}"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}</span></div>
+            </div>`;
+    }
+}
+// E. UPCOMING
+else {
+    const daysUntil = Math.abs(daysLate);
+    if (daysUntil === 0) {
+        banner.innerText = `🚨 DUE TODAY`;
+        banner.className = "status-banner bg-upcoming pulse-today";
+        
+        // --- TRIGGER COUNTDOWN PARA SA DUE TODAY (Hanggang Midnight) ---
+        startLiveCountdown(data.dueDate, "STANDARD");
+    } else {
+        banner.innerText = `⏳ DUE IN ${daysUntil} DAYS`;
+        banner.className = "status-banner bg-unpaid";
+        dNote.innerText = "Keep your account in good standing.";
+        
+        // --- TRIGGER COUNTDOWN PARA SA UPCOMING ---
+        startLiveCountdown(data.dueDate, "STANDARD");
+    }
+}
 
     // (Dito nagtatapos ang Section E...)
     
