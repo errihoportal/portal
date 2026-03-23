@@ -1180,11 +1180,14 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
                 ${deadlineDisplay}
             </div>
 
-           <div style="margin-top: 10px; padding: 5px; border-top: 1px solid #b2dfdb; border-bottom: 1px solid #b2dfdb; display: inline-block; width: 100%;">
-    <span style="font-size: 12px; color: #008080; font-weight: 700; text-transform: uppercase;">Ends In:</span>
-    <span id="timerClock" style="font-size: 18px; color: #008080; font-weight: 900; font-family: 'Courier New', monospace; margin-left: 8px; letter-spacing: 1px;">
-        00:00:00:00
+           <div style="margin-top: 15px; padding: 10px 0; border-top: 1.5px solid #b2dfdb; border-bottom: 1.5px solid #b2dfdb; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
+    <span style="font-size: 11px; color: #008080; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">
+        ⏳ ENDS IN:
     </span>
+    
+    <div id="timerClock" style="font-size: 22px; color: #008080; font-weight: 900; font-family: 'Courier New', monospace; letter-spacing: 2px; line-height: 1;">
+        00:00:00:00
+    </div>
 </div>
 
             <p style="font-size: 11px; color: #66b2b2; margin-top: 15px; font-style: italic; font-weight: 500;">
