@@ -810,64 +810,34 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         navigator.clipboard.writeText(amountText).then(() => { alert("Amount successfully copied: ₱" + amountText); });
     }
 
-    function startLiveCountdown(customDeadline) {
+    function startLiveCountdown(targetTime) {
     if (window.graceInterval) clearInterval(window.graceInterval);
-
     const clockElem = document.getElementById('timerClock');
     if (!clockElem) return;
 
     function updateClock() {
-        let targetDate;
-
-        // 1. Mas matibay na Parsing para sa ISO String
-        if (customDeadline && customDeadline !== "" && customDeadline !== "NONE") {
-            targetDate = new Date(customDeadline).getTime();
-        } 
-
-        // 2. Fallback kung invalid ang deadline o walang laman
-        if (!targetDate || isNaN(targetDate)) {
-            if (window.billData && window.billData.dueDate) {
-                // Default: Due Date + Grace Period (e.g., 3 days)
-                const graceDays = parseInt(window.billData.gracePeriod) || 0;
-                let fallback = new Date(window.billData.dueDate);
-                fallback.setDate(fallback.getDate() + graceDays);
-                fallback.setHours(23, 59, 59, 999);
-                targetDate = fallback.getTime();
-            } else {
-                clockElem.innerText = "--:--:--";
-                return;
-            }
-        }
-
         const now = new Date().getTime();
-        const diff = targetDate - now;
+        const target = new Date(targetTime).getTime();
+        const diff = target - now;
 
         if (diff <= 0) {
             clearInterval(window.graceInterval);
-            clockElem.innerText = "OFFER EXPIRED";
-            clockElem.style.color = "#ff4d4d";
-            clockElem.style.fontWeight = "bold";
+            clockElem.innerText = "EXPIRED";
+            clockElem.style.color = "red";
             
-            // Reload para mag-update ang penalties sa system ni Jerric
-            if (window.billData && window.billData.offerType && window.billData.offerType !== "NONE") {
-                setTimeout(() => { location.reload(); }, 5000);
+            // Kung Due Today ito, mag-reload para lumitaw ang Overdue status sa 12:01 AM
+            if (window.billData && window.billData.daysLate <= 0) {
+                setTimeout(() => { location.reload(); }, 2000);
             }
             return;
         }
 
-        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
         const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const s = Math.floor((diff % (1000 * 60)) / 1000);
 
-        // Formatting: Dagdagan ng leading zero (01:05:09)
         const format = (num) => num.toString().padStart(2, '0');
-        
-        if (d > 0) {
-            clockElem.innerHTML = `<span style="color:#e67e22">${d}d</span> ${format(h)}h ${format(m)}m ${format(s)}s`;
-        } else {
-            clockElem.innerHTML = `${format(h)}h ${format(m)}m ${format(s)}s`;
-        }
+        clockElem.innerHTML = `${format(h)}h ${format(m)}m ${format(s)}s`;
     }
 
     updateClock();
