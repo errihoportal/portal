@@ -535,7 +535,7 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     }
 
     function renderData(data) {
-    // 1. Elements Mapping (Huwag baguhin ang text names)
+    // 1. Elements Mapping
     const banner = document.getElementById('statusBanner');
     const graceArea = document.getElementById('gracePeriodArea');
     const dNote = document.getElementById('dynamicNote');
@@ -543,6 +543,8 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     const feesArea = document.getElementById('feesBreakdownArea');
     const dateDisplay = document.getElementById('dueDateText');
     const copyWrapper = document.getElementById('copyBtnWrapper');
+    const totalLabel = document.getElementById('totalLabel');
+    const amountDiv = document.querySelector('.total-amount');
     
     // Data parsing
     const status = data.status ? data.status.toLowerCase().trim() : "";
@@ -558,12 +560,9 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     document.getElementById('qrImg').src = data.qrLink;
     dateDisplay.innerText = data.dueDate;
 
-    // --- 3. AMOUNT LOGIC (TAMA NA ANG HILA DITO) ---
-    // Default ay Column F (data.amount)
+    // 3. AMOUNT LOGIC
     let displayTotal = parseFloat(data.amount) || 0; 
-
     if (daysLate > 0) {
-        // Magbabago lang ang amount kung may active offer o grace period
         if (offer === "WAIVE_ALL" || isGrace) {
             displayTotal = parseFloat(data.principal) || 0;
         } else if (offer === "WAIVE_PENALTY") {
@@ -575,34 +574,25 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
             displayTotal = (parseFloat(data.principal) || 0) + (penalties * 0.5);
         }
     }
-
-    // Render total amount
     document.getElementById('totalAmount').innerText = displayTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
     // 4. INITIAL RESET
     banner.className = "status-banner";
-    banner.style.animation = "none";
-    banner.style.backgroundColor = "";
-    banner.style.color = "";
-    banner.style.border = "";
+    banner.style = ""; // Reset inline styles
     graceArea.innerHTML = "";
     if (feesArea) feesArea.innerHTML = "";
-    activeSec.style.display = 'block'; // Default show
+    activeSec.style.display = 'block';
     if (copyWrapper) copyWrapper.style.display = 'block';
+    if (totalLabel) totalLabel.style.display = 'block';
+    if (amountDiv) amountDiv.parentElement.style.display = 'flex';
 
-    // --- 5. THE LOGIC ENGINE (TAMA NA ANG TEXT DITO) ---
-
-    // --- 5. THE LOGIC ENGINE ---
+    // 5. THE LOGIC ENGINE
     
+    // A. MAINTENANCE STATUS
     if (status === "maintenance") {
-        // 1. IPAKITA ANG BANNER NA MAY KULAY PANG-MAINTENANCE
         banner.innerText = "🚧 SYSTEM MAINTENANCE";
-        banner.style.backgroundColor = "#2c3e50"; // Dark Blue/Gray
+        banner.style.backgroundColor = "#2c3e50";
         banner.style.color = "#ffffff";
-        banner.className = "status-banner";
-
-        // 2. ITAGO ANG BUONG BILLING CONTENT
-        // Gagamitin natin ang 'mainContainer' para malinis ang screen
         const mainCard = document.querySelector('.bill-card');
         if (mainCard) {
             mainCard.innerHTML = `
@@ -610,89 +600,89 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
                     <h1 style="font-size: 50px;">🚧</h1>
                     <h2 style="color: #2c3e50;">Maintenance in Progress</h2>
                     <p style="color: #7f8c8d; line-height: 1.6;">
-                        Hi <b>${data.name}</b>, we are currently updating our payment systems to serve you better. 
-                        Please try accessing your bill again after a few hours.
+                        Hi <b>${data.name}</b>, we are currently updating our systems. 
+                        Please try accessing your bill again later.
                     </p>
-                    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-                    <p style="font-size: 12px; color: #95a5a6;">Flavi Deal - Business Management System</p>
-                </div>
-            `;
+                </div>`;
         }
-
-        // 3. ITAGO ANG PAYMENT OPTIONS (activeSection)
-        if (activeSec) activeSec.style.display = 'none';
-        
-        // Patayin ang session timer para hindi siya mag-redirect agad
+        activeSec.style.display = 'none';
         if (globalTimer) clearInterval(globalTimer);
-        return; // STOP na dito, huwag na ituloy ang ibang logic sa baba
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('mainContainer').style.display = 'block';
+        return; 
     } 
+
+    // B. PAID STATUS
     else if (status === "paid") {
         banner.innerText = "STATUS: PAID";
         banner.className = "status-banner bg-paid";
         activeSec.style.display = 'none';
         if (copyWrapper) copyWrapper.style.display = 'none';
+        if (totalLabel) totalLabel.innerText = "TOTAL PAID";
         
         let displayDate = (data.paidDate && data.paidDate !== "") ? data.paidDate : "Payment Confirmed";
         const pTag = dateDisplay.parentElement;
         if (pTag) {
             pTag.innerHTML = `Payment Date: <span id="dueDateText" style="color: #27ae60; font-weight: bold;">${displayDate}</span>`;
+            pTag.style.color = "#27ae60";
         }
         dNote.innerHTML = "🎉 Payment settled. Thank you!";
     } 
+
+    // C. VERIFYING STATUS
     else if (status === "verifying") {
         banner.innerText = "STATUS: VERIFYING";
         banner.className = "status-banner bg-verifying";
         activeSec.style.display = 'none';
         if (copyWrapper) copyWrapper.style.display = 'none';
+        if (totalLabel) totalLabel.style.display = 'none';
+        if (amountDiv) amountDiv.parentElement.style.display = 'none';
+
+        const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        const pTag = dateDisplay.parentElement;
+        if (pTag) {
+            pTag.innerHTML = `Date Processed: <span id="dueDateText" style="color: #f39c12; font-weight: bold;">${today}</span>`;
+        }
         dNote.innerHTML = "⏳ <b>We've received your proof.</b><br>Our team is currently validating your payment.";
     }
+
+    // D. OVERDUE / GRACE PERIOD
     else if (daysLate > 0) {
-        // --- DITO PAPASOK ANG OVERDUE O GRACE PERIOD ---
-        
         if (offer !== "NONE" && offer !== "") {
-            // MAY SPECIAL OFFER
-            banner.innerText = "✨ SPECIAL OFFER ACTIVE";
+            banner.innerText = offer === "LEGAL_NOTICE" ? "⚠️ REPOSSESSION NOTICE" : "✨ SPECIAL OFFER ACTIVE";
             banner.className = "status-banner bg-grace";
-            
             if (offer === "LEGAL_NOTICE") {
-                banner.innerText = "⚠️ REPOSSESSION NOTICE";
-                banner.style.backgroundColor = "#000000";
-                banner.style.color = "#ffffff";
-                banner.style.border = "2px solid #ff0000";
-                dNote.innerHTML = `<div style="padding:10px; border:2px solid black;">🚨 <b>NOTICE:</b> Final demand before recovery. Deadline: ${deadline || 'IMMEDIATE'}</div>`;
+                banner.style.backgroundColor = "#000"; banner.style.color = "#fff"; banner.style.border = "2px solid red";
+                dNote.innerHTML = `<div style="padding:10px; border:2px solid black;">🚨 <b>NOTICE:</b> Final demand. Deadline: ${deadline || 'IMMEDIATE'}</div>`;
             } else {
-                dNote.innerHTML = `<div style="padding:10px; border:1px dashed orange;">✨ <b>OFFER:</b> penalties adjusted. Pay before ${deadline || 'midnight'}.</div>`;
+                dNote.innerHTML = `<div style="padding:10px; border:1px dashed orange;">✨ <b>OFFER:</b> Pay before ${deadline || 'midnight'}.</div>`;
             }
         } 
         else if (isGrace) {
-            // GRACE PERIOD
             banner.innerText = "✨ GRACE PERIOD ACTIVE";
             banner.className = "status-banner bg-grace";
             graceArea.innerHTML = `<div class="grace-period-box">⚠️ OVERDUE: ${daysLate} DAY/S<br><b>Grace Period Applied.</b> No extra fees yet!</div>`;
         } 
         else {
-            // TALAGANG OVERDUE
             banner.innerText = "⚠️ ACCOUNT OVERDUE";
             banner.className = "status-banner bg-overdue blink-overdue";
             dNote.innerHTML = `<b style="color:red">${daysLate} DAY/S LATE:</b> Pay now to stop daily interest.`;
         }
 
-        // Render Fees Breakdown for Overdue
         if (feesArea) {
             let lateStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_PENALTY" || isGrace) ? "text-decoration: line-through; color: gray;" : "color: red;";
             let intStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_DAILY" || isGrace) ? "text-decoration: line-through; color: gray;" : "color: red;";
-            
-            feesArea.innerHTML = `
-                <div class="fees-breakdown">
-                    <div class="fee-item"><span>Principal:</span> <span>₱${data.principal}</span></div>
-                    <div class="fee-item" style="${lateStyle}"><span>Late Fee (10%):</span> <span>+ ₱${data.lateFee}</span></div>
-                    <div class="fee-item" style="${intStyle}"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}</span></div>
-                </div>`;
+            feesArea.innerHTML = `<div class="fees-breakdown">
+                <div class="fee-item"><span>Principal:</span> <span>₱${data.principal}</span></div>
+                <div class="fee-item" style="${lateStyle}"><span>Late Fee (10%):</span> <span>+ ₱${data.lateFee}</span></div>
+                <div class="fee-item" style="${intStyle}"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}</span></div>
+            </div>`;
         }
         setTimeout(() => { startLiveCountdown(deadline ? new Date(deadline) : null); }, 100);
     } 
+
+    // E. UPCOMING
     else {
-        // UPCOMING O DUE TODAY
         const daysUntil = Math.abs(daysLate);
         if (daysUntil === 0) {
             banner.innerText = `🚨 DUE TODAY`;
