@@ -1247,19 +1247,64 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
         }
     }
     else {
-        // UPCOMING / DUE TODAY
+        // UPCOMING / DUE TODAY / DUE TOMORROW
         const daysUntil = Math.abs(daysLate);
-        if (daysUntil === 0) {
-            banner.innerText = `🚨 DUE TODAY`;
-            banner.className = "status-banner bg-upcoming pulse-today";
-        } else {
-            banner.innerText = `⏳ DUE IN ${daysUntil} DAYS`;
-            banner.className = "status-banner bg-unpaid";
-            dNote.innerText = "Keep your account in good standing.";
-        }
-        startLiveCountdown(data.dueDate, "STANDARD");
-    }
+        let statusText = "";
+        let messageText = "";
+        let accentColor = "#3498db"; // Default Blue for Upcoming
 
+        if (daysUntil === 0) {
+            // DUE TODAY
+            statusText = "🚨 DUE TODAY";
+            banner.className = "status-banner bg-upcoming pulse-today";
+            accentColor = "#e67e22"; // Orange for Urgency
+            messageText = `Hi <b>${data.name}</b>, your payment is due today. Please settle to avoid late penalties.`;
+        } else if (daysUntil === 1) {
+            // DUE TOMORROW
+            statusText = "⏳ DUE TOMORROW";
+            banner.className = "status-banner bg-upcoming";
+            accentColor = "#2980b9";
+            messageText = `Reminder: Your installment is due tomorrow. Ensure your funds are ready for a smooth transaction.`;
+        } else {
+            // UPCOMING (2 DAYS OR MORE)
+            statusText = `📅 DUE IN ${daysUntil} DAYS`;
+            banner.className = "status-banner bg-unpaid";
+            accentColor = "#16a085"; // Teal Green
+            messageText = "Keep your account in good standing. Early payments are always appreciated!";
+        }
+
+        banner.innerText = statusText;
+
+        // PROFESSIONAL BOX DESIGN WITH TIMER
+        dNote.innerHTML = `
+            <div style="padding: 18px; border: 1.5px solid ${accentColor}; background: #fdfdfd; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+                <div style="font-size: 14px; color: ${accentColor}; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">
+                    Account Status: Active
+                </div>
+                
+                <p style="font-size: 13px; color: #5d6d7e; line-height: 1.5; margin-bottom: 15px;">
+                    ${messageText}
+                </p>
+
+                <div style="padding: 12px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee; display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-size: 11px; color: #95a5a6; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">
+                        ⏳ Time Remaining
+                    </span>
+                    <div id="timerClock" style="font-size: 22px; color: ${accentColor}; font-weight: 900; font-family: 'Courier New', monospace; letter-spacing: 2px;">
+                        00:00:00:00
+                    </div>
+                </div>
+
+                <div style="font-size: 10px; color: #bdc3c7; margin-top: 10px; font-style: italic;">
+                    Official Receipt will be sent via Email/SMS after verification.
+                </div>
+            </div>
+        `;
+
+        // TRIGGER THE TIMER (Gagamit ng OFFER mode para mag-countdown pababa)
+        startLiveCountdown(data.dueDate, "OFFER"); 
+    }
+        
     // 7. SESSION TIMER
     let exitSecs = 250;
     let timerDiv = document.getElementById('session-timer') || document.createElement('div');
