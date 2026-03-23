@@ -1127,7 +1127,7 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #f1f5f9;">
                     <p style="font-size: 11px; color: #94a3b8;">
                         Need urgent assistance? <br>
-                        Contact us at <a href="mailto:errihoportal@flavideal.com" style="color: #2563eb; text-decoration: none; font-weight: 600;">support@flavideal.com</a>
+                        Contact us at <a href="mailto:errihoportal@flavideal.com" style="color: #2563eb; text-decoration: none; font-weight: 600;">errihoportal@flavideal.com</a>
                     </p>
                 </div>
             </div>`;
@@ -1213,10 +1213,13 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
                     Hi <b>${data.name}</b>, we've received your payment proof. Our team is currently validating your transaction.
                 </p>
                 
-                <div style="background: white; padding: 12px; border-radius: 8px; border: 1px dashed #3498db; display: inline-block; width: 100%; box-sizing: border-box;">
-                    <span style="color: #7f8c8d; font-size: 12px; display: block; margin-bottom: 5px;">Estimated Wait Time:</span>
-                    <b style="color: #2980b9; font-size: 14px;">15 - 30 Minutes</b>
-                </div>
+                <div style="background: #f0f7ff; padding: 15px; border-radius: 12px; border: 1px solid #d0e7ff; display: block; width: 100%; box-sizing: border-box; text-align: center;">
+    <span style="color: #64748b; font-size: 11px; display: block; margin-bottom: 5px; text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">Queue Status:</span>
+    <b style="color: #2563eb; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <span style="color: #10b981;">●</span> PRIORITY VERIFICATION
+    </b>
+    <p style="margin: 5px 0 0 0; font-size: 11px; color: #94a3b8;">Your payment is being queued for instant approval.</p>
+</div>>
 
                 <p style="font-size: 11px; color: #95a5a6; margin-top: 15px; font-style: italic; line-height: 1.4;">
     To ensure a smooth process, please avoid resubmitting your proof.<br>
