@@ -995,7 +995,19 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     const daysLate = parseInt(data.daysLate) || 0; 
     const isGrace = data.isGracePeriod === "YES";
     const offer = data.offerType ? data.offerType.trim() : "NONE"; 
-    const deadline = data.offerDeadline;
+    // Sa loob ng renderData function...
+const deadlineRaw = data.offerDeadline;
+let deadlineDisplay = "IMMEDIATE";
+
+if (deadlineRaw) {
+    const dDate = new Date(deadlineRaw);
+    // Format: MARCH 23, 2026
+    deadlineDisplay = dDate.toLocaleDateString('en-US', { 
+        month: 'long', 
+        day: '2-digit', 
+        year: 'numeric' 
+    }).toUpperCase();
+}
 
     // I-set ang global variable para sa startLiveCountdown
     window.billData = data;
@@ -1280,7 +1292,7 @@ else {
         const now = new Date().getTime();
         let target = new Date(targetTime);
         
-        // 1. Gawing dulo ng araw (11:59 PM) kung date lang ang nilagay sa Sheets
+        // Gawing dulo ng araw (11:59:59 PM) kung date lang ang nasa Sheets
         if (target.getHours() === 0 && target.getMinutes() === 0) {
             target.setHours(23, 59, 59, 999);
         }
@@ -1288,34 +1300,29 @@ else {
         const diff = target.getTime() - now;
         const absDiff = Math.abs(diff);
         
-        // 2. Math for D-H-M-S
+        // Math for Days, Hours, Minutes, Seconds
         const d = Math.floor(absDiff / (1000 * 60 * 60 * 24));
         const h = Math.floor((absDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const m = Math.floor((absDiff % (1000 * 60 * 60)) / (1000 * 60));
         const s = Math.floor((absDiff % (1000 * 60)) / 1000);
+        
         const format = (n) => n.toString().padStart(2, '0');
         
-        // Custom format: 00d 00:00:00
-        const timeStr = `${d > 0 ? d + 'd ' : ''}${format(h)}:${format(m)}:${format(s)}`;
+        // Format na hiningi mo: Days + Hours + Mins + Secs
+        const timeStr = `${d}d ${format(h)}h ${format(m)}m ${format(s)}s`;
 
-        // 3. DISPLAY LOGIC
         if (mode === "OFFER") {
             if (diff > 0) {
-                // Ipinapakita ito kapag active pa ang Grace Period o Special Offer
-                clockElem.innerHTML = `<span style="color: #e67e22; font-weight:bold;">✨ GRACE PERIOD ENDS IN: ${timeStr}</span>`;
+                clockElem.innerHTML = `<span style="color: #e67e22; font-weight:bold;">⏳ ENDS IN: ${timeStr}</span>`;
             } else {
-                // Kapag lumampas na sa Deadline Date sa Sheets
                 clockElem.innerHTML = `<span style="color: red; font-weight:bold;">❌ DEADLINE EXPIRED</span>`;
-                // Reload para mag-reflect ang Late Fees sa portal
-                setTimeout(() => location.reload(), 3000);
+                setTimeout(() => location.reload(), 5000);
             }
         } else {
-            // STANDARD MODE (Naka-base sa Original Due Date)
+            // STANDARD MODE
             if (diff > 0) {
-                // Countdown papuntang Due Date
                 clockElem.innerHTML = `<span style="color: #3498db;">⏳ DUE IN: ${timeStr}</span>`;
             } else {
-                // Aging (Pataas ang relo) - Ipinapakita gaano na katagal late
                 clockElem.innerHTML = `<span style="color: #ff4d4d; font-weight:bold;">⚠️ OVERDUE: ${timeStr}</span>`;
             }
         }
