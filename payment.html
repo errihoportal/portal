@@ -591,8 +591,42 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     if (copyWrapper) copyWrapper.style.display = 'block';
 
     // --- 5. THE LOGIC ENGINE (TAMA NA ANG TEXT DITO) ---
+
+    // --- 5. THE LOGIC ENGINE ---
     
-    if (status === "paid") {
+    if (status === "maintenance") {
+        // 1. IPAKITA ANG BANNER NA MAY KULAY PANG-MAINTENANCE
+        banner.innerText = "🚧 SYSTEM MAINTENANCE";
+        banner.style.backgroundColor = "#2c3e50"; // Dark Blue/Gray
+        banner.style.color = "#ffffff";
+        banner.className = "status-banner";
+
+        // 2. ITAGO ANG BUONG BILLING CONTENT
+        // Gagamitin natin ang 'mainContainer' para malinis ang screen
+        const mainCard = document.querySelector('.bill-card');
+        if (mainCard) {
+            mainCard.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px;">
+                    <h1 style="font-size: 50px;">🚧</h1>
+                    <h2 style="color: #2c3e50;">Maintenance in Progress</h2>
+                    <p style="color: #7f8c8d; line-height: 1.6;">
+                        Hi <b>${data.name}</b>, we are currently updating our payment systems to serve you better. 
+                        Please try accessing your bill again after a few hours.
+                    </p>
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                    <p style="font-size: 12px; color: #95a5a6;">Flavi Deal - Business Management System</p>
+                </div>
+            `;
+        }
+
+        // 3. ITAGO ANG PAYMENT OPTIONS (activeSection)
+        if (activeSec) activeSec.style.display = 'none';
+        
+        // Patayin ang session timer para hindi siya mag-redirect agad
+        if (globalTimer) clearInterval(globalTimer);
+        return; // STOP na dito, huwag na ituloy ang ibang logic sa baba
+    } 
+    else if (status === "paid") {
         banner.innerText = "STATUS: PAID";
         banner.className = "status-banner bg-paid";
         activeSec.style.display = 'none';
