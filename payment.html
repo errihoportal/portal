@@ -608,26 +608,29 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     if (cardFeeElem) cardFeeElem.innerText = "+ ₱" + cardFee.toLocaleString('en-US', {minimumFractionDigits: 2});
     if (cardTotalElem) cardTotalElem.innerText = "₱" + cardTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
 
-    // --- 6. SMART COUNTDOWN LOGIC ---
+    // --- 6. SMART COUNTDOWN LOGIC (EXACT TIME) ---
     let finalDeadline = null;
 
+    // 1. KUNG MAY EXPLICIT DEADLINE SA SHEETS (Offer man o Grace Period Deadline)
     if (deadline && deadline !== "" && deadline !== "NONE") {
-        // PRIORIDAD 1: Special Offer Deadline (e.g. 50% Discount Deadline)
+        // Ito ang susundin ng relo (e.g., 2026-03-22T16:00:00.000Z)
         finalDeadline = deadline;
     } 
-    else if (daysLate === 0 || isGrace) {
-        // PRIORIDAD 2: Due Today o nasa Grace Period
-        // Gagawa tayo ng deadline na "Midnight ng kasalukuyang araw"
-        let today = new Date();
-        today.setHours(23, 59, 59, 999);
-        finalDeadline = today.toISOString();
+    // 2. KUNG WALANG DEADLINE PERO DUE TODAY O GRACE (Fallback lang ito)
+    else if (isGrace || daysLate === 0) {
+        let dueDateObj = new Date(data.dueDate);
+        let graceDays = parseInt(data.gracePeriod) || 0;
+        
+        dueDateObj.setDate(dueDateObj.getDate() + graceDays);
+        // Default fallback kung walang oras na nilagay sa Sheets
+        dueDateObj.setHours(23, 59, 59, 999); 
+        finalDeadline = dueDateObj.toISOString();
     }
 
-    // Isalang na sa relo
+    // Isalang sa Clock
     if (finalDeadline) {
         startLiveCountdown(finalDeadline);
     } else {
-        // Kung Overdue na talaga at wala nang Grace/Offer, itago ang timer clock
         const clockElem = document.getElementById('timerClock');
         if (clockElem) clockElem.innerText = "OVERDUE";
     }
