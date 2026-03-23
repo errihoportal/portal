@@ -1167,12 +1167,38 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
             startLiveCountdown(deadlineRaw, "OFFER"); 
         } 
         else {
-            banner.innerText = "⚠️ ACCOUNT OVERDUE";
-            banner.className = "status-banner bg-overdue blink-overdue";
-            dNote.innerHTML = `<div style="padding:10px;"><b style="color:red">${daysLate} DAY/S LATE:</b> Pay now.
-                <div id="timerClock" style="font-size: 18px; margin-top: 10px; color: #ff4d4d; font-weight: bold;"></div></div>`;
-            startLiveCountdown(data.dueDate, "STANDARD");
-        }
+        banner.innerText = "⚠️ ACCOUNT OVERDUE";
+        banner.className = "status-banner bg-overdue blink-overdue";
+        
+        // Tinanggal ang timer at pinalitan ng mas professional at urgent na message
+        dNote.innerHTML = `
+            <div style="padding: 20px; border: 1px solid #ff4d4d; background: #fff5f5; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <div style="font-size: 14px; color: #d63031; font-weight: 800; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px;">
+                    ⚠️ Urgent Notice: Payment Required
+                </div>
+                
+                <div style="font-size: 16px; color: #2c3e50; font-weight: 700; margin-bottom: 8px;">
+                    Your account is <span style="color: #e74c3c;">${daysLate} Day/s Overdue</span>
+                </div>
+                
+                <p style="font-size: 13px; color: #5d6d7e; line-height: 1.5; margin: 0 0 15px 0;">
+                    Hi <b>${data.name}</b>, your payment is now past due. Please settle your balance immediately to maintain a good credit standing and avoid additional daily interest.
+                </p>
+
+                <div style="background: #ffffff; padding: 10px; border-radius: 8px; border: 1px dashed #ff7675;">
+                    <span style="font-size: 11px; color: #636e72; display: block; margin-bottom: 2px;">STATUS UPDATE:</span>
+                    <b style="color: #d63031; font-size: 13px;">IMMEDIATE SETTLEMENT REQUIRED</b>
+                </div>
+                
+                <p style="font-size: 10px; color: #95a5a6; margin-top: 15px; font-style: italic;">
+                    Kindly ignore if payment has been made and is currently for verification.
+                </p>
+            </div>
+        `;
+        
+        // Tinanggal ang startLiveCountdown para wala nang timer na lumabas
+        if (globalTimer) clearInterval(globalTimer);
+    }
 
         // Display Fees Breakdown
         if (feesArea) {
