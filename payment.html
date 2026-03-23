@@ -604,13 +604,28 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     if (cardFeeElem) cardFeeElem.innerText = "+ ₱" + cardFee.toLocaleString('en-US', {minimumFractionDigits: 2});
     if (cardTotalElem) cardTotalElem.innerText = "₱" + cardTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
 
-    // --- 6. COUNTDOWN LOGIC ---
+    // --- 6. SMART COUNTDOWN LOGIC ---
+    let finalDeadline = null;
+
     if (deadline && deadline !== "" && deadline !== "NONE") {
-        // Kung may offer deadline (2026-03-22T16:00:00.000Z), ito ang gagamitin
-        startLiveCountdown(deadline);
+        // PRIORIDAD 1: Special Offer Deadline (e.g. 50% Discount Deadline)
+        finalDeadline = deadline;
+    } 
+    else if (daysLate === 0 || isGrace) {
+        // PRIORIDAD 2: Due Today o nasa Grace Period
+        // Gagawa tayo ng deadline na "Midnight ng kasalukuyang araw"
+        let today = new Date();
+        today.setHours(23, 59, 59, 999);
+        finalDeadline = today.toISOString();
+    }
+
+    // Isalang na sa relo
+    if (finalDeadline) {
+        startLiveCountdown(finalDeadline);
     } else {
-        // Kung wala, automatic fallback sa Due Date + Grace Period
-        startLiveCountdown(null);
+        // Kung Overdue na talaga at wala nang Grace/Offer, itago ang timer clock
+        const clockElem = document.getElementById('timerClock');
+        if (clockElem) clockElem.innerText = "OVERDUE";
     }
 
     // --- 7. STATUS & BANNER LOGIC (KASUNOD) ---
