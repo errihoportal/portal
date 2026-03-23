@@ -816,54 +816,62 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         navigator.clipboard.writeText(amountText).then(() => { alert("Amount successfully copied: ₱" + amountText); });
     }
 
-    function startLiveCountdown() {
+    function startLiveCountdown(customDeadline) {
     function updateClock() {
-        if (!billData.dueDate) return;
+        let targetDate;
 
-        // 1. Ayusin ang pag-parse ng date (para gumana sa lahat ng browsers)
-        const dueDate = new Date(billData.dueDate); 
-        
-        // 2. Deadline Calculation
-        // Kung may Offer Type, 24 hours lang ang binibigay natin (o hanggang midnight)
-        // Pero para simple, susunod pa rin tayo sa Grace Period logic mo
-        const graceDays = parseInt(billData.gracePeriod) || 0; 
-        
-        const deadline = new Date(dueDate);
-        deadline.setDate(deadline.getDate() + graceDays);
-        deadline.setHours(23, 59, 59, 999);
+        // 1. DETERMINING THE TARGET
+        if (customDeadline && !isNaN(new Date(customDeadline).getTime())) {
+            // Gamitin ang date mula sa Column X kung valid ito
+            targetDate = new Date(customDeadline);
+        } else if (billData.dueDate) {
+            // Fallback: Due Date + Grace Days (Hatinggabi)
+            const graceDays = parseInt(billData.gracePeriod) || 0;
+            targetDate = new Date(billData.dueDate);
+            targetDate.setDate(targetDate.getDate() + graceDays);
+            targetDate.setHours(23, 59, 59, 999);
+        } else {
+            return; // Walang basehan ng oras
+        }
 
         const now = new Date();
-        const diff = deadline - now;
-
+        const diff = targetDate - now;
         const clockElem = document.getElementById('timerClock');
         if (!clockElem) return;
 
-        // 3. KAPAG EXPIRED NA
+        // 2. KAPAG EXPIRED NA
         if (diff <= 0) {
             clearInterval(window.graceInterval);
-            clockElem.innerText = "EXPIRED";
+            clockElem.innerText = "OFFER EXPIRED";
             clockElem.style.color = "red";
-
-            // REFRESH LOGIC: Kung nawala na ang Grace o ang Offer, kailangan mag-reload
-            // para bumalik sa original price ang portal (penalty included)
-            if (billData.isGracePeriod === "YES" || (billData.offerType && billData.offerType !== "NONE")) {
+            
+            // Reload pagkatapos ng 3 seconds para bumalik sa original price (may penalty)
+            if (billData.offerType && billData.offerType !== "NONE") {
                 setTimeout(() => { location.reload(); }, 3000);
             }
             return;
         }
 
-        // 4. Calculation (D-H-M-S)
+        // 3. CALCULATION (D-H-M-S)
         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
         const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
         const m = Math.floor((diff / (1000 * 60)) % 60);
         const s = Math.floor((diff / 1000) % 60);
 
-        // Display format
+        // 4. DISPLAY FORMAT
+        // Kapag less than 1 hour na lang, gagawin nating red at blinking para sa urgency
+        if (diff < (1000 * 60 * 60)) {
+            clockElem.style.color = "#e74c3c";
+            clockElem.classList.add("blink-overdue"); 
+        } else {
+            clockElem.style.color = "#2c3e50";
+        }
+
         clockElem.innerText = (d > 0) ? `${d}d ${h}h ${m}m ${s}s` : `${h}h ${m}m ${s}s`;
     }
-    
-    if(window.graceInterval) clearInterval(window.graceInterval);
-    updateClock(); 
+
+    if (window.graceInterval) clearInterval(window.graceInterval);
+    updateClock();
     window.graceInterval = setInterval(updateClock, 1000);
 }
     
