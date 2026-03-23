@@ -1180,7 +1180,7 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
             subMessage = "Flash Offer: Pay only half of your penalties if you settle within the given time limit.";
             break; 
     }
-
+        
     // 3. RENDER THE DYNAMIC BOX (Unified Design)
     if (offer !== "NONE" && offer !== "" && offer !== "GRACE") {
         banner.innerText = offerTitle;
@@ -1200,7 +1200,6 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
             </div>`;
         startLiveCountdown(deadlineRaw, "OFFER");
     }
-}
         else if (offer === "GRACE") {
     banner.innerText = "✨ GRACE PERIOD GRANTED";
     banner.className = "status-banner bg-grace"; // Siguraduhin na ang bg-grace sa CSS ay Teal Green
@@ -1279,6 +1278,7 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
         // Tinanggal ang startLiveCountdown para wala nang timer na lumabas
         if (globalTimer) clearInterval(globalTimer);
     }
+}
 
         // Display Fees Breakdown
         if (feesArea) {
