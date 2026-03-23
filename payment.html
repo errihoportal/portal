@@ -1278,7 +1278,6 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
         // Tinanggal ang startLiveCountdown para wala nang timer na lumabas
         if (globalTimer) clearInterval(globalTimer);
     }
-}
 
         // Display Fees Breakdown
         if (feesArea) {
@@ -1350,7 +1349,8 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
         // TRIGGER THE TIMER (Gagamit ng OFFER mode para mag-countdown pababa)
         startLiveCountdown(data.dueDate, "OFFER"); 
     }
-        
+}
+    
     // 7. SESSION TIMER
     let exitSecs = 250;
     let timerDiv = document.getElementById('session-timer') || document.createElement('div');
