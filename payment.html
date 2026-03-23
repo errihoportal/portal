@@ -1157,15 +1157,47 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
             startLiveCountdown(deadlineRaw, "OFFER"); 
         } 
         else if (offer === "GRACE") {
-            banner.innerText = "✨ GRACE PERIOD ACTIVE";
-            banner.className = "status-banner bg-grace";
-            graceArea.innerHTML = `<div class="grace-period-box" style="border: 2px dashed #f39c12; padding: 15px;">
-                <b style="color: #e67e22;">⚠️ OVERDUE: ${daysLate} DAY/S</b><br>
-                <span>Deadline: <span style="color:red;">${deadlineDisplay}</span></span>
-                <div id="timerClock" style="font-size: 22px; color: #e67e22; margin-top: 10px; font-weight: bold;"></div>
-            </div>`;
-            startLiveCountdown(deadlineRaw, "OFFER"); 
-        } 
+    banner.innerText = "✨ GRACE PERIOD GRANTED";
+    banner.className = "status-banner bg-grace"; // Siguraduhin na ang bg-grace sa CSS ay Teal Green
+
+    // Premium Teal Green Design
+    graceArea.innerHTML = `
+        <div class="grace-period-box" style="border: 2px solid #008080; padding: 20px; border-radius: 12px; background: #f0fdfa; text-align: center; box-shadow: 0 4px 12px rgba(0, 128, 128, 0.1);">
+            <div style="font-size: 13px; color: #008080; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">
+                🌟 SPECIAL EXTENSION ACTIVE
+            </div>
+            
+            <div style="font-size: 15px; color: #2c3e50; margin-bottom: 12px; line-height: 1.4;">
+                Good news! Your account is <b>${daysLate} Day/s Overdue</b>, but we have granted you a temporary <b>Grace Period</b>.
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #b2dfdb; margin: 15px 0;">
+
+            <div style="font-size: 11px; color: #5d6d7e; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">
+                New Settlement Deadline:
+            </div>
+            <div style="font-size: 15px; color: #00695c; font-weight: 700; margin-bottom: 15px;">
+                ${deadlineDisplay}
+            </div>
+
+            <div style="background: #ffffff; padding: 15px; border-radius: 10px; border: 1.5px solid #008080; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+                <div id="timerClock" style="font-size: 28px; color: #008080; font-weight: 900; font-family: 'Courier New', monospace; letter-spacing: 2px;">
+                    00:00:00:00
+                </div>
+                <div style="font-size: 10px; color: #008080; font-weight: 800; margin-top: 5px; text-transform: uppercase;">Time Left to Pay without Penalty</div>
+            </div>
+
+            <p style="font-size: 11px; color: #66b2b2; margin-top: 15px; font-style: italic; font-weight: 500;">
+                Take advantage of this extension to settle your balance before the timer expires.
+            </p>
+        </div>
+    `;
+
+    // Trigger ang countdown
+    if (deadlineRaw) {
+        startLiveCountdown(deadlineRaw, "OFFER"); 
+    }
+}
         else {
         banner.innerText = "⚠️ ACCOUNT OVERDUE";
         banner.className = "status-banner bg-overdue blink-overdue";
