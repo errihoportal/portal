@@ -608,23 +608,19 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     if (cardFeeElem) cardFeeElem.innerText = "+ ₱" + cardFee.toLocaleString('en-US', {minimumFractionDigits: 2});
     if (cardTotalElem) cardTotalElem.innerText = "₱" + cardTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
 
-   // --- 6. GRACE & DEADLINE CONNECTION ---
-let timerTarget = null;
-let timerMode = "";
+  // --- SECTION 6: DEADLINE-BASED TIMER ---
+const clockElem = document.getElementById('timerClock');
 
-// Check muna natin kung may laman ang 'deadline' (offerDeadline sa Sheets)
-if (data.offerDeadline && data.offerDeadline !== "" && data.offerDeadline !== "NONE") {
-    // DITO MO NAKABASE ANG GRACE PERIOD
-    timerTarget = data.offerDeadline; 
-    timerMode = "GRACE"; // O "OFFER"
-} else {
-    // Kung walang deadline, balik tayo sa Standard Due Date
-    timerTarget = data.dueDate;
-    timerMode = "STANDARD";
+if (deadline && deadline !== "" && deadline !== "NONE") {
+    // DITO PAPASOK ANG GRACE PERIOD (Naka-base sa Deadline Date)
+    // Ang mode ay "OFFER" para pababa ang countdown
+    startLiveCountdown(deadline, "OFFER"); 
+} 
+else {
+    // STANDARD DUE DATE (Dito ang basehan kung walang palugit)
+    // Kung past due na, "STANDARD" mode ang mag-o-overdue aging (pataas)
+    startLiveCountdown(data.dueDate, "STANDARD");
 }
-
-// Isalang sa relo
-startLiveCountdown(timerTarget, timerMode);
 
     // --- 7. STATUS & BANNER LOGIC (KASUNOD) ---
     // (Dito mo itutuloy ang mga if(status === 'unpaid') etc. mo...)
@@ -808,7 +804,7 @@ startLiveCountdown(timerTarget, timerMode);
         navigator.clipboard.writeText(amountText).then(() => { alert("Amount successfully copied: ₱" + amountText); });
     }
 
-    ffunction startLiveCountdown(targetTime, mode) {
+    function startLiveCountdown(targetTime, mode) {
     if (window.graceInterval) clearInterval(window.graceInterval);
     const clockElem = document.getElementById('timerClock');
     if (!clockElem) return;
@@ -817,7 +813,7 @@ startLiveCountdown(timerTarget, timerMode);
         const now = new Date().getTime();
         let target = new Date(targetTime);
         
-        // Gawing dulo ng araw kung date lang ang nilagay sa Sheets
+        // 1. Gawing dulo ng araw (11:59 PM) kung date lang ang nilagay sa Sheets
         if (target.getHours() === 0 && target.getMinutes() === 0) {
             target.setHours(23, 59, 59, 999);
         }
@@ -825,28 +821,35 @@ startLiveCountdown(timerTarget, timerMode);
         const diff = target.getTime() - now;
         const absDiff = Math.abs(diff);
         
-        // Math for D-H-M-S
+        // 2. Math for D-H-M-S
         const d = Math.floor(absDiff / (1000 * 60 * 60 * 24));
         const h = Math.floor((absDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const m = Math.floor((absDiff % (1000 * 60 * 60)) / (1000 * 60));
         const s = Math.floor((absDiff % (1000 * 60)) / 1000);
         const format = (n) => n.toString().padStart(2, '0');
+        
+        // Custom format: 00d 00:00:00
         const timeStr = `${d > 0 ? d + 'd ' : ''}${format(h)}:${format(m)}:${format(s)}`;
 
+        // 3. DISPLAY LOGIC
         if (mode === "OFFER") {
             if (diff > 0) {
-                clockElem.innerHTML = `<span style="color: #e67e22;">✨ OFFER ENDS IN: ${timeStr}</span>`;
+                // Ipinapakita ito kapag active pa ang Grace Period o Special Offer
+                clockElem.innerHTML = `<span style="color: #e67e22; font-weight:bold;">✨ GRACE PERIOD ENDS IN: ${timeStr}</span>`;
             } else {
-                clockElem.innerHTML = `<span style="color: red;">❌ OFFER EXPIRED</span>`;
-                // Kapag expired ang offer, i-reload para bumalik sa standard price (may penalties)
+                // Kapag lumampas na sa Deadline Date sa Sheets
+                clockElem.innerHTML = `<span style="color: red; font-weight:bold;">❌ DEADLINE EXPIRED</span>`;
+                // Reload para mag-reflect ang Late Fees sa portal
                 setTimeout(() => location.reload(), 3000);
             }
         } else {
-            // STANDARD MODE
+            // STANDARD MODE (Naka-base sa Original Due Date)
             if (diff > 0) {
+                // Countdown papuntang Due Date
                 clockElem.innerHTML = `<span style="color: #3498db;">⏳ DUE IN: ${timeStr}</span>`;
             } else {
-                clockElem.innerHTML = `<span style="color: #ff4d4d;">⚠️ OVERDUE: ${timeStr}</span>`;
+                // Aging (Pataas ang relo) - Ipinapakita gaano na katagal late
+                clockElem.innerHTML = `<span style="color: #ff4d4d; font-weight:bold;">⚠️ OVERDUE: ${timeStr}</span>`;
             }
         }
     }
