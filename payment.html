@@ -827,21 +827,26 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     }
 
     function startLiveCountdown(customDeadline) {
+    if (window.graceInterval) clearInterval(window.graceInterval);
+
     function updateClock() {
         let targetDate;
 
         // 1. DETERMINING THE TARGET
-        if (customDeadline && !isNaN(new Date(customDeadline).getTime())) {
-            // Gamitin ang date mula sa Column X kung valid ito
-            targetDate = new Date(customDeadline);
-        } else if (billData.dueDate) {
-            // Fallback: Due Date + Grace Days (Hatinggabi)
-            const graceDays = parseInt(billData.gracePeriod) || 0;
-            targetDate = new Date(billData.dueDate);
-            targetDate.setDate(targetDate.getDate() + graceDays);
-            targetDate.setHours(23, 59, 59, 999);
-        } else {
-            return; // Walang basehan ng oras
+        try {
+            if (customDeadline && !isNaN(new Date(customDeadline).getTime())) {
+                targetDate = new Date(customDeadline);
+            } else if (data.dueDate) { // Ginawa nating 'data' o 'billData' depende sa gamit mo
+                const graceDays = parseInt(data.gracePeriod) || 0;
+                targetDate = new Date(data.dueDate);
+                targetDate.setDate(targetDate.getDate() + graceDays);
+                targetDate.setHours(23, 59, 59, 999);
+            } else {
+                return; 
+            }
+        } catch (e) {
+            console.log("Date error:", e);
+            return;
         }
 
         const now = new Date();
@@ -855,32 +860,32 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
             clockElem.innerText = "OFFER EXPIRED";
             clockElem.style.color = "red";
             
-            // Reload pagkatapos ng 3 seconds para bumalik sa original price (may penalty)
-            if (billData.offerType && billData.offerType !== "NONE") {
+            // Reload para bumalik sa original price (papasok na ang penalty)
+            // Tinitiyak nito na hindi "naka-stuck" sa discounted price ang portal
+            if (data.offerType && data.offerType !== "NONE") {
                 setTimeout(() => { location.reload(); }, 3000);
             }
             return;
         }
 
-        // 3. CALCULATION (D-H-M-S)
+        // 3. CALCULATION
         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
         const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
         const m = Math.floor((diff / (1000 * 60)) % 60);
         const s = Math.floor((diff / 1000) % 60);
 
-        // 4. DISPLAY FORMAT
-        // Kapag less than 1 hour na lang, gagawin nating red at blinking para sa urgency
-        if (diff < (1000 * 60 * 60)) {
+        // 4. DISPLAY & URGENCY STYLE
+        if (diff < (1000 * 60 * 60)) { // Less than 1 hour
             clockElem.style.color = "#e74c3c";
-            clockElem.classList.add("blink-overdue"); 
+            clockElem.classList.add("blink-overdue"); // Siguraduhing may CSS class ka nito
         } else {
             clockElem.style.color = "#2c3e50";
+            clockElem.classList.remove("blink-overdue");
         }
 
         clockElem.innerText = (d > 0) ? `${d}d ${h}h ${m}m ${s}s` : `${h}h ${m}m ${s}s`;
     }
 
-    if (window.graceInterval) clearInterval(window.graceInterval);
     updateClock();
     window.graceInterval = setInterval(updateClock, 1000);
 }
