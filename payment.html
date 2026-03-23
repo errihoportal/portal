@@ -1057,26 +1057,43 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
     else if (status === "paid") {
     banner.innerText = "STATUS: PAID";
     banner.className = "status-banner bg-paid";
-    activeSec.style.display = 'none';
+    
+    // 1. ITAGO ANG MGA SECTIONS NA HINDI NA KAILANGAN
+    activeSec.style.display = 'none'; // Tinatago ang payment methods
+    if (copyWrapper) copyWrapper.style.display = 'none'; // Tinatago ang copy button
+    if (totalLabel) totalLabel.style.display = 'none'; // Tinatago ang "Total Payable" label
+    if (amountDiv) amountDiv.parentElement.style.display = 'none'; // Tinatago ang malaking amount sa taas
+    
+    // Itago rin ang original due date display sa taas
+    const dueDateDisplay = document.querySelector('.due-date-section'); // I-check ang class name ng wrapper ng due date mo
+    if (dueDateDisplay) dueDateDisplay.style.display = 'none';
 
-    // Siguraduhing tugma ang variable names sa Apps Script response
+    // 2. DATA MAPPING PARA SA RECEIPT
     const pAmount = parseFloat(data.amountPaid) || 0;
     const pRef = data.refNumber || "N/A";
+    const pDate = data.paidDate || "N/A"; // Galing sa Column T
 
+    // 3. DIGITAL RECEIPT DISPLAY (Dito na lalabas ang details sa baba)
     dNote.innerHTML = `
         <div style="padding: 20px; border: 1px solid #2ecc71; background: #fafffa; border-radius: 12px; text-align: center;">
             <h2 style="color: #2ecc71; margin-top: 0; font-size: 18px;">🎉 PAYMENT RECEIVED</h2>
-            <p style="color: #7f8c8d; font-size: 12px;">Your transaction has been successfully processed.</p>
-            <hr style="border: 0; border-top: 1px dashed #2ecc71; margin: 15px 0;">
+            <p style="color: #7f8c8d; font-size: 12px; margin-bottom: 15px;">Your transaction has been successfully processed.</p>
             
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
-                <span style="color: #94a3b8;">Amount Paid:</span>
-                <b style="color: #2c3e50;">₱${pAmount.toLocaleString('en-US', {minimumFractionDigits: 2})}</b>
-            </div>
-            
-            <div style="display: flex; justify-content: space-between; font-size: 13px;">
-                <span style="color: #94a3b8;">Reference No:</span>
-                <b style="color: #2c3e50; font-family: monospace;">${pRef}</b>
+            <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
+                    <span style="color: #94a3b8;">Amount Paid:</span>
+                    <b style="color: #2c3e50;">₱${pAmount.toLocaleString('en-US', {minimumFractionDigits: 2})}</b>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px;">
+                    <span style="color: #94a3b8;">Reference No:</span>
+                    <b style="color: #2c3e50; font-family: monospace;">${pRef}</b>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                    <span style="color: #94a3b8;">Payment Date:</span>
+                    <b style="color: #2c3e50;">${pDate}</b>
+                </div>
             </div>
 
             <div style="margin-top: 15px; padding: 8px; background: #e8f5e9; border-radius: 6px;">
