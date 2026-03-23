@@ -646,11 +646,14 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         dNote.innerHTML = "⏳ <b>We've received your proof.</b><br>Our team is currently validating your payment.";
     }
 
-    // D. OVERDUE / GRACE PERIOD
+    // D. OVERDUE / GRACE PERIOD / OFFERS
     else if (daysLate > 0) {
-        if (offer !== "NONE" && offer !== "") {
+        
+        // 1. KUNG MAY SPECIAL OFFER (Pero hindi GRACE)
+        if (offer !== "NONE" && offer !== "" && offer !== "GRACE") {
             banner.innerText = offer === "LEGAL_NOTICE" ? "⚠️ REPOSSESSION NOTICE" : "✨ SPECIAL OFFER ACTIVE";
             banner.className = "status-banner bg-grace";
+            
             if (offer === "LEGAL_NOTICE") {
                 banner.style.backgroundColor = "#000"; banner.style.color = "#fff"; banner.style.border = "2px solid red";
                 dNote.innerHTML = `<div style="padding:10px; border:2px solid black;">🚨 <b>NOTICE:</b> Final demand. Deadline: ${deadline || 'IMMEDIATE'}</div>`;
@@ -658,29 +661,44 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
                 dNote.innerHTML = `<div style="padding:10px; border:1px dashed orange;">✨ <b>OFFER:</b> Pay before ${deadline || 'midnight'}.</div>`;
             }
         } 
-        else if (isGrace) {
+        // 2. KUNG GRACE PERIOD (Naka-set sa Column W)
+        else if (offer === "GRACE") {
             banner.innerText = "✨ GRACE PERIOD ACTIVE";
             banner.className = "status-banner bg-grace";
-            graceArea.innerHTML = `<div class="grace-period-box">⚠️ OVERDUE: ${daysLate} DAY/S<br><b>Grace Period Applied.</b> No extra fees yet!</div>`;
+            
+            // Dito na natin gagamitin ang Deadline mula sa Column X
+            const displayDeadline = deadline ? deadline : "Midnight Today";
+            
+            graceArea.innerHTML = `
+                <div class="grace-period-box" style="border: 2px dashed #f39c12; background: #fffcf5; padding: 15px; border-radius: 8px;">
+                    <b style="color: #e67e22;">⚠️ OVERDUE: ${daysLate} DAY/S</b><br>
+                    <span>Grace Period Applied. No extra fees yet!</span><br>
+                    <div style="margin-top: 5px; font-weight: bold;">Deadline: <span style="color:red;">${displayDeadline}</span></div>
+                </div>`;
         } 
+        // 3. TALAGANG OVERDUE (Walang kahit anong nakasulat sa Column W)
         else {
             banner.innerText = "⚠️ ACCOUNT OVERDUE";
             banner.className = "status-banner bg-overdue blink-overdue";
             dNote.innerHTML = `<b style="color:red">${daysLate} DAY/S LATE:</b> Pay now to stop daily interest.`;
         }
 
+        // --- Fees Breakdown Rendering ---
         if (feesArea) {
-            let lateStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_PENALTY" || isGrace) ? "text-decoration: line-through; color: gray;" : "color: red;";
-            let intStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_DAILY" || isGrace) ? "text-decoration: line-through; color: gray;" : "color: red;";
+            // Ituturing nating "Waived" ang fees kung offer ay WAIVE_ALL o GRACE
+            let lateStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_PENALTY" || offer === "GRACE") ? "text-decoration: line-through; color: gray;" : "color: red;";
+            let intStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_DAILY" || offer === "GRACE") ? "text-decoration: line-through; color: gray;" : "color: red;";
+            
             feesArea.innerHTML = `<div class="fees-breakdown">
                 <div class="fee-item"><span>Principal:</span> <span>₱${data.principal}</span></div>
                 <div class="fee-item" style="${lateStyle}"><span>Late Fee (10%):</span> <span>+ ₱${data.lateFee}</span></div>
                 <div class="fee-item" style="${intStyle}"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}</span></div>
             </div>`;
         }
+        
+        // I-set ang countdown sa deadline kung meron, kung wala ay sa original due date
         setTimeout(() => { startLiveCountdown(deadline ? new Date(deadline) : null); }, 100);
-    } 
-
+    }
     // E. UPCOMING
     else {
         const daysUntil = Math.abs(daysLate);
