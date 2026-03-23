@@ -1180,12 +1180,12 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
                 ${deadlineDisplay}
             </div>
 
-           <div style="margin-top: 15px; padding: 10px 0; border-top: 1.5px solid #b2dfdb; border-bottom: 1.5px solid #b2dfdb; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
-    <span style="font-size: 11px; color: #008080; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">
+           <div style="margin-top: 15px; padding: 12px 0; border-top: 1.5px solid #b2dfdb; border-bottom: 1.5px solid #b2dfdb; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
+    <span style="font-size: 11px; color: #008080; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;">
         ⏳ ENDS IN:
     </span>
     
-    <div id="timerClock" style="font-size: 22px; color: #008080; font-weight: 900; font-family: 'Courier New', monospace; letter-spacing: 2px; line-height: 1;">
+    <div id="timerClock" style="font-size: 24px; color: #008080; font-weight: 900; font-family: 'Courier New', monospace; letter-spacing: 2px; line-height: 1;">
         00:00:00:00
     </div>
 </div>
@@ -1395,7 +1395,8 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
 
         if (mode === "OFFER") {
             if (diff > 0) {
-                clockElem.innerHTML = `<span style="color: #e67e22; font-weight:bold;">⏳ ENDS IN: ${timeStr}</span>`;
+                // Hahayaan nating ang CSS ng #timerClock ang mag-decide ng kulay
+clockElem.innerHTML = `<span style="font-weight: 900; font-family: 'Courier New', monospace;">${timeStr}</span>`;
             } else {
                 clockElem.innerHTML = `<span style="color: red; font-weight:bold;">❌ DEADLINE EXPIRED</span>`;
                 setTimeout(() => location.reload(), 5000);
