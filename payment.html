@@ -604,12 +604,12 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     if (cardFeeElem) cardFeeElem.innerText = "+ ₱" + cardFee.toLocaleString('en-US', {minimumFractionDigits: 2});
     if (cardTotalElem) cardTotalElem.innerText = "₱" + cardTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
 
-    // --- 6. COUNTDOWN LOGIC (NEW) ---
-    if (deadline && deadline !== "") {
-        // I-activate ang countdown kung may deadline sa Google Sheets
+    // --- 6. COUNTDOWN LOGIC ---
+    if (deadline && deadline !== "" && deadline !== "NONE") {
+        // Kung may offer deadline (2026-03-22T16:00:00.000Z), ito ang gagamitin
         startLiveCountdown(deadline);
     } else {
-        // Kung walang special deadline, default sa Due Date + Grace Period
+        // Kung wala, automatic fallback sa Due Date + Grace Period
         startLiveCountdown(null);
     }
 
@@ -674,9 +674,6 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
             let intStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_DAILY" || offer === "GRACE") ? "text-decoration: line-through; color: gray;" : "color: red;";
             feesArea.innerHTML = `<div class="fees-breakdown"><div class="fee-item"><span>Principal:</span> <span>₱${data.principal}</span></div><div class="fee-item" style="${lateStyle}"><span>Late Fee (10%):</span> <span>+ ₱${data.lateFee}</span></div><div class="fee-item" style="${intStyle}"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}</span></div></div>`;
         }
-
-        // Countdown trigger for Section D
-        setTimeout(() => { startLiveCountdown(deadline); }, 100);
     } 
     // E. UPCOMING
     else {
@@ -684,7 +681,6 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         if (daysUntil === 0) {
             banner.innerText = `🚨 DUE TODAY`;
             banner.className = "status-banner bg-upcoming pulse-today";
-            setTimeout(() => { startLiveCountdown(null); }, 100);
         } else {
             banner.innerText = `⏳ DUE IN ${daysUntil} DAYS`;
             banner.className = "status-banner bg-unpaid";
@@ -692,7 +688,9 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         }
     }
 
-    // 6. AUTO-EXIT TIMER
+    // (Dito nagtatapos ang Section E...)
+    
+    // 7. SESSION EXPIRY TIMER (Huwag itong paghaluin sa Payment Countdown)
     let exitSecs = 250;
     let timerDiv = document.getElementById('session-timer') || document.createElement('div');
     timerDiv.id = "session-timer";
@@ -701,6 +699,7 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         const card = document.querySelector('.bill-card');
         if (card) card.appendChild(timerDiv);
     }
+    
     if (globalTimer) clearInterval(globalTimer);
     globalTimer = setInterval(() => {
         exitSecs--;
@@ -710,7 +709,7 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
 
     document.getElementById('loader').style.display = 'none';
     document.getElementById('mainContainer').style.display = 'block';
-}
+} // DULO NG RENDERDATA
         
     function updateFileName() {
         const fileInput = document.getElementById('fileInput');
@@ -799,52 +798,61 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     function startLiveCountdown(customDeadline) {
     if (window.graceInterval) clearInterval(window.graceInterval);
 
+    const clockElem = document.getElementById('timerClock');
+    if (!clockElem) return;
+
     function updateClock() {
         let targetDate;
-        
-        // 1. Parse ang deadline (ISO or String)
-        if (customDeadline) {
+
+        // 1. Mas matibay na Parsing para sa ISO String
+        if (customDeadline && customDeadline !== "" && customDeadline !== "NONE") {
             targetDate = new Date(customDeadline).getTime();
         } 
-        
-        // Fallback sa Due Date + Grace Period kung walang Custom Deadline
+
+        // 2. Fallback kung invalid ang deadline o walang laman
         if (!targetDate || isNaN(targetDate)) {
             if (window.billData && window.billData.dueDate) {
+                // Default: Due Date + Grace Period (e.g., 3 days)
                 const graceDays = parseInt(window.billData.gracePeriod) || 0;
                 let fallback = new Date(window.billData.dueDate);
                 fallback.setDate(fallback.getDate() + graceDays);
                 fallback.setHours(23, 59, 59, 999);
                 targetDate = fallback.getTime();
             } else {
+                clockElem.innerText = "--:--:--";
                 return;
             }
         }
 
         const now = new Date().getTime();
         const diff = targetDate - now;
-        const clockElem = document.getElementById('timerClock');
-        if (!clockElem) return;
 
-        // 2. Kapag Expired na
         if (diff <= 0) {
             clearInterval(window.graceInterval);
             clockElem.innerText = "OFFER EXPIRED";
-            clockElem.style.color = "red";
+            clockElem.style.color = "#ff4d4d";
+            clockElem.style.fontWeight = "bold";
             
-            // Auto-reload kung may active offer para mag-apply ang penalty
+            // Reload para mag-update ang penalties sa system ni Jerric
             if (window.billData && window.billData.offerType && window.billData.offerType !== "NONE") {
-                setTimeout(() => { location.reload(); }, 3000);
+                setTimeout(() => { location.reload(); }, 5000);
             }
             return;
         }
 
-        // 3. Calculation ng D-H-M-S
         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
         const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const s = Math.floor((diff % (1000 * 60)) / 1000);
 
-        clockElem.innerText = (d > 0) ? `${d}d ${h}h ${m}m ${s}s` : `${h}h ${m}m ${s}s`;
+        // Formatting: Dagdagan ng leading zero (01:05:09)
+        const format = (num) => num.toString().padStart(2, '0');
+        
+        if (d > 0) {
+            clockElem.innerHTML = `<span style="color:#e67e22">${d}d</span> ${format(h)}h ${format(m)}m ${format(s)}s`;
+        } else {
+            clockElem.innerHTML = `${format(h)}h ${format(m)}m ${format(s)}s`;
+        }
     }
 
     updateClock();
