@@ -1180,12 +1180,14 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
                 ${deadlineDisplay}
             </div>
 
-            <div style="background: #ffffff; padding: 15px; border-radius: 10px; border: 1.5px solid #008080; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
-                <div id="timerClock" style="font-size: 28px; color: #008080; font-weight: 900; font-family: 'Courier New', monospace; letter-spacing: 2px;">
-                    00:00:00:00
-                </div>
-                <div style="font-size: 10px; color: #008080; font-weight: 800; margin-top: 5px; text-transform: uppercase;">Time Left to Pay without Penalty</div>
-            </div>
+           <div style="background: #ffffff; padding: 10px; border-radius: 8px; border: 1.2px solid #008080; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); margin: 0 auto; max-width: 250px;">
+    <div id="timerClock" style="font-size: 20px; color: #008080; font-weight: 900; font-family: 'Courier New', monospace; letter-spacing: 1px;">
+        00:00:00:00
+    </div>
+    <div style="font-size: 9px; color: #008080; font-weight: 700; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px;">
+        Time Left to Pay
+    </div>
+</div>
 
             <p style="font-size: 11px; color: #66b2b2; margin-top: 15px; font-style: italic; font-weight: 500;">
                 Take advantage of this extension to settle your balance before the timer expires.
@@ -1238,7 +1240,7 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
             let intStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_DAILY" || offer === "GRACE") ? "text-decoration: line-through; color: gray;" : "color: red;";
             feesArea.innerHTML = `<div class="fees-breakdown">
                 <div class="fee-item"><span>Principal:</span> <span>₱${data.principal}</span></div>
-                <div class="fee-item" style="${lateStyle}"><span>Late Fee (10%):</span> <span>+ ₱${data.lateFee}</span></div>
+                <div class="fee-item" style="${lateStyle}"><span>Late Payment Fee:</span> <span>+ ₱${data.lateFee}</span></div>
                 <div class="fee-item" style="${intStyle}"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}</span></div>
             </div>`;
         }
