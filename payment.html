@@ -608,19 +608,23 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     if (cardFeeElem) cardFeeElem.innerText = "+ ₱" + cardFee.toLocaleString('en-US', {minimumFractionDigits: 2});
     if (cardTotalElem) cardTotalElem.innerText = "₱" + cardTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
 
-    // --- 6. SEPARATED TIMER LOGIC ---
-    const clockElem = document.getElementById('timerClock');
-    
-    // CASE A: May Special Offer o Grace Deadline (PABABA ANG RELO)
-    if (deadline && deadline !== "" && deadline !== "NONE") {
-        // Countdown mode: Gaano na lang katagal bago mawala ang offer?
-        startLiveCountdown(deadline, "OFFER"); 
-    } 
-    // CASE B: Walang Offer, Standard Due Date lang (PATAAS O PABABA DEPENDE KUNG LATE)
-    else {
-        // Standard mode: Due Today o Overdue na?
-        startLiveCountdown(data.dueDate, "STANDARD");
-    }
+   // --- 6. GRACE & DEADLINE CONNECTION ---
+let timerTarget = null;
+let timerMode = "";
+
+// Check muna natin kung may laman ang 'deadline' (offerDeadline sa Sheets)
+if (data.offerDeadline && data.offerDeadline !== "" && data.offerDeadline !== "NONE") {
+    // DITO MO NAKABASE ANG GRACE PERIOD
+    timerTarget = data.offerDeadline; 
+    timerMode = "GRACE"; // O "OFFER"
+} else {
+    // Kung walang deadline, balik tayo sa Standard Due Date
+    timerTarget = data.dueDate;
+    timerMode = "STANDARD";
+}
+
+// Isalang sa relo
+startLiveCountdown(timerTarget, timerMode);
 
     // --- 7. STATUS & BANNER LOGIC (KASUNOD) ---
     // (Dito mo itutuloy ang mga if(status === 'unpaid') etc. mo...)
