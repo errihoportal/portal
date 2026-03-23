@@ -589,7 +589,30 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     if (totalLabel) totalLabel.style.display = 'block';
     if (amountDiv) amountDiv.parentElement.style.display = 'flex';
 
-    // 5. THE LOGIC ENGINE
+   // --- 5. CARD FEE CALCULATION (NEW) ---
+    const feeMultiplier = 0.032; // 3.20%
+    const cardFee = displayTotal * feeMultiplier;
+    const cardTotal = displayTotal + cardFee;
+
+    const cardBaseElem = document.getElementById('cardBaseAmount');
+    const cardFeeElem = document.getElementById('cardFeeAmount');
+    const cardTotalElem = document.getElementById('cardTotalAmount');
+
+    if (cardBaseElem) cardBaseElem.innerText = "₱" + displayTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
+    if (cardFeeElem) cardFeeElem.innerText = "+ ₱" + cardFee.toLocaleString('en-US', {minimumFractionDigits: 2});
+    if (cardTotalElem) cardTotalElem.innerText = "₱" + cardTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+    // --- 6. COUNTDOWN LOGIC (NEW) ---
+    if (deadline && deadline !== "") {
+        // I-activate ang countdown kung may deadline sa Google Sheets
+        startLiveCountdown(deadline);
+    } else {
+        // Kung walang special deadline, default sa Due Date + Grace Period
+        startLiveCountdown(null);
+    }
+
+    // --- 7. STATUS & BANNER LOGIC (KASUNOD) ---
+    // (Dito mo itutuloy ang mga if(status === 'unpaid') etc. mo...)
     
     if (status === "maintenance") {
         // ... (Maintenance logic remains the same)
@@ -776,14 +799,13 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
 
     function updateClock() {
         let targetDate;
-
-        // 1. CLEANING THE DATE INPUT
+        
+        // 1. Parse ang deadline (ISO or String)
         if (customDeadline) {
-            // Sinisiguro nito na kahit ISO String (may T at Z), babasahin ito nang tama
             targetDate = new Date(customDeadline).getTime();
         } 
         
-        // Fallback kung walang custom deadline o invalid ang format
+        // Fallback sa Due Date + Grace Period kung walang Custom Deadline
         if (!targetDate || isNaN(targetDate)) {
             if (window.billData && window.billData.dueDate) {
                 const graceDays = parseInt(window.billData.gracePeriod) || 0;
@@ -801,20 +823,20 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
         const clockElem = document.getElementById('timerClock');
         if (!clockElem) return;
 
-        // 2. CHECK IF EXPIRED
+        // 2. Kapag Expired na
         if (diff <= 0) {
             clearInterval(window.graceInterval);
             clockElem.innerText = "OFFER EXPIRED";
             clockElem.style.color = "red";
             
-            // Auto-reload para bumalik sa original price (penalty included)
+            // Auto-reload kung may active offer para mag-apply ang penalty
             if (window.billData && window.billData.offerType && window.billData.offerType !== "NONE") {
                 setTimeout(() => { location.reload(); }, 3000);
             }
             return;
         }
 
-        // 3. DISPLAY LOGIC (D-H-M-S)
+        // 3. Calculation ng D-H-M-S
         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
         const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -827,37 +849,40 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     window.graceInterval = setInterval(updateClock, 1000);
 }
     
-function toggleOption(contentId, arrowId) {
+function toggleOption(contentId) {
     const allOptions = document.querySelectorAll('.option-item');
     const targetContent = document.getElementById(contentId);
-    const selectedOption = targetContent.closest('.option-item');
-    const arrow = document.getElementById(arrowId);
     
-    // Check kung kasalukuyang nakasara
-    const isOpening = targetContent.style.display !== 'block';
+    // Automatic na hanapin ang arrow base sa prefix (e.g., 'qrph' mula sa 'qrph-content')
+    const prefix = contentId.split('-')[0]; 
+    const arrow = document.getElementById('arrow-' + prefix);
+    
+    // Check kung kasalukuyang nakasara (gamit ang computed style para sigurado)
+    const isOpening = window.getComputedStyle(targetContent).display === 'none';
 
     if (isOpening) {
-        // 1. Itago lahat ng ibang boxes
+        // 1. Itago muna ang lahat (Para magmukhang "focused" ang pinili)
         allOptions.forEach(option => {
             option.style.display = 'none';
         });
 
-        // 2. Ipakita ang piniling box at ang details nito
+        // 2. Ipakita ang magulang na box at ang mismong details
+        const selectedOption = targetContent.closest('.option-item');
         selectedOption.style.display = 'block';
         targetContent.style.display = 'block';
         
-        // 3. Palitan ang arrow gamit ang ID
+        // 3. Palitan ang arrow
         if (arrow) arrow.innerHTML = '▲';
 
     } else {
-        // PAG I-C-CLOSE NA (Babalik sa listahan)
+        // PAG I-C-CLOSE NA (Babalik sa main list)
         
         // 1. Ipakita ulit lahat ng boxes
         allOptions.forEach(option => {
             option.style.display = 'block';
         });
 
-        // 2. Itago ang details
+        // 2. Itago ang details ng pinili
         targetContent.style.display = 'none';
         
         // 3. Ibalik sa down ang arrow
