@@ -13,25 +13,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
-
         :root { --primary: #e67e22; --success: #2ecc71; --danger: #e74c3c; --dark: #2c3e50; }
-
         body { font-family: 'Poppins', sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
-
         .container { width: 100%; max-width: 450px; background: white; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.1); position: relative; padding-bottom: 80px; display: none; }
-
         .loading-screen { width: 100%; max-width: 450px; height: 100vh; background: white; display: flex; justify-content: center; align-items: center; text-align: center; }
-
         .header { text-align: center; padding: 20px; background: white; }
-
         .logo { width: 120px; height: auto; }
-
         .status-banner { padding: 10px; text-align: center; font-weight: bold; color: white; text-transform: uppercase; letter-spacing: 1px; }
-
         .bg-unpaid { background-color: #f39c12; }
-
         .bg-overdue { background-color: var(--danger); }
-
         .bg-verifying { background-color: #3498db; }
 
         .bg-paid { background-color: var(--success); }
@@ -997,14 +987,17 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     const offer = data.offerType ? data.offerType.trim() : "NONE"; 
     
     // --- FORMAT DEADLINE DATE ---
-    const deadlineRaw = data.offerDeadline;
-    let deadlineDisplay = "IMMEDIATE";
-    if (deadlineRaw) {
-        const dDate = new Date(deadlineRaw);
-        deadlineDisplay = dDate.toLocaleDateString('en-US', { 
-            month: 'long', day: '2-digit', year: 'numeric' 
-        }).toUpperCase();
-    }
+const deadlineRaw = data.offerDeadline;
+let deadlineDisplay = "IMMEDIATE";
+if (deadlineRaw) {
+    const dDate = new Date(deadlineRaw);
+    deadlineDisplay = dDate.toLocaleDateString('en-US', { 
+        month: 'long', 
+        day: 'numeric', 
+        year: 'numeric', 
+        weekday: 'long' // Dagdag ito para sa "Monday"
+    }).toUpperCase();
+}
 
     window.billData = data;
 
@@ -1013,7 +1006,13 @@ if (!isAuthorized && !hasDirectLink && !hasPortalLink) {
     document.getElementById('billNumDisplay').innerText = "Bill #" + data.bill;
     document.getElementById('itemName').innerText = data.item;
     document.getElementById('qrImg').src = data.qrLink;
-    dateDisplay.innerText = data.dueDate;
+    const mainDueDate = new Date(data.dueDate);
+dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', { 
+    month: 'long', 
+    day: 'numeric', 
+    year: 'numeric', 
+    weekday: 'long' 
+}).toUpperCase();
 
     // 3. AMOUNT LOGIC
     let displayTotal = parseFloat(data.amount) || 0; 
