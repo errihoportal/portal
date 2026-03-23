@@ -1146,16 +1146,64 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
         `;
     }
     else if (daysLate > 0) {
-        // OVERDUE LOGIC
-        if (offer !== "NONE" && offer !== "" && offer !== "GRACE") {
-            banner.innerText = offer === "LEGAL_NOTICE" ? "⚠️ REPOSSESSION NOTICE" : "✨ SPECIAL OFFER ACTIVE";
-            banner.className = "status-banner bg-grace";
-            dNote.innerHTML = `<div style="padding:15px; border:2px solid black; background:#fff;">
-                🚨 <b>NOTICE:</b> Deadline: <span style="color:red;">${deadlineDisplay}</span>
-                <div id="timerClock" style="font-size: 20px; font-weight: bold; color: red; margin-top: 10px;"></div>
+    // 1. DYNAMIC COLOR & TEXT SETTINGS
+    let boxColor = "#d63031"; // Default Red
+    let bgColor = "#fff5f5";
+    let offerTitle = "⚠️ REPOSSESSION NOTICE";
+    let subMessage = `Failure to settle by the deadline will result in <b>immediate device repossession</b> and account termination.`;
+
+    // 2. CHECK OFFER TYPE (Dito mo i-edit lahat)
+    switch(offer) {
+        case "LEGAL_NOTICE":
+            offerTitle = "⚠️ LEGAL REPOSSESSION NOTICE";
+            // Stay Red
+            break;
+        case "WAIVE_PENALTY":
+            boxColor = "#008080"; bgColor = "#f0fdfa";
+            offerTitle = "✨ PENALTY WAIVER ACTIVE";
+            subMessage = "Good news! Your late payment fee has been waived. Settle the remaining balance before it expires.";
+            break;
+        case "WAIVE_DAILY":
+            boxColor = "#008080"; 
+            bgColor = "#f0fdfa";
+            offerTitle = "📉 DAILY INTEREST WAIVED";
+            subMessage = "To help you settle your balance, we have removed your accumulated daily interest. Pay only the principal and late fee!";
+            break;
+        case "WAIVE_ALL":
+            boxColor = "#008080"; bgColor = "#f0fdfa";
+            offerTitle = "🎁 FULL WAIVER GRANTED";
+            subMessage = "Special privilege: All penalties and interests have been removed. Pay only the principal amount now!";
+            break;
+        case "DISCOUNT_50":
+            boxColor = "#f39c12"; bgColor = "#fffdf5";
+            offerTitle = "⚡ 50% PENALTY DISCOUNT";
+            subMessage = "Flash Offer: Pay only half of your penalties if you settle within the given time limit.";
+            break;
+        case "GRACE":
+            // I-skip ito dahil may sarili kang "else if (offer === 'GRACE')" sa baba
+            return; 
+    }
+
+    // 3. RENDER THE DYNAMIC BOX (Unified Design)
+    if (offer !== "NONE" && offer !== "" && offer !== "GRACE") {
+        banner.innerText = offerTitle;
+        banner.className = "status-banner"; // Add your CSS class
+        banner.style.backgroundColor = boxColor;
+
+        dNote.innerHTML = `
+            <div style="padding: 20px; border: 2px solid ${boxColor}; background: ${bgColor}; border-radius: 12px; text-align: center;">
+                <div style="font-size: 13px; color: ${boxColor}; font-weight: 800; text-transform: uppercase; margin-bottom: 8px;">
+                    ${offerTitle}
+                </div>
+                <p style="font-size: 14px; color: #2c3e50; margin-bottom: 15px;">${subMessage}</p>
+                <div style="padding: 10px 0; border-top: 1.5px dashed ${boxColor}; border-bottom: 1.5px dashed ${boxColor};">
+                    <span style="font-size: 11px; color: #636e72; font-weight: 700;">FINAL DEADLINE: ${deadlineDisplay}</span>
+                    <div id="timerClock" style="font-size: 24px; color: ${boxColor}; font-weight: 900; font-family: 'Courier New', monospace; margin-top: 5px;">00:00:00:00</div>
+                </div>
             </div>`;
-            startLiveCountdown(deadlineRaw, "OFFER"); 
-        } 
+        startLiveCountdown(deadlineRaw, "OFFER");
+    }
+}
         else if (offer === "GRACE") {
     banner.innerText = "✨ GRACE PERIOD GRANTED";
     banner.className = "status-banner bg-grace"; // Siguraduhin na ang bg-grace sa CSS ay Teal Green
