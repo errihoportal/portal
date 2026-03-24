@@ -1078,8 +1078,8 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
         } else if (offer === "WAIVE_DAILY") {
             displayTotal = (parseFloat(data.principal) || 0) + (parseFloat(data.lateFee) || 0);
         } else if (offer === "DISCOUNT_50") {
-            let penalties = (parseFloat(data.lateFee) || 0) + (parseFloat(data.dailyInterest) || 0);
-            displayTotal = (parseFloat(data.principal) || 0) + (penalties * 0.5);
+            let penalties = (parseFloat(String(data.lateFee).replace(/,/g, '')) || 0) + (parseFloat(String(data.dailyInterest).replace(/,/g, '')) || 0);
+        displayTotal = (parseFloat(String(data.principal).replace(/,/g, '')) || 0) + (penalties * 0.5);
         }
     }
     document.getElementById('totalAmount').innerText = displayTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
