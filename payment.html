@@ -1078,8 +1078,21 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
         } else if (offer === "WAIVE_DAILY") {
             displayTotal = (parseFloat(data.principal) || 0) + (parseFloat(data.lateFee) || 0);
         } else if (offer === "DISCOUNT_50") {
-            let penalties = (parseFloat(String(data.lateFee).replace(/,/g, '')) || 0) + (parseFloat(String(data.dailyInterest).replace(/,/g, '')) || 0);
-        displayTotal = (parseFloat(String(data.principal).replace(/,/g, '')) || 0) + (penalties * 0.5);
+            // Kunin ang malinis na values
+            let p = parseFloat(String(data.principal).replace(/,/g, '')) || 0;
+            let lf = parseFloat(String(data.lateFee).replace(/,/g, '')) || 0;
+            let di = parseFloat(String(data.dailyInterest).replace(/,/g, '')) || 0;
+            
+            // DITO NATIN I-UUPDATE ANG MGA FEES PARA MAG-DISCOUNT DIN SA DISPLAY
+            let discountedLF = lf * 0.5;
+            let discountedDI = di * 0.5;
+            
+            // I-save pabalik sa 'data' para sa breakdown area
+            data.lateFee = discountedLF.toFixed(2);
+            data.dailyInterest = discountedDI.toFixed(2);
+            
+            // Compute ang saktong 13,027.41
+            displayTotal = p + discountedLF + discountedDI;
         }
     }
     document.getElementById('totalAmount').innerText = displayTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
