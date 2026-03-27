@@ -1105,13 +1105,19 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
     activeSec.style.display = 'block';
 
     // 5. CARD FEE
-    const feeMultiplier = 0.032;
-    const cardFee = displayTotal * feeMultiplier;
-    const cardTotal = displayTotal + cardFee;
-    if (document.getElementById('cardBaseAmount')) document.getElementById('cardBaseAmount').innerText = "₱" + displayTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
-    if (document.getElementById('cardFeeAmount')) document.getElementById('cardFeeAmount').innerText = "+ ₱" + cardFee.toLocaleString('en-US', {minimumFractionDigits: 2});
-    if (document.getElementById('cardTotalAmount')) document.getElementById('cardTotalAmount').innerText = "₱" + cardTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
+const feeMultiplier = 0.032;
+const cardFee = displayTotal * feeMultiplier;
+const cardTotal = displayTotal + cardFee;
 
+if (document.getElementById('cardBaseAmount')) 
+    document.getElementById('cardBaseAmount').innerText = "₱" + displayTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+if (document.getElementById('cardFeeAmount')) 
+    document.getElementById('cardFeeAmount').innerText = "+ ₱" + cardFee.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+if (document.getElementById('cardTotalAmount')) 
+    document.getElementById('cardTotalAmount').innerText = "₱" + cardTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
     // --- 6. MAIN STATUS LOGIC (FIXED STRUCTURE) ---
     if (status === "maintenance") {
     banner.innerText = "🚧 SYSTEM SCHEDULED MAINTENANCE";
