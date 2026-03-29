@@ -1068,31 +1068,28 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
     weekday: 'long' 
 }).toUpperCase();
 
-   // --- 3. AMOUNT LOGIC (FIXED) ---
+  // --- 3. AMOUNT LOGIC (AUTO-OVERRIDE) ---
 let displayTotal = parseFloat(data.amount) || 0; 
 const principalOnly = parseFloat(data.principal) || 0;
 
-if (daysLate > 0) {
-    // A. Check kung expired na ang deadline (Dapat match ito sa timer mo)
-    let isExpired = false;
-    if (data.offerDeadline) {
-        const now = new Date().getTime();
-        let target = new Date(data.offerDeadline);
-        if (target.getHours() === 0 && target.getMinutes() === 0) {
-            target.setHours(23, 59, 59, 999);
-        }
-        if (now > target.getTime()) isExpired = true;
-    }
+// Alamin muna natin ang Oras Ngayon vs Deadline
+let isExpired = false;
+if (data.offerDeadline) {
+    const now = new Date().getTime();
+    let target = new Date(data.offerDeadline);
+    if (target.getHours() === 0 && target.getMinutes() === 0) target.setHours(23, 59, 59, 999);
+    if (now > target.getTime()) isExpired = true; // Dito natin malalaman kung expired na
+}
 
-    // B. DECISION LOGIC
+if (daysLate > 0) {
+    // KUNG EXPIRED NA (Kahit "YES" pa ang Grace sa Sheets, babalik ang Penalty)
     if (isExpired) {
-        // EXPIRED NA: Gamitin ang buong amount (Principal + Penalties)
-        displayTotal = parseFloat(data.amount) || 0; 
+        displayTotal = parseFloat(data.amount) || 0; // Kukunin ang full amount (may penalty)
     } 
+    // KUNG HINDI PA EXPIRED (Dito lang gagana ang 0 penalty/discount)
     else {
-        // ACTIVE PA ANG OFFER/GRACE: I-apply ang discounts
         if (offer === "WAIVE_ALL" || isGrace || offer === "GRACE") {
-            displayTotal = principalOnly;
+            displayTotal = principalOnly; // 0 Penalty (Principal lang)
         } else if (offer === "WAIVE_PENALTY") {
             displayTotal = principalOnly + (parseFloat(data.dailyInterest) || 0);
         } else if (offer === "WAIVE_DAILY") {
