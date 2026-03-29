@@ -1085,30 +1085,43 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
             if (now > target.getTime()) isExpired = true;
         }
 
-        // B. Logic para sa Presyo
-        if (isExpired) {
-            // Kung expired na, ipakita ang FULL AMOUNT (Principal + Penalties)
-            displayTotal = parseFloat(data.amount) || 0; 
-        } else {
-            // Kung HINDI pa expired, sundin ang offers
-            if (offer === "WAIVE_ALL" || isGrace) {
-                displayTotal = principalOnly;
-            } else if (offer === "WAIVE_PENALTY") {
-                displayTotal = principalOnly + (parseFloat(data.dailyInterest) || 0);
-            } else if (offer === "WAIVE_DAILY") {
-                displayTotal = principalOnly + (parseFloat(data.lateFee) || 0);
-            } else if (offer === "DISCOUNT_50") {
-                let lf = parseFloat(String(data.lateFee).replace(/,/g, '')) || 0;
-                let di = parseFloat(String(data.dailyInterest).replace(/,/g, '')) || 0;
-                displayTotal = principalOnly + (lf * 0.5) + (di * 0.5);
-                
-                // I-update din ang data para sa fees breakdown display
-                data.lateFee = (lf * 0.5).toFixed(2);
-                data.dailyInterest = (di * 0.5).toFixed(2);
-            }
+        // --- 3. AMOUNT LOGIC (FIXED) ---
+let displayTotal = parseFloat(data.amount) || 0; 
+const principalOnly = parseFloat(data.principal) || 0;
+
+if (daysLate > 0) {
+    // A. Check kung expired na ang deadline (Dapat match ito sa timer mo)
+    let isExpired = false;
+    if (data.offerDeadline) {
+        const now = new Date().getTime();
+        let target = new Date(data.offerDeadline);
+        if (target.getHours() === 0 && target.getMinutes() === 0) {
+            target.setHours(23, 59, 59, 999);
+        }
+        if (now > target.getTime()) isExpired = true;
+    }
+
+    // B. DECISION LOGIC
+    if (isExpired) {
+        // EXPIRED NA: Gamitin ang buong amount (Principal + Penalties)
+        displayTotal = parseFloat(data.amount) || 0; 
+    } 
+    else {
+        // ACTIVE PA ANG OFFER/GRACE: I-apply ang discounts
+        if (offer === "WAIVE_ALL" || isGrace || offer === "GRACE") {
+            displayTotal = principalOnly;
+        } else if (offer === "WAIVE_PENALTY") {
+            displayTotal = principalOnly + (parseFloat(data.dailyInterest) || 0);
+        } else if (offer === "WAIVE_DAILY") {
+            displayTotal = principalOnly + (parseFloat(data.lateFee) || 0);
+        } else if (offer === "DISCOUNT_50") {
+            let lf = parseFloat(String(data.lateFee).replace(/,/g, '')) || 0;
+            let di = parseFloat(String(data.dailyInterest).replace(/,/g, '')) || 0;
+            displayTotal = principalOnly + (lf * 0.5) + (di * 0.5);
         }
     }
-    document.getElementById('totalAmount').innerText = displayTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+}
+document.getElementById('totalAmount').innerText = displayTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         
     // 4. INITIAL RESET
     banner.className = "status-banner";
