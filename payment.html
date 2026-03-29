@@ -1259,6 +1259,8 @@ if (document.getElementById('cardTotalAmount'))
     }
     else if (daysLate > 0) {
     // 1. CHECK KUNG EXPIRED NA ANG OFFER/GRACE DEADLINE
+
+    let currentOffer = isExpired ? "NONE" : offer;
     
     if (deadlineRaw) {
         const now = new Date().getTime();
@@ -1271,7 +1273,7 @@ if (document.getElementById('cardTotalAmount'))
 
     // 2. FORCE OVERDUE STATUS KUNG EXPIRED NA
     // Kung expired na, i-ignore natin ang offer/grace at i-set sa NONE
-    let currentOffer = isExpired ? "NONE" : offer;
+    currentOffer = isExpired ? "NONE" : offer;
         
     // 3. DYNAMIC COLOR & TEXT SETTINGS
     let boxColor = "#d63031"; // Default Red
