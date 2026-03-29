@@ -1377,15 +1377,19 @@ if (document.getElementById('cardTotalAmount'))
     }
 
         // Display Fees Breakdown
-        if (feesArea) {
-            let lateStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_PENALTY" || offer === "GRACE") ? "text-decoration: line-through; color: gray;" : "color: red;";
-            let intStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_DAILY" || offer === "GRACE") ? "text-decoration: line-through; color: gray;" : "color: red;";
-            feesArea.innerHTML = `<div class="fees-breakdown">
-                <div class="fee-item"><span>Principal:</span> <span>₱${data.principal}</span></div>
-                <div class="fee-item" style="${lateStyle}"><span>Late Payment Fee:</span> <span>+ ₱${data.lateFee}</span></div>
-                <div class="fee-item" style="${intStyle}"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}</span></div>
-            </div>`;
-        }
+if (feesArea) {
+    // Kung expired na, wala nang strikethrough (slash) sa penalties
+    let noSlash = isExpired ? "" : "text-decoration: line-through; color: gray;";
+    
+    let lateStyle = (currentOffer === "WAIVE_ALL" || currentOffer === "WAIVE_PENALTY" || currentOffer === "GRACE") ? noSlash : "color: red;";
+    let intStyle = (currentOffer === "WAIVE_ALL" || currentOffer === "WAIVE_DAILY" || currentOffer === "GRACE") ? noSlash : "color: red;";
+    
+    feesArea.innerHTML = `<div class="fees-breakdown">
+        <div class="fee-item"><span>Principal:</span> <span>₱${data.principal}</span></div>
+        <div class="fee-item" style="${lateStyle}"><span>Late Payment Fee:</span> <span>+ ₱${data.lateFee}</span></div>
+        <div class="fee-item" style="${intStyle}"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}</span></div>
+    </div>`;
+}
     }
     else {
         // UPCOMING / DUE TODAY / DUE TOMORROW
