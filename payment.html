@@ -1587,40 +1587,42 @@ if (document.getElementById('cardTotalAmount'))
         const now = new Date().getTime();
         let target = new Date(targetTime);
         
-        // Gawing dulo ng araw (11:59:59 PM) kung date lang ang nasa Sheets
+        // Gawing dulo ng araw kung date lang
         if (target.getHours() === 0 && target.getMinutes() === 0) {
             target.setHours(23, 59, 59, 999);
         }
         
         const diff = target.getTime() - now;
-        const absDiff = Math.abs(diff);
         
-        // Math for Days, Hours, Minutes, Seconds
-        const d = Math.floor(absDiff / (1000 * 60 * 60 * 24));
-        const h = Math.floor((absDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const m = Math.floor((absDiff % (1000 * 60 * 60)) / (1000 * 60));
-        const s = Math.floor((absDiff % (1000 * 60)) / 1000);
+        // --- 1. LOGIC PARA SA EXPIRED NA ---
+        if (diff <= 0) {
+            clearInterval(window.graceInterval); // Itigil na ang pag-count
+            
+            if (mode === "OFFER") {
+                clockElem.innerHTML = `<span style="color: red; font-weight:bold;">❌ DEADLINE EXPIRED</span>`;
+                // Refresh agad (1 second lang) para bumalik sa Overdue Status
+                setTimeout(() => { location.reload(); }, 1000); 
+            } else {
+                // Para sa Standard Mode (Due Today/Tomorrow)
+                clockElem.innerHTML = `<span style="color: #ff4d4d; font-weight:bold;">⚠️ ACCOUNT OVERDUE</span>`;
+            }
+            return; // Hinto na dito ang function
+        }
+
+        // --- 2. MATH PARA SA ACTIVE COUNTDOWN ---
+        // Gagamitin lang ang diff (hindi absDiff) para pababa ang bilang
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
         
         const format = (n) => n.toString().padStart(2, '0');
-        
-        // Format na hiningi mo: Days + Hours + Mins + Secs
         const timeStr = `${d}d ${format(h)}h ${format(m)}m ${format(s)}s`;
 
         if (mode === "OFFER") {
-            if (diff > 0) {
-                // Hahayaan nating ang CSS ng #timerClock ang mag-decide ng kulay
-clockElem.innerHTML = `<span style="font-weight: 900; font-family: 'Courier New', monospace;">${timeStr}</span>`;
-            } else {
-                clockElem.innerHTML = `<span style="color: red; font-weight:bold;">❌ DEADLINE EXPIRED</span>`;
-                setTimeout(() => location.reload(), 5000);
-            }
+            clockElem.innerHTML = `<span style="font-weight: 900; font-family: 'Courier New', monospace;">${timeStr}</span>`;
         } else {
-            // STANDARD MODE
-            if (diff > 0) {
-                clockElem.innerHTML = `<span style="color: #3498db;">⏳ DUE IN: ${timeStr}</span>`;
-            } else {
-                clockElem.innerHTML = `<span style="color: #ff4d4d; font-weight:bold;">⚠️ OVERDUE: ${timeStr}</span>`;
-            }
+            clockElem.innerHTML = `<span style="color: #3498db;">⏳ DUE IN: ${timeStr}</span>`;
         }
     }
 
