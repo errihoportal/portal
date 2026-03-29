@@ -1068,24 +1068,7 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
     weekday: 'long' 
 }).toUpperCase();
 
-    // --- 3. AMOUNT LOGIC (FIXED) ---
-    let displayTotal = parseFloat(data.amount) || 0; 
-    const principalOnly = parseFloat(data.principal) || 0;
-
-    if (daysLate > 0) {
-        // A. Alamin muna kung expired na ang deadline
-        let isExpired = false;
-        if (data.offerDeadline) {
-            const now = new Date().getTime();
-            let target = new Date(data.offerDeadline);
-            // Gawing 11:59:59 PM kung date lang
-            if (target.getHours() === 0 && target.getMinutes() === 0) {
-                target.setHours(23, 59, 59, 999);
-            }
-            if (now > target.getTime()) isExpired = true;
-        }
-
-        // --- 3. AMOUNT LOGIC (FIXED) ---
+   // --- 3. AMOUNT LOGIC (FIXED) ---
 let displayTotal = parseFloat(data.amount) || 0; 
 const principalOnly = parseFloat(data.principal) || 0;
 
