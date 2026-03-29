@@ -1248,14 +1248,25 @@ if (document.getElementById('cardTotalAmount'))
         `;
     }
     else if (daysLate > 0) {
-    // 1. DYNAMIC COLOR & TEXT SETTINGS
+    // 1. CHECK KUNG EXPIRED NA ANG OFFER DEADLINE
+    let isExpired = false;
+    if (deadlineRaw) {
+        const now = new Date().getTime();
+        let target = new Date(deadlineRaw);
+        // I-set sa 11:59:59 PM kung date lang ang galing sa Sheets
+        if (target.getHours() === 0 && target.getMinutes() === 0) {
+            target.setHours(23, 59, 59, 999);
+        }
+        if (now > target.getTime()) isExpired = true;
+    }
+    // 2. DYNAMIC COLOR & TEXT SETTINGS
     let boxColor = "#d63031"; // Default Red
     let bgColor = "#fff5f5";
     let offerTitle = "⚠️ REPOSSESSION NOTICE";
     let subMessage = `Failure to settle by the deadline will result in <b>immediate device repossession</b> and account termination.`;
 
-    // 2. CHECK OFFER TYPE (Dito mo i-edit lahat)
-    switch(offer) {
+    // 3. CHECK OFFER TYPE (Gamitin ang currentOffer sa switch)
+   switch(currentOffer) {
         case "LEGAL_NOTICE":
             offerTitle = "⚠️ LEGAL REPOSSESSION NOTICE";
             // Stay Red
@@ -1280,7 +1291,9 @@ if (document.getElementById('cardTotalAmount'))
             boxColor = "#f39c12"; bgColor = "#fffdf5";
             offerTitle = "⚡ 50% PENALTY DISCOUNT";
             subMessage = "Flash Offer: Pay only half of your penalties if you settle within the given time limit.";
-            break; 
+            break;
+        default:
+            currentOffer = "NONE"; // Babalik ito sa Red Overdue notice sa baba
     }
         
     // 3. RENDER THE DYNAMIC BOX (Unified Design)
