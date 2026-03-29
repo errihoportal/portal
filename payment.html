@@ -1068,13 +1068,13 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
     weekday: 'long' 
 }).toUpperCase();
 
-  // --- 3. AMOUNT LOGIC (FIXED) ---
-    const fullAmount = parseFloat(String(data.amount).replace(/,/g, '')) || 0;
-    const principalOnly = parseFloat(String(data.principal).replace(/,/g, '')) || 0;
-    const lateFee = parseFloat(String(data.lateFee).replace(/,/g, '')) || 0;
-    const dailyInt = parseFloat(String(data.dailyInterest).replace(/,/g, '')) || 0;
+  // --- 3. AMOUNT LOGIC (STABLE) ---
+    const principalValue = parseFloat(String(data.principal).replace(/,/g, '')) || 0;
+    const lateFeeValue = parseFloat(String(data.lateFee).replace(/,/g, '')) || 0;
+    const dailyIntValue = parseFloat(String(data.dailyInterest).replace(/,/g, '')) || 0;
+    const fullAmountValue = principalValue + lateFeeValue + dailyIntValue;
 
-    // ALAMIN AGAD KUNG EXPIRED (Para magamit sa buong function)
+    // ALAMIN KUNG EXPIRED
     let isExpired = false;
     if (data.offerDeadline) {
         const now = new Date().getTime();
@@ -1083,28 +1083,37 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
         if (now > target.getTime()) isExpired = true;
     }
 
-    let displayTotal = fullAmount; 
+    let displayTotal = fullAmountValue; 
+    let finalLateFee = lateFeeValue;
+    let finalDailyInt = dailyIntValue;
 
     if (daysLate > 0) {
-        // KUNG EXPIRED NA: Force Full Amount (Penalty included)
-        if (isExpired) {
-            displayTotal = fullAmount;
-        } 
-        // KUNG ACTIVE PA: Apply Discounts/Grace
-        else {
+        // KUNG ACTIVE PA ANG OFFER (HINDI EXPIRED)
+        if (!isExpired) {
             if (isGrace || offer === "WAIVE_ALL" || offer === "GRACE") {
-                displayTotal = principalOnly;
+                displayTotal = principalValue;
+                finalLateFee = 0;
+                finalDailyInt = 0;
             } else if (offer === "WAIVE_PENALTY") {
-                displayTotal = principalOnly + dailyInt;
+                displayTotal = principalValue + dailyIntValue;
+                finalLateFee = 0;
             } else if (offer === "WAIVE_DAILY") {
-                displayTotal = principalOnly + lateFee;
+                displayTotal = principalValue + lateFeeValue;
+                finalDailyInt = 0;
             } else if (offer === "DISCOUNT_50") {
-                displayTotal = principalOnly + (lateFee * 0.5) + (dailyInt * 0.5);
-                data.lateFee = (lateFee * 0.5).toFixed(2);
-                data.dailyInterest = (dailyInt * 0.5).toFixed(2);
+                finalLateFee = lateFeeValue * 0.5;
+                finalDailyInt = dailyIntValue * 0.5;
+                displayTotal = principalValue + finalLateFee + finalDailyInt;
             }
+        } else {
+            // KUNG EXPIRED NA: Balik sa Full Amount
+            displayTotal = fullAmountValue;
+            finalLateFee = lateFeeValue;
+            finalDailyInt = dailyIntValue;
         }
     }
+
+    // I-display ang Total
     document.getElementById('totalAmount').innerText = displayTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         
     // 4. INITIAL RESET
@@ -1377,18 +1386,16 @@ if (document.getElementById('cardTotalAmount'))
 
         // Display Fees Breakdown
 if (feesArea) {
-    // Kung expired na, wala nang strikethrough (slash) sa penalties
-    let noSlash = isExpired ? "" : "text-decoration: line-through; color: gray;";
-    
-    let lateStyle = (currentOffer === "WAIVE_ALL" || currentOffer === "WAIVE_PENALTY" || currentOffer === "GRACE") ? noSlash : "color: red;";
-    let intStyle = (currentOffer === "WAIVE_ALL" || currentOffer === "WAIVE_DAILY" || currentOffer === "GRACE") ? noSlash : "color: red;";
-    
-    feesArea.innerHTML = `<div class="fees-breakdown">
-        <div class="fee-item"><span>Principal:</span> <span>₱${data.principal}</span></div>
-        <div class="fee-item" style="${lateStyle}"><span>Late Payment Fee:</span> <span>+ ₱${data.lateFee}</span></div>
-        <div class="fee-item" style="${intStyle}"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}</span></div>
-    </div>`;
-}
+        // Kung expired na, wala nang strikethrough at dapat red ang fees
+        let lateStyle = (isExpired || (offer !== "WAIVE_ALL" && offer !== "WAIVE_PENALTY" && offer !== "GRACE")) ? "color: red;" : "text-decoration: line-through; color: gray;";
+        let intStyle = (isExpired || (offer !== "WAIVE_ALL" && offer !== "WAIVE_DAILY" && offer !== "GRACE")) ? "color: red;" : "text-decoration: line-through; color: gray;";
+        
+        feesArea.innerHTML = `<div class="fees-breakdown">
+            <div class="fee-item"><span>Principal:</span> <span>₱${principalValue.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>
+            <div class="fee-item" style="${lateStyle}"><span>Late Payment Fee:</span> <span>+ ₱${finalLateFee.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>
+            <div class="fee-item" style="${intStyle}"><span>Daily Interest:</span> <span>+ ₱${finalDailyInt.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>
+        </div>`;
+    }
     }
     else {
         // UPCOMING / DUE TODAY / DUE TOMORROW
