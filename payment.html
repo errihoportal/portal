@@ -1259,7 +1259,7 @@ if (document.getElementById('cardTotalAmount'))
     }
     else if (daysLate > 0) {
     // 1. CHECK KUNG EXPIRED NA ANG OFFER/GRACE DEADLINE
-    let currentOffer = isExpired ? "NONE" : offer;
+    
     if (deadlineRaw) {
         const now = new Date().getTime();
         let target = new Date(deadlineRaw);
