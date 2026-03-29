@@ -1248,27 +1248,28 @@ if (document.getElementById('cardTotalAmount'))
         `;
     }
     else if (daysLate > 0) {
-    // 1. CHECK KUNG EXPIRED NA ANG OFFER DEADLINE
+    // 1. CHECK KUNG EXPIRED NA ANG OFFER/GRACE DEADLINE
     let isExpired = false;
     if (deadlineRaw) {
         const now = new Date().getTime();
         let target = new Date(deadlineRaw);
-        // I-set sa 11:59:59 PM kung date lang ang galing sa Sheets
         if (target.getHours() === 0 && target.getMinutes() === 0) {
             target.setHours(23, 59, 59, 999);
         }
         if (now > target.getTime()) isExpired = true;
     }
-    // 2. DYNAMIC COLOR & TEXT SETTINGS
+
+    // 2. FORCE OVERDUE STATUS KUNG EXPIRED NA
+    // Kung expired na, i-ignore natin ang offer/grace at i-set sa NONE
+    let currentOffer = isExpired ? "NONE" : offer;
+        
+    // 3. DYNAMIC COLOR & TEXT SETTINGS
     let boxColor = "#d63031"; // Default Red
     let bgColor = "#fff5f5";
     let offerTitle = "⚠️ REPOSSESSION NOTICE";
     let subMessage = `Failure to settle by the deadline will result in <b>immediate device repossession</b> and account termination.`;
-
-    // Kung expired na, i-force natin ang offer na maging "NONE"
-    let currentOffer = isExpired ? "NONE" : offer;
     
-    // 3. CHECK OFFER TYPE (Gamitin ang currentOffer sa switch)
+    // 4. SWITCH LOGIC (Gamit ang currentOffer)
    switch(currentOffer) {
         case "LEGAL_NOTICE":
             offerTitle = "⚠️ LEGAL REPOSSESSION NOTICE";
