@@ -1068,40 +1068,49 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
     weekday: 'long' 
 }).toUpperCase();
 
-  // --- 3. AMOUNT LOGIC (AUTO-OVERRIDE) ---
-let displayTotal = parseFloat(data.amount) || 0; 
-const principalOnly = parseFloat(data.principal) || 0;
+  // --- 3. AMOUNT LOGIC (TIME-BASED OVERRIDE) ---
+    // Kunin muna ang base amounts mula sa data
+    const fullAmount = parseFloat(String(data.amount).replace(/,/g, '')) || 0;
+    const principalOnly = parseFloat(String(data.principal).replace(/,/g, '')) || 0;
+    const lateFee = parseFloat(String(data.lateFee).replace(/,/g, '')) || 0;
+    const dailyInt = parseFloat(String(data.dailyInterest).replace(/,/g, '')) || 0;
 
-// Alamin muna natin ang Oras Ngayon vs Deadline
-let isExpired = false;
-if (data.offerDeadline) {
-    const now = new Date().getTime();
-    let target = new Date(data.offerDeadline);
-    if (target.getHours() === 0 && target.getMinutes() === 0) target.setHours(23, 59, 59, 999);
-    if (now > target.getTime()) isExpired = true; // Dito natin malalaman kung expired na
-}
+    let displayTotal = fullAmount; // Default: May penalty
 
-if (daysLate > 0) {
-    // KUNG EXPIRED NA (Kahit "YES" pa ang Grace sa Sheets, babalik ang Penalty)
-    if (isExpired) {
-        displayTotal = parseFloat(data.amount) || 0; // Kukunin ang full amount (may penalty)
-    } 
-    // KUNG HINDI PA EXPIRED (Dito lang gagana ang 0 penalty/discount)
-    else {
-        if (offer === "WAIVE_ALL" || isGrace || offer === "GRACE") {
-            displayTotal = principalOnly; // 0 Penalty (Principal lang)
-        } else if (offer === "WAIVE_PENALTY") {
-            displayTotal = principalOnly + (parseFloat(data.dailyInterest) || 0);
-        } else if (offer === "WAIVE_DAILY") {
-            displayTotal = principalOnly + (parseFloat(data.lateFee) || 0);
-        } else if (offer === "DISCOUNT_50") {
-            let lf = parseFloat(String(data.lateFee).replace(/,/g, '')) || 0;
-            let di = parseFloat(String(data.dailyInterest).replace(/,/g, '')) || 0;
-            displayTotal = principalOnly + (lf * 0.5) + (di * 0.5);
+    if (daysLate > 0) {
+        // A. ALAMIN KUNG EXPIRED NA ANG DEADLINE
+        let isExpired = false;
+        if (data.offerDeadline) {
+            const now = new Date().getTime();
+            let target = new Date(data.offerDeadline);
+            // I-set sa 11:59:59 PM para sa end of day
+            if (target.getHours() === 0 && target.getMinutes() === 0) {
+                target.setHours(23, 59, 59, 999);
+            }
+            if (now > target.getTime()) isExpired = true;
+        }
+
+        // B. LOGIC OVERRIDE: Kung EXPIRED na, huwag nang pansinin ang Grace sa Sheets
+        if (isExpired) {
+            displayTotal = fullAmount; // Automatic: Full Amount na (may penalties)
+        } 
+        else {
+            // C. KUNG HINDI PA EXPIRED: Dito lang susundin ang Grace/Offer mula sa Sheets
+            if (isGrace || offer === "WAIVE_ALL" || offer === "GRACE") {
+                displayTotal = principalOnly; // 0 Fees
+            } else if (offer === "WAIVE_PENALTY") {
+                displayTotal = principalOnly + dailyInt;
+            } else if (offer === "WAIVE_DAILY") {
+                displayTotal = principalOnly + lateFee;
+            } else if (offer === "DISCOUNT_50") {
+                displayTotal = principalOnly + (lateFee * 0.5) + (dailyInt * 0.5);
+                // I-update din ang data para sa breakdown display
+                data.lateFee = (lateFee * 0.5).toFixed(2);
+                data.dailyInterest = (dailyInt * 0.5).toFixed(2);
+            }
         }
     }
-}
-document.getElementById('totalAmount').innerText = displayTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    document.getElementById('totalAmount').innerText = displayTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         
     // 4. INITIAL RESET
     banner.className = "status-banner";
