@@ -1265,6 +1265,9 @@ if (document.getElementById('cardTotalAmount'))
     let offerTitle = "⚠️ REPOSSESSION NOTICE";
     let subMessage = `Failure to settle by the deadline will result in <b>immediate device repossession</b> and account termination.`;
 
+    // Kung expired na, i-force natin ang offer na maging "NONE"
+    let currentOffer = isExpired ? "NONE" : offer;
+    
     // 3. CHECK OFFER TYPE (Gamitin ang currentOffer sa switch)
    switch(currentOffer) {
         case "LEGAL_NOTICE":
