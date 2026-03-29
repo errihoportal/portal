@@ -1068,54 +1068,35 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
     weekday: 'long' 
 }).toUpperCase();
 
-  // --- 3. AMOUNT LOGIC (STABLE) ---
-    const principalValue = parseFloat(String(data.principal).replace(/,/g, '')) || 0;
-    const lateFeeValue = parseFloat(String(data.lateFee).replace(/,/g, '')) || 0;
-    const dailyIntValue = parseFloat(String(data.dailyInterest).replace(/,/g, '')) || 0;
-    const fullAmountValue = principalValue + lateFeeValue + dailyIntValue;
-
-    // ALAMIN KUNG EXPIRED
-    let isExpired = false;
-    if (data.offerDeadline) {
-        const now = new Date().getTime();
-        let target = new Date(data.offerDeadline);
-        if (target.getHours() === 0 && target.getMinutes() === 0) target.setHours(23, 59, 59, 999);
-        if (now > target.getTime()) isExpired = true;
-    }
-
-    let displayTotal = fullAmountValue; 
-    let finalLateFee = lateFeeValue;
-    let finalDailyInt = dailyIntValue;
-
+    // 3. AMOUNT LOGIC
+    let displayTotal = parseFloat(data.amount) || 0; 
     if (daysLate > 0) {
-        // KUNG ACTIVE PA ANG OFFER (HINDI EXPIRED)
-        if (!isExpired) {
-            if (isGrace || offer === "WAIVE_ALL" || offer === "GRACE") {
-                displayTotal = principalValue;
-                finalLateFee = 0;
-                finalDailyInt = 0;
-            } else if (offer === "WAIVE_PENALTY") {
-                displayTotal = principalValue + dailyIntValue;
-                finalLateFee = 0;
-            } else if (offer === "WAIVE_DAILY") {
-                displayTotal = principalValue + lateFeeValue;
-                finalDailyInt = 0;
-            } else if (offer === "DISCOUNT_50") {
-                finalLateFee = lateFeeValue * 0.5;
-                finalDailyInt = dailyIntValue * 0.5;
-                displayTotal = principalValue + finalLateFee + finalDailyInt;
-            }
-        } else {
-            // KUNG EXPIRED NA: Balik sa Full Amount
-            displayTotal = fullAmountValue;
-            finalLateFee = lateFeeValue;
-            finalDailyInt = dailyIntValue;
+        if (offer === "WAIVE_ALL" || isGrace) {
+            displayTotal = parseFloat(data.principal) || 0;
+        } else if (offer === "WAIVE_PENALTY") {
+            displayTotal = (parseFloat(data.principal) || 0) + (parseFloat(data.dailyInterest) || 0);
+        } else if (offer === "WAIVE_DAILY") {
+            displayTotal = (parseFloat(data.principal) || 0) + (parseFloat(data.lateFee) || 0);
+        } else if (offer === "DISCOUNT_50") {
+            // Kunin ang malinis na values
+            let p = parseFloat(String(data.principal).replace(/,/g, '')) || 0;
+            let lf = parseFloat(String(data.lateFee).replace(/,/g, '')) || 0;
+            let di = parseFloat(String(data.dailyInterest).replace(/,/g, '')) || 0;
+            
+            // DITO NATIN I-UUPDATE ANG MGA FEES PARA MAG-DISCOUNT DIN SA DISPLAY
+            let discountedLF = lf * 0.5;
+            let discountedDI = di * 0.5;
+            
+            // I-save pabalik sa 'data' para sa breakdown area
+            data.lateFee = discountedLF.toFixed(2);
+            data.dailyInterest = discountedDI.toFixed(2);
+            
+            // Compute ang saktong 13,027.41
+            displayTotal = p + discountedLF + discountedDI;
         }
     }
-
-    // I-display ang Total
     document.getElementById('totalAmount').innerText = displayTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        
+
     // 4. INITIAL RESET
     banner.className = "status-banner";
     banner.style = ""; 
@@ -1267,31 +1248,14 @@ if (document.getElementById('cardTotalAmount'))
         `;
     }
     else if (daysLate > 0) {
-    // 1. CHECK KUNG EXPIRED NA ANG OFFER/GRACE DEADLINE
-
-    let currentOffer = isExpired ? "NONE" : offer;
-    
-    if (deadlineRaw) {
-        const now = new Date().getTime();
-        let target = new Date(deadlineRaw);
-        if (target.getHours() === 0 && target.getMinutes() === 0) {
-            target.setHours(23, 59, 59, 999);
-        }
-        if (now > target.getTime()) isExpired = true;
-    }
-
-    // 2. FORCE OVERDUE STATUS KUNG EXPIRED NA
-    // Kung expired na, i-ignore natin ang offer/grace at i-set sa NONE
-    currentOffer = isExpired ? "NONE" : offer;
-        
-    // 3. DYNAMIC COLOR & TEXT SETTINGS
+    // 1. DYNAMIC COLOR & TEXT SETTINGS
     let boxColor = "#d63031"; // Default Red
     let bgColor = "#fff5f5";
     let offerTitle = "⚠️ REPOSSESSION NOTICE";
     let subMessage = `Failure to settle by the deadline will result in <b>immediate device repossession</b> and account termination.`;
-    
-    // 4. SWITCH LOGIC (Gamit ang currentOffer)
-   switch(currentOffer) {
+
+    // 2. CHECK OFFER TYPE (Dito mo i-edit lahat)
+    switch(offer) {
         case "LEGAL_NOTICE":
             offerTitle = "⚠️ LEGAL REPOSSESSION NOTICE";
             // Stay Red
@@ -1316,18 +1280,11 @@ if (document.getElementById('cardTotalAmount'))
             boxColor = "#f39c12"; bgColor = "#fffdf5";
             offerTitle = "⚡ 50% PENALTY DISCOUNT";
             subMessage = "Flash Offer: Pay only half of your penalties if you settle within the given time limit.";
-            break;
-        case "GRACE":
-            boxColor = "#008080"; bgColor = "#f0fdfa";
-            offerTitle = "✨ GRACE PERIOD GRANTED";
-            subMessage = "Good news! A temporary <b>Grace Period</b> has been applied to your account. Please settle your balance before the deadline to avoid <b>late payment fees</b> and <b>daily interest charges</b>.";
-            break;
-        default:
-            currentOffer = "NONE"; // Babalik ito sa Red Overdue notice sa baba
+            break; 
     }
         
     // 3. RENDER THE DYNAMIC BOX (Unified Design)
-   if (currentOffer !== "NONE") {
+    if (offer !== "NONE" && offer !== "" && offer !== "GRACE") {
         banner.innerText = offerTitle;
         banner.className = "status-banner"; // Add your CSS class
         banner.style.backgroundColor = boxColor;
@@ -1350,6 +1307,51 @@ if (document.getElementById('cardTotalAmount'))
             </div>`;
         startLiveCountdown(deadlineRaw, "OFFER");
     }
+        else if (offer === "GRACE") {
+    banner.innerText = "✨ GRACE PERIOD GRANTED";
+    banner.className = "status-banner bg-grace"; // Siguraduhin na ang bg-grace sa CSS ay Teal Green
+
+    // Premium Teal Green Design
+    graceArea.innerHTML = `
+        <div class="grace-period-box" style="border: 2px solid #008080; padding: 20px; border-radius: 12px; background: #f0fdfa; text-align: center; box-shadow: 0 4px 12px rgba(0, 128, 128, 0.1);">
+            <div style="font-size: 13px; color: #008080; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;">
+                🌟 SPECIAL EXTENSION ACTIVE
+            </div>
+            
+            <div style="font-size: 15px; color: #2c3e50; margin-bottom: 12px; line-height: 1.4;">
+                Good news! Your account is <b>${daysLate} Day/s Overdue</b>, but we have granted you a temporary <b>Grace Period</b>.
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #b2dfdb; margin: 15px 0;">
+
+            <div style="font-size: 11px; color: #5d6d7e; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">
+                New Settlement Deadline:
+            </div>
+            <div style="font-size: 15px; color: #00695c; font-weight: 700; margin-bottom: 15px;">
+                ${deadlineDisplay}
+            </div>
+
+           <div style="margin-top: 15px; padding: 12px 0; border-top: 1.5px solid #b2dfdb; border-bottom: 1.5px solid #b2dfdb; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%;">
+    <span style="font-size: 11px; color: #008080; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;">
+        ⏳ ENDS IN:
+    </span>
+    
+    <div id="timerClock" style="font-size: 24px; color: #008080; font-weight: 900; font-family: 'Courier New', monospace; letter-spacing: 2px; line-height: 1;">
+        00:00:00:00
+    </div>
+</div>
+
+            <p style="font-size: 11px; color: #66b2b2; margin-top: 15px; font-style: italic; font-weight: 500;">
+                Take advantage of this extension to settle your balance before the timer expires.
+            </p>
+        </div>
+    `;
+
+    // Trigger ang countdown
+    if (deadlineRaw) {
+        startLiveCountdown(deadlineRaw, "OFFER"); 
+    }
+}
         else {
         banner.innerText = "⚠️ ACCOUNT OVERDUE";
         banner.className = "status-banner bg-overdue blink-overdue";
@@ -1381,21 +1383,19 @@ if (document.getElementById('cardTotalAmount'))
         `;
         
         // Tinanggal ang startLiveCountdown para wala nang timer na lumabas
-        if (window.graceInterval) clearInterval(window.graceInterval);
+        if (globalTimer) clearInterval(globalTimer);
     }
 
         // Display Fees Breakdown
-if (feesArea) {
-        // Kung expired na, wala nang strikethrough at dapat red ang fees
-        let lateStyle = (isExpired || (offer !== "WAIVE_ALL" && offer !== "WAIVE_PENALTY" && offer !== "GRACE")) ? "color: red;" : "text-decoration: line-through; color: gray;";
-        let intStyle = (isExpired || (offer !== "WAIVE_ALL" && offer !== "WAIVE_DAILY" && offer !== "GRACE")) ? "color: red;" : "text-decoration: line-through; color: gray;";
-        
-        feesArea.innerHTML = `<div class="fees-breakdown">
-            <div class="fee-item"><span>Principal:</span> <span>₱${principalValue.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>
-            <div class="fee-item" style="${lateStyle}"><span>Late Payment Fee:</span> <span>+ ₱${finalLateFee.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>
-            <div class="fee-item" style="${intStyle}"><span>Daily Interest:</span> <span>+ ₱${finalDailyInt.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>
-        </div>`;
-    }
+        if (feesArea) {
+            let lateStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_PENALTY" || offer === "GRACE") ? "text-decoration: line-through; color: gray;" : "color: red;";
+            let intStyle = (offer === "WAIVE_ALL" || offer === "WAIVE_DAILY" || offer === "GRACE") ? "text-decoration: line-through; color: gray;" : "color: red;";
+            feesArea.innerHTML = `<div class="fees-breakdown">
+                <div class="fee-item"><span>Principal:</span> <span>₱${data.principal}</span></div>
+                <div class="fee-item" style="${lateStyle}"><span>Late Payment Fee:</span> <span>+ ₱${data.lateFee}</span></div>
+                <div class="fee-item" style="${intStyle}"><span>Daily Interest:</span> <span>+ ₱${data.dailyInterest}</span></div>
+            </div>`;
+        }
     }
     else {
         // UPCOMING / DUE TODAY / DUE TOMORROW
@@ -1571,42 +1571,40 @@ if (feesArea) {
         const now = new Date().getTime();
         let target = new Date(targetTime);
         
-        // Gawing dulo ng araw kung date lang
+        // Gawing dulo ng araw (11:59:59 PM) kung date lang ang nasa Sheets
         if (target.getHours() === 0 && target.getMinutes() === 0) {
             target.setHours(23, 59, 59, 999);
         }
         
         const diff = target.getTime() - now;
+        const absDiff = Math.abs(diff);
         
-        // --- 1. LOGIC PARA SA EXPIRED NA ---
-        if (diff <= 0) {
-            clearInterval(window.graceInterval); // Itigil na ang pag-count
-            
-            if (mode === "OFFER") {
-                clockElem.innerHTML = `<span style="color: red; font-weight:bold;">❌ DEADLINE EXPIRED</span>`;
-                // Refresh agad (1 second lang) para bumalik sa Overdue Status
-                setTimeout(() => { location.reload(); }, 1000); 
-            } else {
-                // Para sa Standard Mode (Due Today/Tomorrow)
-                clockElem.innerHTML = `<span style="color: #ff4d4d; font-weight:bold;">⚠️ ACCOUNT OVERDUE</span>`;
-            }
-            return; // Hinto na dito ang function
-        }
-
-        // --- 2. MATH PARA SA ACTIVE COUNTDOWN ---
-        // Gagamitin lang ang diff (hindi absDiff) para pababa ang bilang
-        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const s = Math.floor((diff % (1000 * 60)) / 1000);
+        // Math for Days, Hours, Minutes, Seconds
+        const d = Math.floor(absDiff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((absDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((absDiff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((absDiff % (1000 * 60)) / 1000);
         
         const format = (n) => n.toString().padStart(2, '0');
+        
+        // Format na hiningi mo: Days + Hours + Mins + Secs
         const timeStr = `${d}d ${format(h)}h ${format(m)}m ${format(s)}s`;
 
         if (mode === "OFFER") {
-            clockElem.innerHTML = `<span style="font-weight: 900; font-family: 'Courier New', monospace;">${timeStr}</span>`;
+            if (diff > 0) {
+                // Hahayaan nating ang CSS ng #timerClock ang mag-decide ng kulay
+clockElem.innerHTML = `<span style="font-weight: 900; font-family: 'Courier New', monospace;">${timeStr}</span>`;
+            } else {
+                clockElem.innerHTML = `<span style="color: red; font-weight:bold;">❌ DEADLINE EXPIRED</span>`;
+                setTimeout(() => location.reload(), 5000);
+            }
         } else {
-            clockElem.innerHTML = `<span style="color: #3498db;">⏳ DUE IN: ${timeStr}</span>`;
+            // STANDARD MODE
+            if (diff > 0) {
+                clockElem.innerHTML = `<span style="color: #3498db;">⏳ DUE IN: ${timeStr}</span>`;
+            } else {
+                clockElem.innerHTML = `<span style="color: #ff4d4d; font-weight:bold;">⚠️ OVERDUE: ${timeStr}</span>`;
+            }
         }
     }
 
