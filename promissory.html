@@ -543,7 +543,7 @@
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const maxDate = new Date();
-    maxDate.setDate(today.getDate() + 20);
+    maxDate.setDate(today.getDate() + 15);
 
     // --- CHECK KUNG MAY ADDRESS ---
     if (!addr || addr === "" || addr === "[ENTER FULL ADDRESS HERE]" || addr.length < 5) {
@@ -560,7 +560,7 @@
 
     // --- CHECK KUNG LAMPAS 20 DAYS ---
     if (selectedDate > maxDate) {
-        alert("⚠️ Maximum extension is 20 days only.");
+        alert("⚠️ Maximum extension is 15 days only.");
         return;
     }
 
