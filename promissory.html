@@ -376,7 +376,7 @@
             const minDateStr = `${year}-${month}-${day}`;
             
             const maxDate = new Date();
-            maxDate.setDate(today.getDate() + 20); // 20 days limit
+            maxDate.setDate(today.getDate() + 15); // 15 days limit
             
             const maxDateStr = `${maxDate.getFullYear()}-${String(maxDate.getMonth() + 1).padStart(2, '0')}-${String(maxDate.getDate()).padStart(2, '0')}`;
 
