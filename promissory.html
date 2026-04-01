@@ -408,82 +408,94 @@
         }
     };
 
-    // INILABAS ITO PARA GUMANA SA ONCHANGE NG DATE PICKER
-    function updateComputation() {
-        let pDateVal = document.getElementById('promiseDate').value;
-        if (!pDateVal) return;
+   // ILAGAY ITO SA LABAS NG window.onload PARA SIGURADONG MATAWAG NG DATE PICKER
+function updateComputation() {
+    console.log("Computation Triggered!"); // Para malaman mo sa Console kung gumagana
+    
+    let pDateVal = document.getElementById('promiseDate').value;
+    if (!pDateVal) return;
+    
+    let promiseDate = new Date(pDateVal);
+    promiseDate.setHours(0,0,0,0);
+    
+    let totalOverall = 0;
+    let tableHtml = "";
+
+    if (!data || !data.schedule) return;
+
+    data.schedule.forEach(bill => {
+        // Skip kung Paid na o may P_Date na sa sheet
+        if (bill.p_date !== "---" && bill.p_date !== "" && bill.p_date !== null) return;
+        if (bill.st === "PAID" || bill.st === "Paid") return;
+
+        let dueDate = new Date(bill.mo); 
+        dueDate.setHours(0,0,0,0);
+
+        let principal = 0;
+        let lateFee = 0;
+        let interest = 0;
+        let subtotal = 0;
+
+        // Kunin ang Month at Day para sa checking (para kahit anong format ng date sa sheet, gagana)
+        let billMonth = dueDate.getMonth() + 1; // 2 = Feb, 3 = March
+        let billDay = dueDate.getDate();
+
+        // --- FIXED LOGIC (HINDI KUKUHA SA SHEET AMOUNT) ---
         
-        let promiseDate = new Date(pDateVal);
-        promiseDate.setHours(0,0,0,0);
-        
-        let totalOverall = 0;
-        let tableHtml = "";
-
-        if (!data || !data.schedule) return;
-
-        data.schedule.forEach(bill => {
-            if (bill.p_date !== "---" && bill.p_date !== "" && bill.p_date !== null) return;
-            if (bill.st === "PAID" || bill.st === "Paid") return;
-
-            let principal = parseFloat(bill.p_amt.toString().replace(/[₱,]/g, '')) || 0;
-            let dueDate = new Date(bill.mo); 
-            dueDate.setHours(0,0,0,0);
-
-            let lateFee = 0;
-            let interest = 0;
-            let subtotal = 0;
-
-            const billDateStr = bill.mo; // Halimbawa: "February 12, 2026"
-
-            if (billDateStr.includes("February 12")) {
-                // FIXED AMOUNT - NO FEES
-                principal = 2675.27; 
-                lateFee = 0;
-                interest = 0;
-                subtotal = principal;
-            } 
-            else if (billDateStr.includes("March 12")) {
-                // DYNAMIC - MAY FEES
-                principal = 7998.33; 
-                if (promiseDate > dueDate) {
-                    lateFee = parseFloat((principal * 0.10).toFixed(2)); 
-                    const diffTime = promiseDate.getTime() - dueDate.getTime();
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                    interest = parseFloat(((principal * 0.15) * (diffDays / 30)).toFixed(2));
-                }
-                subtotal = principal + lateFee + interest;
-            } 
-            else {
-                // IBANG MONTHS
-                if (promiseDate > dueDate) {
-                    lateFee = parseFloat((principal * 0.10).toFixed(2)); 
-                    const diffTime = promiseDate.getTime() - dueDate.getTime();
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                    interest = parseFloat(((principal * 0.15) * (diffDays / 30)).toFixed(2));
-                }
-                subtotal = principal + lateFee + interest;
+        if (billMonth === 2 && billDay === 12) {
+            // FEBRUARY 12 - ALWAYS FIXED, NO FEES
+            principal = 2675.27; 
+            lateFee = 0;
+            interest = 0;
+            subtotal = principal;
+        } 
+        else if (billMonth === 3 && billDay === 12) {
+            // MARCH 12 - FIXED PRINCIPAL + DYNAMIC FEES
+            principal = 7998.33; 
+            if (promiseDate > dueDate) {
+                // 10% Late Fee
+                lateFee = parseFloat((principal * 0.10).toFixed(2)); 
+                
+                // 15% Interest base sa days of delay
+                const diffTime = promiseDate.getTime() - dueDate.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                interest = parseFloat(((principal * 0.15) * (diffDays / 30)).toFixed(2));
             }
+            subtotal = principal + lateFee + interest;
+        } 
+        else {
+            // KUNG MAY IBANG MONTHS (Dito lang kukuha sa Sheet Amount)
+            principal = parseFloat(bill.p_amt.toString().replace(/[₱,]/g, '')) || 0;
+            if (promiseDate > dueDate) {
+                lateFee = parseFloat((principal * 0.10).toFixed(2)); 
+                const diffTime = promiseDate.getTime() - dueDate.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                interest = parseFloat(((principal * 0.15) * (diffDays / 30)).toFixed(2));
+            }
+            subtotal = principal + lateFee + interest;
+        }
 
-            totalOverall += subtotal;
+        totalOverall += subtotal;
 
-            tableHtml += `
-                <tr style="border-bottom:1px solid #eee;">
-                    <td style="padding:6px;">${bill.mo}</td>
-                    <td style="padding:6px;">₱${principal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                    <td style="padding:6px;">₱${lateFee.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                    <td style="padding:6px;">₱${interest.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
-                    <td style="padding:6px; text-align:right;"><b>₱${subtotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</b></td>
-                </tr>`;
-        });
+        tableHtml += `
+            <tr style="border-bottom:1px solid #eee;">
+                <td style="padding:8px;">${bill.mo}</td>
+                <td style="padding:8px;">₱${principal.toLocaleString('en-US', {minimumFractionDigits:2})}</td>
+                <td style="padding:8px; color: ${lateFee > 0 ? 'red' : 'inherit'};">₱${lateFee.toLocaleString('en-US', {minimumFractionDigits:2})}</td>
+                <td style="padding:8px; color: ${interest > 0 ? 'red' : 'inherit'};">₱${interest.toLocaleString('en-US', {minimumFractionDigits:2})}</td>
+                <td style="padding:8px; text-align:right;"><b>₱${subtotal.toLocaleString('en-US', {minimumFractionDigits:2})}</b></td>
+            </tr>`;
+    });
 
-        document.getElementById('breakdownBody').innerHTML = tableHtml;
-        
-        const finalStr = totalOverall.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-        document.getElementById('projectedTotal').innerText = "₱ " + finalStr;
-        document.getElementById('amountNum').innerText = "(₱ " + finalStr + ")";
-        document.getElementById('amountNum2').innerText = finalStr;
-        document.getElementById('amountWords').innerText = convertAmountToWords(totalOverall);
-    }
+    // I-update ang UI
+    document.getElementById('breakdownBody').innerHTML = tableHtml;
+    
+    const finalStr = totalOverall.toLocaleString('en-US', {minimumFractionDigits:2});
+    document.getElementById('projectedTotal').innerText = "₱ " + finalStr;
+    document.getElementById('amountNum').innerText = "(₱ " + finalStr + ")";
+    document.getElementById('amountNum2').innerText = finalStr;
+    document.getElementById('amountWords').innerText = convertAmountToWords(totalOverall);
+}
 
     function updateDateDisplay() { 
         updateComputation(); 
