@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invest - ERRIHO PORTAL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #fafbfc; margin: 0; padding: 0; color: #1a1a1a; }
+        .app-header { background: #ffffff; padding: 15px 20px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .main-container { max-width: 450px; margin: 0 auto; padding: 20px; }
+        
+        /* Back Button */
+        .back-btn { text-decoration: none; color: #64748b; font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 5px; margin-bottom: 25px; }
+
+        /* Investment Hero Section */
+        .invest-hero { 
+            background: linear-gradient(135deg, #27ae60 0%, #1e8449 100%); 
+            padding: 35px 25px; 
+            border-radius: 32px; 
+            color: white; 
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 30px rgba(39, 174, 96, 0.2);
+        }
+        .invest-hero h1 { font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
+        .invest-hero p { font-size: 14px; opacity: 0.9; margin-top: 10px; line-height: 1.5; }
+        
+        .rate-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 800;
+            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* Feature Cards */
+        .feature-grid { display: grid; gap: 15px; margin-top: 20px; }
+        .f-card { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 24px; 
+            border: 1px solid #f1f5f9;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        .f-icon { font-size: 22px; }
+        .f-info b { font-size: 15px; display: block; margin-bottom: 3px; }
+        .f-info span { font-size: 12px; color: #64748b; line-height: 1.4; }
+
+        /* Message Section */
+        .message-box {
+            text-align: center;
+            margin-top: 40px;
+            padding: 0 10px;
+        }
+        .message-box h2 { font-size: 20px; font-weight: 800; color: #1a1a1a; margin-bottom: 10px; }
+        .message-box p { font-size: 13px; color: #64748b; line-height: 1.6; }
+
+        .notify-btn {
+            background: #1a1a1a;
+            color: white;
+            padding: 18px;
+            border-radius: 18px;
+            font-weight: 800;
+            font-size: 14px;
+            margin-top: 25px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+        }
+
+        .footer-note { text-align: center; margin-top: 40px; font-size: 10px; color: #cbd5e1; font-weight: 700; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <img src="images/logo.png" alt="ERRIHO" style="height: 30px; width: auto;">
+        <span style="font-weight: 800; color: #27ae60; font-size: 14px;">ERRIHO PORTAL</span>
+    </header>
+
+    <div class="main-container">
+        
+        <a href="index.html" class="back-btn">← GO BACK</a>
+
+        <div class="invest-hero">
+            <h1>Grow Your Wealth</h1>
+            <p>Make your money work for you with Erriho's high-yield investment options.</p>
+            <div class="rate-badge">8% Fixed Interest</div>
+        </div>
+
+        <div class="feature-grid">
+            <div class="f-card">
+                <div class="f-icon">🛡️</div>
+                <div class="f-info">
+                    <b>Safe & Secured</b>
+                    <span>Your capital is protected and managed by ERRIHO Personal Finance.</span>
+                </div>
+            </div>
+            <div class="f-card">
+                <div class="f-icon">📈</div>
+                <div class="f-info">
+                    <b>High Returns</b>
+                    <span>Enjoy a fixed 8% interest rate, much higher than traditional bank savings.</span>
+                </div>
+            </div>
+            <div class="f-card">
+                <div class="f-icon">🗓️</div>
+                <div class="f-info">
+                    <b>Flexible Terms</b>
+                    <span>Choose a plan that fits your financial goals and timeline.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="message-box">
+            <h2>Something Great is Brewing! ☕</h2>
+            <p>We are currently finalizing the legal and digital framework to ensure your investments are managed with the highest level of security. We can't wait to help you grow your savings!</p>
+            
+            <button class="notify-btn" onclick="alert('Thank you! We will notify you once Investment options are live.')">NOTIFY ME WHEN LIVE</button>
+        </div>
+
+        <div class="footer-note">
+            © 2026 ERRIHO PERSONAL FINANCE • BUTUAN CITY
+        </div>
+
+    </div>
+
+</body>
+</html>
