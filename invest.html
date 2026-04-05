@@ -89,10 +89,37 @@
         <a href="index.html" class="back-btn">← GO BACK</a>
 
         <div class="invest-hero">
-            <h1>Grow Your Wealth</h1>
-            <p>Make your money work for you with Erriho's high-yield investment options.</p>
-            <div class="rate-badge">8% Fixed Interest</div>
+    <h1>Grow Your Wealth</h1>
+    <p>Calculate your guaranteed earnings with 8% fixed interest over a 12-month term.</p>
+    
+    <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 20px; margin-top: 20px; border: 1px solid rgba(255,255,255,0.2);">
+        <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8;">Investment Amount</span>
+        <div style="font-size: 32px; font-weight: 800; margin: 10px 0;" id="amount-display">₱10,000</div>
+        
+        <input type="range" id="invest-range" min="10000" max="1000000" step="5000" value="10000" 
+               style="width: 100%; accent-color: #ffffff; cursor: pointer; margin: 10px 0;">
+        
+        <div style="display: flex; justify-content: space-between; font-size: 11px; opacity: 0.7; margin-bottom: 20px;">
+            <span>Min: ₱10k</span>
+            <span>Max: ₱1M</span>
         </div>
+
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.2); margin: 15px 0;">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left;">
+            <div>
+                <span style="font-size: 11px; opacity: 0.8;">Interest (8%)</span>
+                <div style="font-size: 18px; font-weight: 700; color: #f1c40f;" id="interest-display">₱800</div>
+            </div>
+            <div style="text-align: right;">
+                <span style="font-size: 11px; opacity: 0.8;">Total Payout</span>
+                <div style="font-size: 18px; font-weight: 700;" id="total-display">₱10,800</div>
+            </div>
+        </div>
+    </div>
+    
+    <p style="font-size: 11px; margin-top: 15px; opacity: 0.7;">*Terms and Conditions Apply. 12-month lock-in period.</p>
+</div>
 
         <div class="feature-grid">
             <div class="f-card">
@@ -167,6 +194,25 @@
         </div>
 
     </div>
+
+<script>
+    const slider = document.getElementById('invest-range');
+    const amountDisplay = document.getElementById('amount-display');
+    const interestDisplay = document.getElementById('interest-display');
+    const totalDisplay = document.getElementById('total-display');
+
+    function updateCalculator() {
+        let val = parseInt(slider.value);
+        let interest = val * 0.08;
+        let total = val + interest;
+
+        amountDisplay.innerText = "₱" + val.toLocaleString();
+        interestDisplay.innerText = "₱" + interest.toLocaleString();
+        totalDisplay.innerText = "₱" + total.toLocaleString();
+    }
+
+    slider.oninput = updateCalculator;
+</script>
 
 </body>
 </html>
