@@ -2,177 +2,198 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ERRIHO | Update Passcode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ERRIHO | Account Update</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
         :root {
             --primary-green: #27ae60;
-            --light-green: #e8f5e9;
             --dark-text: #1a1a1a;
         }
 
-        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
-        
         body { 
+            font-family: 'Inter', sans-serif; 
             background: #f0f2f5; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
             margin: 0; 
+            padding: 0; 
+            color: var(--dark-text); 
+        }
+        
+        .app-header { 
+            background: #ffffff; 
+            padding: 15px 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+        }
+
+        .main-container { 
+            max-width: 450px; 
+            margin: 0 auto; 
             padding: 20px; 
+            box-sizing: border-box; 
         }
 
         .update-card { 
             background: #ffffff; 
-            padding: 30px 25px; 
+            padding: 35px 25px; 
             border-radius: 28px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.08); 
-            width: 100%; 
-            max-width: 400px; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08); 
             text-align: center; 
-        }
-
-        .logo-section { margin-bottom: 20px; }
-        .logo-section img { height: 60px; margin-bottom: 10px; }
-
-        .brand-title { 
-            font-size: 18px; 
-            font-weight: 800; 
-            color: var(--primary-green); 
-            letter-spacing: 1px;
-            margin-bottom: 5px;
+            border: 1px solid #f1f1f1; 
+            margin-top: 10px;
         }
 
         .instructions { 
             font-size: 13px; 
-            color: #666; 
-            line-height: 1.5; 
+            color: #475569; 
+            line-height: 1.6; 
             margin-bottom: 25px; 
-            background: var(--light-green);
-            padding: 15px;
-            border-radius: 15px;
-            border: 1px solid #d1f2dc;
+            background: #f0fdf4;
+            padding: 18px;
+            border-radius: 20px;
+            border: 1px solid #dcfce7;
         }
 
         .input-group { margin-bottom: 18px; text-align: left; }
         
         label { 
-            font-size: 11px; 
+            font-size: 10px; 
             font-weight: 800; 
-            color: #888; 
+            color: #94a3b8; 
             margin-left: 5px; 
             text-transform: uppercase;
+            display: block;
+            margin-bottom: 5px;
         }
 
         input { 
             width: 100%; 
-            padding: 14px; 
-            margin-top: 6px; 
-            border: 2px solid #eee; 
-            border-radius: 14px; 
+            padding: 16px; 
+            border: 1.5px solid #e2e8f0; 
+            border-radius: 15px; 
             font-size: 15px; 
             outline: none; 
+            background: #f8fafc;
             transition: 0.3s;
+            box-sizing: border-box;
         }
 
-        input:focus { border-color: var(--primary-green); background: #fafafa; }
-
-        .otp-section { 
-            display: none; 
-            background: #fff8e1; 
-            padding: 15px; 
-            border-radius: 15px; 
-            margin-top: 10px; 
-        }
+        input:focus { border-color: var(--primary-green); background: #fff; box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.1); }
 
         button { 
             width: 100%; 
-            padding: 16px; 
+            padding: 18px; 
             background: var(--primary-green); 
             color: white; 
             border: none; 
-            border-radius: 16px; 
-            font-size: 16px; 
-            font-weight: 700; 
+            border-radius: 18px; 
+            font-size: 15px; 
+            font-weight: 800; 
             cursor: pointer; 
             margin-top: 10px; 
-            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.2);
+            box-shadow: 0 8px 20px rgba(39, 174, 96, 0.2);
+            transition: transform 0.2s;
         }
-
-        .btn-back {
-            display: inline-block;
-            margin-top: 20px;
-            font-size: 13px;
-            color: #888;
-            text-decoration: none;
-            font-weight: 600;
-        }
+        
+        button:active { transform: scale(0.98); }
 
         #status-msg { 
             display: none; 
-            margin-top: 15px; 
-            font-size: 14px; 
+            margin-top: 20px; 
+            font-size: 13px; 
             color: var(--primary-green); 
-            font-weight: bold; 
+            font-weight: 700; 
+        }
+
+        .otp-warning {
+            font-size: 12px; 
+            color: #856404; 
+            background: #fff3cd; 
+            padding: 15px; 
+            border-radius: 15px; 
+            border: 1px solid #ffeeba; 
+            margin-bottom: 20px; 
+            line-height: 1.5;
+            text-align: left;
         }
     </style>
 </head>
 <body>
 
-<div class="update-card">
-    <div class="logo-section">
-        <img src="images/logo.png" alt="Logo">
-        <div class="brand-title">ACCOUNT UPDATE</div>
-    </div>
-
-    <p class="instructions">
-        <i class="fas fa-shield-alt"></i><br>
-        To protect your account, please verify your details. We will send an <strong>OTP</strong> to your registered email.
-    </p>
-
-    <div id="step1">
-        <div class="input-group">
-            <label><i class="fas fa-user"></i> Full Name</label>
-            <input type="text" id="fullname" placeholder="Full Name (e.g. Juan Dela Cruz)">
+    <header class="app-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="images/logo.png" alt="ERRIHO" style="height: 35px; width: auto;">
+            <span style="font-weight: 800; color: #27ae60; font-size: 14px;">ERRIHO PORTAL</span>
         </div>
-        <div class="input-group">
-            <label><i class="fas fa-envelope"></i> Registered Email</label>
-            <input type="email" id="email" placeholder="example@gmail.com">
+        <a href="index.html" style="text-decoration: none; font-size: 12px; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 6px 12px; border-radius: 8px;">BACK</a>
+    </header>
+
+    <div class="main-container">
+        <div class="update-card">
+            <div style="text-align: left; margin-bottom: 25px;">
+                <a href="index.html" style="text-decoration: none; display: inline-block; background: #f1f5f9; padding: 8px 15px; border-radius: 10px; font-weight: 800; font-size: 12px; color: #64748b;">← BACK</a>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <h2 style="color: var(--primary-green); margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -1px;">ACCOUNT UPDATE</h2>
+                <p style="font-size: 10px; color: #64748b; margin-top: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;">Security Verification</p>
+            </div>
+
+            <div id="step1">
+                <p class="instructions">
+                    <i class="fas fa-shield-alt" style="font-size: 20px; margin-bottom: 10px; display: block;"></i>
+                    To protect your account, please verify your identity. We will send an <b>OTP</b> to your registered email.
+                </p>
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="fullname" placeholder="Full Name (e.g. Juan Dela Cruz)">
+                </div>
+                <div class="input-group">
+                    <label>Registered Email</label>
+                    <input type="email" id="email" placeholder="example@gmail.com">
+                </div>
+                <button onclick="requestOTP()">VERIFY & SEND OTP</button>
+            </div>
+
+            <div id="step2" style="display:none;">
+                <div class="otp-warning">
+                    <i class="fas fa-envelope-open-text"></i> Check email <b>no-reply-errihoportal@flavideal.com</b> for the 6-digit OTP. 
+                    <span style="display:block; margin-top: 8px; font-size: 11px; opacity: 0.8;">*Please check your <b>Spam/Junk</b> folder.</span>
+                </div>
+
+                <div class="input-group">
+                    <label>Enter 6-Digit OTP</label>
+                    <input type="text" id="otp-code" placeholder="000000" maxlength="6" style="text-align:center; letter-spacing: 8px; font-weight:bold; font-size: 24px;">
+                </div>
+
+                <div class="input-group">
+                    <label>New Username</label>
+                    <input type="text" id="newuser" placeholder="Small letters, no spaces">
+                </div>
+                <div class="input-group">
+                    <label>New Passcode</label>
+                    <input type="password" id="newpass" placeholder="6-digit passcode" maxlength="6" inputmode="numeric">
+                </div>
+                <button onclick="verifyAndSubmit()">CONFIRM UPDATE</button>
+            </div>
+
+            <div id="status-msg">Verifying details...</div>
         </div>
-        <button onclick="requestOTP()">VERIFY & SEND OTP</button>
-    </div>
 
-    <div id="step2" style="display:none;">
-    <p style="font-size: 12px; color: #856404; background: #fff3cd; padding: 12px; border-radius: 12px; border: 1px solid #ffeeba; margin-bottom: 20px; line-height: 1.4;">
-        <i class="fas fa-envelope-open-text"></i><br>
-        Check your email <b>no-reply-errihoportal@flavideal.com</b> for the 6-digit OTP. 
-        <span style="display:block; margin-top: 5px; font-size: 11px; color: #a07e1a;">
-            *If not found, please check your <b>Spam/Junk</b> folder.
-        </span>
-    </p>
-
-    <div class="otp-section" id="otp-input-area" style="display:block; margin-bottom:20px;">
-        <label style="color: #b58105;">ENTER 6-DIGIT OTP</label>
-        <input type="text" id="otp-code" placeholder="000000" maxlength="6" style="text-align:center; letter-spacing: 5px; font-weight:bold; border-color: #ffe082;">
+        <div style="text-align: center; margin-top: 30px; padding-bottom: 20px;">
+            <p style="font-size: 10px; color: #cbd5e1; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">
+                © 2026 ERRIHO PERSONAL FINANCE
+            </p>
+        </div>
     </div>
-
-    <div class="input-group">
-        <label>New Username</label>
-        <input type="text" id="newuser" placeholder="Small letters, no spaces">
-    </div>
-    <div class="input-group">
-        <label>New Passcode</label>
-        <input type="password" id="newpass" placeholder="6-digit passcode" maxlength="6">
-    </div>
-    <button onclick="verifyAndSubmit()">CONFIRM UPDATE</button>
-</div>
-
-    <div id="status-msg">Verifying details...</div>
-    
-    <a href="index.html" class="btn-back">← Back to Login</a>
-</div>
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec"; 
@@ -210,7 +231,6 @@
                 statusMsg.style.display = "none";
             }
         } catch (error) {
-            console.error(error);
             alert("Connection error. Please check your internet.");
             statusMsg.style.display = "none";
         }
@@ -247,10 +267,8 @@
 
             if (result.status === "success") {
                 alert("🎉 ACCOUNT UPDATED!\n\nYour username and passcode have been changed successfully.");
-                
                 statusMsg.innerText = "🎉 Account updated successfully! Redirecting...";
                 setTimeout(() => {
-                    // BINAGO: Redirect sa index.html
                     window.location.href = "index.html"; 
                 }, 1000);
             } else {
@@ -258,7 +276,6 @@
                 statusMsg.style.display = "none";
             }
         } catch (error) {
-            console.error(error);
             alert("Failed to update account.");
             statusMsg.style.display = "none";
         }
