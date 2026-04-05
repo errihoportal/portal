@@ -31,13 +31,12 @@
 </head>
 <body>
 
-    <div style="width: 100%; background: #ffffff; padding: 15px 0; border-bottom: 1px solid #eee; margin-bottom: 30px; position: sticky; top: 0; z-index: 100;">
+    <div style="width: 100%; background: #ffffff; padding: 15px 0; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
     <div style="max-width: 800px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center;">
         
-        <a href="statement.html" onclick="if(document.referrer) { window.history.back(); return false; }" 
-   style="text-decoration: none; color: #64748b; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 5px;">
-    ← BACK
-</a>
+        <a href="index.html" onclick="if(document.referrer.indexOf(window.location.host) !== -1) { window.history.back(); return false; }" style="text-decoration: none; color: #64748b; font-weight: 700; font-size: 14px;">
+            ← BACK
+        </a>
 
         <span style="font-weight: 800; color: #27ae60; font-size: 12px; letter-spacing: 1px;">ERRIHO PORTAL</span>
     </div>
