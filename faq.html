@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - ERRIHO Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f0f2f5; color: #1a1a1a; line-height: 1.6; margin: 0; padding: 0; }
+        .container { max-width: 700px; margin: 20px auto 50px auto; background: white; padding: 40px; border-radius: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-top: 8px solid #3498db; }
+        h1 { color: #3498db; font-size: 24px; font-weight: 800; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; }
+        .faq-item { margin-bottom: 25px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; }
+        .faq-question { font-weight: 800; color: #334155; font-size: 15px; display: block; margin-bottom: 8px; }
+        .faq-answer { font-size: 14px; color: #64748b; margin: 0; }
+        .highlight { color: #27ae60; font-weight: 700; }
+        .penalty { color: #e74c3c; font-weight: 700; }
+        footer { text-align: center; margin-top: 30px; font-size: 10px; color: #bbb; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* Header Style */
+        .header-nav { width: 100%; background: #ffffff; padding: 15px 0; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .header-content { max-width: 800px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+    </style>
+</head>
+<body>
+
+    <div class="header-nav">
+        <div class="header-content">
+            <a href="index.html" onclick="if(document.referrer.indexOf(window.location.host) !== -1) { window.history.back(); return false; }" style="text-decoration: none; color: #64748b; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 5px;">
+                ← BACK
+            </a>
+            <span style="font-weight: 800; color: #27ae60; font-size: 12px; letter-spacing: 1px;">ERRIHO PORTAL</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Frequently Asked Questions</h1>
+        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 30px;">Answers to common questions about your ERRIHO Personal Finance account.</p>
+
+        <div class="faq-item">
+            <span class="faq-question">1. How do I log in to the portal?</span>
+            <p class="faq-answer">Use the official <b>Username</b> and <b>Passcode</b> provided to you via Messenger or Email. If you haven't received yours, please contact our support team.</p>
+        </div>
+
+        <div class="faq-item">
+            <span class="faq-question">2. What happens if I miss my payment deadline?</span>
+            <p class="faq-answer">Late payments are subject to a <span class="penalty">10% Late Penalty Fee</span> and daily interest. Your <b>Credit Rating</b> will also decrease, which may affect your future applications at Flavi Deal.</p>
+        </div>
+
+        <div class="faq-item">
+            <span class="faq-question">3. How is my Credit Rating calculated?</span>
+            <p class="faq-answer">Your rating is based on your payment consistency. Paying on or before the due date keeps your rating high (<span class="highlight">51% - 100%</span>). Frequent late payments will drop your rating below 50%.</p>
+        </div>
+
+        <div class="faq-item">
+            <span class="faq-question">4. Why does the portal log me out automatically?</span>
+            <p class="faq-answer">For your security, the portal has an <b>Auto-Logout</b> feature that triggers after 1 minute of inactivity. This prevents unauthorized access to your financial data if you leave your device unattended.</p>
+        </div>
+
+        <div class="faq-item">
+            <span class="faq-question">5. Is my data safe here?</span>
+            <p class="faq-answer">Yes. Our database is secured through <b>Google Cloud’s enterprise-grade encryption</b>. Furthermore, your sensitive documents are automatically purged from our system 30 days after full settlement.</p>
+        </div>
+
+        <div class="faq-item">
+            <span class="faq-question">6. Can I change my Passcode?</span>
+            <p class="faq-answer">Yes. You can use the <b>"Update Passcode"</b> link on the login page. You will need your account reference number to verify the change.</p>
+        </div>
+
+        <div style="margin-top: 40px; padding: 20px; background: #f8fafc; border-radius: 20px; text-align: center;">
+            <p style="font-size: 13px; font-weight: 700; color: #334155; margin-bottom: 15px;">Still have questions?</p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <a href="https://m.me/errihopersonalfinance" target="_blank" style="text-decoration: none; background: #0084FF; color: white; padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 700;">Messenger</a>
+                <a href="mailto:errihoportal@flavideal.com" style="text-decoration: none; background: #e74c3c; color: white; padding: 10px 20px; border-radius: 12px; font-size: 13px; font-weight: 700;">Email Us</a>
+            </div>
+        </div>
+
+        <footer>
+            © 2026 ERRIHO PERSONAL FINANCE | SUPPORT HUB
+        </footer>
+    </div>
+</body>
+</html>
