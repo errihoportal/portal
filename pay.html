@@ -94,7 +94,11 @@
     <div class="main-container">
 
         <div class="login-card">
-            <div style="margin-bottom: 25px;">
+            <div style="text-align: left; margin-bottom: 25px;">
+                <a href="index.html" style="text-decoration: none; display: inline-block; background: #f1f5f9; padding: 8px 15px; border-radius: 10px; font-weight: 800; font-size: 12px; color: #64748b; cursor: pointer;">← BACK</a>
+            </div>
+
+            <div style="margin-bottom: 30px;">
                 <div style="background: #f0fdf4; width: 80px; height: 80px; border-radius: 20px; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px; border: 1px solid #dcfce7;">
                     <img src="https://errihoportal.flavideal.com/images/logoportal.png" alt="ERRIHO" style="height: 60px; width: auto;">
                 </div>
@@ -108,7 +112,7 @@
 
             <div id="error-msg">❌ Invalid Passcode. Please try again.</div>
 
-            <div style="text-align: left; margin-bottom: 10px;">
+            <div style="text-align: left; margin-bottom: 15px;">
                 <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-left: 5px;">Passcode</label>
                 <input type="password" id="passcode" placeholder="••••••" maxlength="6" inputmode="numeric">
             </div>
@@ -117,19 +121,13 @@
             
             <button id="payBtn" class="btn-pay" onclick="handlePay()">PROCEED TO PAYMENT</button>
 
-            <div style="margin-top: 30px; border-top: 1px solid #f1f1f1; padding-top: 20px;">
-                <a href="javascript:void(0)" onclick="showLoginHelp()" style="font-size: 13px; color: #64748b; text-decoration: none; font-weight: 600; display: block; margin-bottom: 20px;">Can't sign in? View Login Guide</a>
-                
-                <div class="support-links" style="display: flex; justify-content: center; gap: 10px; margin-bottom: 10px;">
-                    <a href="https://m.me/errihopersonalfinance" target="_blank" style="color: #0084FF;">💬 Messenger</a>
-                    <a href="mailto:info.erriho@gmail.com" style="color: #e74c3c;">✉️ Email Us</a>
-                </div>
-                
-                <a href="index.html" class="back-portal"><i class="fas fa-arrow-left"></i> Back to Portal</a>
+            <div style="margin-top: 30px; border-top: 1px solid #f1f1f1; padding-top: 25px;">
+                <a href="javascript:void(0)" onclick="showLoginHelp()" style="font-size: 13px; color: #64748b; text-decoration: none; font-weight: 600; display: block; margin-bottom: 10px;">Can't sign in? View Login Guide</a>
+                <a href="update.html" style="font-size: 13px; color: #27ae60; text-decoration: none; font-weight: 700; display: block;">🔑 Forgot or Change Passcode?</a>
             </div>
         </div>
 
-        <div style="text-align: center; margin-top: 30px; padding-bottom: 20px;">
+        <div style="text-align: center; margin-top: 40px; padding-bottom: 20px;">
             <p style="font-size: 10px; color: #cbd5e1; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">
                 © 2026 ERRIHO PERSONAL FINANCE
             </p>
