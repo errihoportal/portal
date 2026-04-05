@@ -20,17 +20,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        body { font-family: 'Inter', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #1a1a1a; }
+        body { font-family: 'Inter', sans-serif; background: #f0f2f5; margin: 0; padding: 0; color: #1a1a1a; }
         
+        /* Header style same as index */
+        .app-header { background: #ffffff; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        
+        .main-container { max-width: 450px; margin: 0 auto; padding: 20px; box-sizing: border-box; }
+
         .login-card { 
-            max-width: 400px; 
-            margin: 40px auto; 
-            padding: 45px 35px; 
             background: #ffffff; 
+            padding: 35px 25px; 
             border-radius: 28px; 
             box-shadow: 0 15px 40px rgba(0,0,0,0.08); 
             text-align: center; 
             border: 1px solid #f1f1f1; 
+            margin-top: 10px;
         }
 
         input { 
@@ -45,8 +49,9 @@
             text-align: center;
             letter-spacing: 8px;
             outline: none;
+            transition: all 0.3s;
         }
-        input:focus { border-color: #27ae60; background: #fff; }
+        input:focus { border-color: #27ae60; background: #fff; box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.1); }
 
         .btn-pay { 
             width:100%; 
@@ -54,67 +59,90 @@
             background:#27ae60; 
             color:white; 
             border:none; 
-            border-radius:14px; 
+            border-radius:18px; 
             font-weight:800; 
             font-size:16px; 
             cursor:pointer; 
             margin-top: 20px; 
+            box-shadow: 0 8px 20px rgba(39, 174, 96, 0.2);
+            transition: transform 0.2s;
         }
-        .btn-pay:disabled { background: #94a3b8; }
+        .btn-pay:active { transform: scale(0.98); }
+        .btn-pay:disabled { background: #94a3b8; box-shadow: none; }
 
         #error-msg { background: #fff1f0; color: #e74c3c; padding: 12px; border-radius: 12px; font-size: 12px; margin-top: 15px; font-weight: 600; border: 1px solid #ffccc7; display: none; }
         
-        .loading-text { font-size: 12px; color: #64748b; margin-top: 10px; display: none; }
-        .back-portal { display: inline-block; margin-top: 20px; font-size: 13px; color: #27ae60; text-decoration: none; font-weight: 700; }
+        .loading-text { font-size: 12px; color: #64748b; margin-top: 15px; display: none; }
+        .back-portal { display: inline-block; margin-top: 25px; font-size: 13px; color: #27ae60; text-decoration: none; font-weight: 800; }
+        
+        .support-links a { text-decoration: none; font-size: 12px; font-weight: 700; padding: 8px 12px; border-radius: 10px; background: #f8fafc; border: 1px solid #f1f5f9; }
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <div style="margin-bottom: 30px;">
-            <div style="background: #f0fdf4; width: 100px; height: 100px; border-radius: 20px; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px; border: 1px solid #dcfce7;">
-                <img src="https://errihoportal.flavideal.com/images/logoportal.png" alt="ERRIHO" style="height: 100px; width: auto;">
+    <header class="app-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="images/logo.png" alt="ERRIHO" style="height: 35px; width: auto;">
+            <span style="font-weight: 800; color: #27ae60; font-size: 14px; letter-spacing: 0.5px;">ERRIHO PORTAL</span>
+        </div>
+        <a href="index.html" style="text-decoration: none; font-size: 12px; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 6px 12px; border-radius: 8px;">BACK</a>
+    </header>
+
+    <div class="main-container">
+
+        <div class="login-card">
+            <div style="margin-bottom: 25px;">
+                <div style="background: #f0fdf4; width: 80px; height: 80px; border-radius: 20px; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px; border: 1px solid #dcfce7;">
+                    <img src="https://errihoportal.flavideal.com/images/logoportal.png" alt="ERRIHO" style="height: 60px; width: auto;">
+                </div>
+                <h2 style="color: #27ae60; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -1px;">PAY NOW</h2>
+                <p style="font-size: 10px; color: #64748b; margin-top: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;">Secure Payment Gateway</p>
             </div>
-            <h2 style="color: #27ae60; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -1px;">PAY NOW</h2>
-            <p style="font-size: 11px; color: #64748b; margin-top: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;">Secure Payment Gateway</p>
-        </div>
 
-        <p style="font-size: 13px; color: #475569; line-height: 1.5; margin-bottom: 20px;">
-            For your security, please enter your 6-digit passcode to access your billing information and proceed with the payment.
-        </p>
+            <p style="font-size: 13px; color: #475569; line-height: 1.5; margin-bottom: 20px;">
+                For your security, please enter your <b>6-digit passcode</b> to access your billing information and proceed with the payment.
+            </p>
 
-        <div id="error-msg">❌ Invalid Passcode. Please try again.</div>
+            <div id="error-msg">❌ Invalid Passcode. Please try again.</div>
 
-        <div style="text-align: left; margin-bottom: 15px;">
-            <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-left: 5px;">Passcode</label>
-            <input type="password" id="passcode" placeholder="••••••" maxlength="6" inputmode="numeric">
-        </div>
-
-        <div id="loading" class="loading-text"><i class="fas fa-spinner fa-spin"></i> Verifying account and retrieving bill...</div>
-        
-        <button id="payBtn" class="btn-pay" onclick="handlePay()">PROCEED TO PAYMENT</button>
-
-        <div style="margin-top: 25px; border-top: 1px solid #f1f1f1; padding-top: 20px;">
-            <a href="javascript:void(0)" onclick="showLoginHelp()" style="font-size: 13px; color: #64748b; text-decoration: none; font-weight: 600; display: block; margin-bottom: 15px;">Can't sign in? View Login Guide</a>
-            <div style="display: flex; justify-content: center; gap: 20px;">
-                <a href="https://m.me/errihopersonalfinance" target="_blank" style="text-decoration: none; color: #0084FF; font-size: 13px; font-weight: 600;">💬 Messenger</a>
-                <a href="mailto:info.erriho@gmail.com" style="text-decoration: none; color: #e74c3c; font-size: 13px; font-weight: 600;">✉️ Email Us</a>
+            <div style="text-align: left; margin-bottom: 10px;">
+                <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-left: 5px;">Passcode</label>
+                <input type="password" id="passcode" placeholder="••••••" maxlength="6" inputmode="numeric">
             </div>
-            <a href="index.html" class="back-portal"><i class="fas fa-arrow-left"></i> Back to Portal</a>
+
+            <div id="loading" class="loading-text"><i class="fas fa-spinner fa-spin"></i> Verifying account and retrieving bill...</div>
+            
+            <button id="payBtn" class="btn-pay" onclick="handlePay()">PROCEED TO PAYMENT</button>
+
+            <div style="margin-top: 30px; border-top: 1px solid #f1f1f1; padding-top: 20px;">
+                <a href="javascript:void(0)" onclick="showLoginHelp()" style="font-size: 13px; color: #64748b; text-decoration: none; font-weight: 600; display: block; margin-bottom: 20px;">Can't sign in? View Login Guide</a>
+                
+                <div class="support-links" style="display: flex; justify-content: center; gap: 10px; margin-bottom: 10px;">
+                    <a href="https://m.me/errihopersonalfinance" target="_blank" style="color: #0084FF;">💬 Messenger</a>
+                    <a href="mailto:info.erriho@gmail.com" style="color: #e74c3c;">✉️ Email Us</a>
+                </div>
+                
+                <a href="index.html" class="back-portal"><i class="fas fa-arrow-left"></i> Back to Portal</a>
+            </div>
         </div>
+
+        <div style="text-align: center; margin-top: 30px; padding-bottom: 20px;">
+            <p style="font-size: 10px; color: #cbd5e1; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">
+                © 2026 ERRIHO PERSONAL FINANCE
+            </p>
+        </div>
+
     </div>
 
-   <script>
+    <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
 
-    // 1. AUTO-REFRESH LOGIC
     window.addEventListener('pageshow', function(event) {
         if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
             window.location.reload();
         }
     });
 
-    // 2. ANTI-BACK HISTORY
     window.history.pushState(null, null, window.location.href);
     window.onpopstate = function () {
         window.history.go(1);
@@ -141,17 +169,11 @@
             const result = await response.json();
 
             if (result.status === "success" && result.link) {
-                // 1. Maglagay ng "Susi" sa browser session
                 sessionStorage.setItem("erriho_authorized", "TRUE");
-
-                // 2. Linisin ang UI
                 document.getElementById("passcode").value = "";
                 loading.innerText = "Verifying account and retrieving bill...";
-
-                // 3. I-redirect gamit ang replace
                 window.location.replace(result.link);
             } else {
-                // Ito ang itinama natin, inalis ang sobrang bracket sa taas nito
                 throw new Error("Invalid");
             }
         } catch (e) {
