@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ERRIHO PORTAL</title>
@@ -22,158 +21,181 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     
     <style>
-        body { font-family: 'Inter', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #1a1a1a; }
-        .login-card { max-width: 400px; margin: 40px auto; padding: 45px 35px; background: #ffffff; border-radius: 28px; box-shadow: 0 15px 40px rgba(0,0,0,0.08); text-align: center; border: 1px solid #f1f1f1; position: relative; }
+        body { font-family: 'Inter', sans-serif; background: #f0f2f5; margin: 0; padding: 0; color: #1a1a1a; }
+        
+        /* Premium Header */
+        .app-header { 
+            background: #ffffff; padding: 15px 20px; display: flex; justify-content: space-between; 
+            align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+        }
+
+        .main-container { max-width: 450px; margin: 0 auto; padding: 20px; }
+
+        /* Action Cards Style */
+        .action-card {
+            background: white; padding: 20px; border-radius: 24px; text-decoration: none; 
+            display: flex; align-items: center; gap: 15px; margin-bottom: 15px;
+            border: 1px solid #f1f1f1; box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+            transition: transform 0.2s;
+        }
+        .action-card:active { transform: scale(0.98); }
+        .icon-circle { width: 45px; height: 45px; border-radius: 14px; display: flex; justify-content: center; align-items: center; font-size: 20px; }
+
+        /* Login Card */
+        .login-card { background: #ffffff; border-radius: 28px; padding: 35px 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.08); text-align: center; border: 1px solid #f1f1f1; display: none; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
         input { width: 100%; padding: 16px; border-radius: 15px; border: 1.5px solid #e2e8f0; box-sizing: border-box; font-size: 15px; background: #f8fafc; margin-top: 5px; }
         .btn-login { width:100%; padding:18px; background:#27ae60; color:white; border:none; border-radius:14px; font-weight:800; font-size:16px; cursor:pointer; margin-top: 20px; }
         #error-msg { background: #fff1f0; color: #e74c3c; padding: 12px; border-radius: 12px; font-size: 12px; margin-bottom: 20px; font-weight: 600; border: 1px solid #ffccc7; display: none; }
         .loading { opacity: 0.5; pointer-events: none; }
 
-        /* Style para sa Add to Home Screen Message */
-        .pwa-badge {
-            display: none;
-            background: #fff;
-            padding: 15px;
-            border-radius: 15px;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            z-index: 1000;
-            border-left: 5px solid #27ae60;
-            animation: slideUp 0.5s ease-out;
-        }
+        .pwa-badge { display: none; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); position: fixed; bottom: 20px; left: 20px; right: 20px; z-index: 1000; border-left: 5px solid #27ae60; animation: slideUp 0.5s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         .pwa-badge p { margin: 0; font-size: 13px; color: #475569; line-height: 1.4; }
         .pwa-badge b { color: #27ae60; }
         .close-pwa { float: right; cursor: pointer; font-weight: bold; color: #94a3b8; }
-
-        /* Idagdag ito sa loob ng <style> tag mo */
-input[type="checkbox"] {
-    width: auto !important;
-    margin-top: 0;
-    cursor: pointer;
-}
-        
+        input[type="checkbox"] { width: auto !important; margin-top: 0; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <div style="margin-bottom: 30px;">
-            <div style="background: #f0fdf4; width: 100px; height: 100px; border-radius: 20px; display: flex; justify-content: center; align-items: center; margin: 0 auto 15px; border: 1px solid #dcfce7;">
-                <img src="images/logo.png" alt="ERRIHO" style="height: 100px; width: auto;">
+    <header class="app-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="images/logo.png" alt="ERRIHO" style="height: 35px; width: auto;">
+            <span style="font-weight: 800; color: #27ae60; font-size: 14px; letter-spacing: 0.5px;">ERRIHO PORTAL</span>
+        </div>
+        <a href="faq.html" style="text-decoration: none; font-size: 12px; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 6px 12px; border-radius: 8px;">HELP</a>
+    </header>
+
+    <div class="main-container">
+
+        <div id="landing-options">
+            <div style="margin: 20px 0 30px;">
+                <h2 style="font-size: 24px; font-weight: 800; margin: 0;">Welcome!</h2>
+                <p style="font-size: 14px; color: #64748b; margin: 5px 0 0;">Manage your financial activities securely.</p>
             </div>
-            <h2 style="color: #27ae60; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -1px;">ERRIHO PORTAL</h2>
-            <p style="font-size: 11px; color: #64748b; margin-top: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;">ErriHo Personal Finance</p>   
-                    
-            <div style="margin-top: 15px; padding: 0 10px;">
-            <p style="font-size: 13px; color: #475569; line-height: 1.5; margin: 0;">
-            This portal allows you to securely view your financial statements and settle payments. 
-                    <span style="display: block; margin-top: 5px; color: #94a3b8; font-size: 12px;">Please provide your account credentials below.</span>
-                </p>
+
+            <a href="javascript:void(0)" onclick="showLogin()" class="action-card">
+                <div class="icon-circle" style="background: #f0fdf4; color: #27ae60;">📊</div>
+                <div style="flex: 1;">
+                    <b style="display: block; color: #1a1a1a; font-size: 16px;">VIEW STATEMENT</b>
+                    <span style="font-size: 12px; color: #64748b;">Check balance & account status</span>
+                </div>
+                <span style="color: #cbd5e1;">→</span>
+            </a>
+
+            <a href="pay.html" class="action-card">
+                <div class="icon-circle" style="background: #1a1a1a; color: white;">💳</div>
+                <div style="flex: 1;">
+                    <b style="display: block; color: #1a1a1a; font-size: 16px;">PAY NOW</b>
+                    <span style="font-size: 12px; color: #64748b;">Direct to payment gateway</span>
+                </div>
+                <span style="color: #cbd5e1;">→</span>
+            </a>
+
+            <a href="https://m.me/errihopersonalfinance" target="_blank" class="action-card">
+                <div class="icon-circle" style="background: #eef2ff; color: #4f46e5;">📝</div>
+                <div style="flex: 1;">
+                    <b style="display: block; color: #1a1a1a; font-size: 16px;">APPLY NOW</b>
+                    <span style="font-size: 12px; color: #64748b;">New installment application</span>
+                </div>
+                <span style="color: #cbd5e1;">→</span>
+            </a>
+        </div>
+
+        <div id="login-card" class="login-card">
+            <div style="text-align: left; margin-bottom: 25px;">
+                <button onclick="hideLogin()" style="border: none; background: #f1f5f9; padding: 8px 15px; border-radius: 10px; font-weight: 800; font-size: 12px; color: #64748b; cursor: pointer;">← BACK</button>
+            </div>
+
+            <div style="margin-bottom: 30px;">
+                <h2 style="color: #27ae60; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -1px;">AUTHORIZE LOGIN</h2>
+                <p style="font-size: 13px; color: #475569; margin-top: 10px;">Please provide your account credentials below.</p>
+            </div>
+
+            <div id="error-msg">❌ Invalid Username or Passcode</div>
+
+            <form id="loginForm">
+                <div style="text-align: left; margin-bottom: 15px;">
+                    <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-left: 5px;">Username</label>
+                    <input type="text" id="acc" placeholder="Enter username" required>
+                </div>
+                <div style="text-align: left; margin-bottom: 25px;">
+                    <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-left: 5px;">Passcode</label>
+                    <input type="password" id="pass" placeholder="Enter passcode" required>
+                </div>
+                <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; text-align: left; padding: 0 5px;">
+                    <input type="checkbox" id="termsCheckbox" style="width: 20px; height: 20px; accent-color: #27ae60; margin-top: 3px;" required>
+                    <label for="termsCheckbox" style="font-size: 12px; color: #64748b; line-height: 1.4; cursor: pointer;">
+                        I agree to the <a href="privacy.html" target="_blank" style="color: #27ae60; font-weight: 700; text-decoration: none;">Privacy Policy</a> 
+                        and <a href="terms.html" target="_blank" style="color: #27ae60; font-weight: 700; text-decoration: none;">Terms & Conditions</a> of ERRIHO Portal.
+                    </label>
+                </div>
+                <button type="submit" class="btn-login" id="loginBtn">AUTHORIZE LOGIN</button>
+            </form>
+
+            <div style="margin-top: 25px; border-top: 1px solid #f1f1f1; padding-top: 20px;">
+                <a href="javascript:void(0)" onclick="showLoginHelp()" style="font-size: 13px; color: #64748b; text-decoration: none; font-weight: 600; display: block; margin-bottom: 15px;">Can't sign in? View Login Guide</a>
+                <a href="update.html" style="font-size: 13px; color: #27ae60; text-decoration: none; font-weight: 700; display: block;">🔑 Forgot or Change Passcode?</a>
             </div>
         </div>
-  
-        <div id="error-msg">❌ Invalid Username or Passcode</div>
 
-        <form id="loginForm">
-            <div style="text-align: left; margin-bottom: 15px;">
-                <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-left: 5px;">Username</label>
-                <input type="text" id="acc" placeholder="Enter username" required>
+        <div style="margin-top: 40px; text-align: center;">
+            <p style="font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; margin-bottom: 15px;">Contact Support</p>
+            <div style="display: flex; justify-content: center; gap: 25px;">
+                <a href="https://m.me/errihopersonalfinance" target="_blank" style="text-decoration: none; color: #0084FF; font-size: 14px; font-weight: 700;">💬 Messenger</a>
+                <a href="mailto:errihoportal@flavideal.com" style="text-decoration: none; color: #e74c3c; font-size: 14px; font-weight: 700;">✉️ Email Us</a>
             </div>
-            <div style="text-align: left; margin-bottom: 25px;">
-                <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-left: 5px;">Passcode</label>
-                <input type="password" id="pass" placeholder="Enter passcode" required>
-            </div>
-           <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; text-align: left; padding: 0 5px;">
-    <input type="checkbox" id="termsCheckbox" style="width: 20px; height: 20px; cursor: pointer; accent-color: #27ae60; margin-top: 3px;" required>
-    <label for="termsCheckbox" style="font-size: 12px; color: #64748b; line-height: 1.4; cursor: pointer;">
-        I agree to the <a href="privacy.html" target="_blank" style="color: #27ae60; font-weight: 700; text-decoration: none;">Privacy Policy</a> 
-        and <a href="terms.html" target="_blank" style="color: #27ae60; font-weight: 700; text-decoration: none;">Terms & Conditions</a> of ERRIHO Portal.
-    </label>
-</div>
+            <p style="font-size: 10px; color: #cbd5e1; margin-top: 30px;">© 2026 ERRIHO PERSONAL FINANCE</p>
+        </div>
 
-<button type="submit" class="btn-login" id="loginBtn">AUTHORIZE LOGIN</button>
-        </form>
-
-        <div style="margin-top: 25px; border-top: 1px solid #f1f1f1; padding-top: 20px;">
-    <a href="javascript:void(0)" onclick="showLoginHelp()" style="font-size: 13px; color: #64748b; text-decoration: none; font-weight: 600; display: block; margin-bottom: 15px;">
-        Can't sign in? View Login Guide
-    </a>
-
-    <a href="update.html" style="font-size: 13px; color: #27ae60; text-decoration: none; font-weight: 700; display: block; margin-bottom: 20px;">
-        🔑 Forgot or Change Passcode?
-    </a>
-
-    <p style="font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; margin-bottom: 12px;">Contact Support</p>
-    
-    <div style="display: flex; justify-content: center; gap: 20px;">
-        <a href="https://m.me/errihopersonalfinance" target="_blank" style="text-decoration: none; color: #0084FF; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 5px;">
-            <span>💬 Messenger</span>
-        </a>
-        <a href="mailto:errihoportal@flavideal.com?subject=ERRIHO%20Portal%20Inquiry" style="text-decoration: none; color: #e74c3c; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 5px;">
-    <span>✉️ Email Us</span>
-</a>
     </div>
-</div>
-</div>
-            
+
     <div id="pwa-badge" class="pwa-badge">
         <span class="close-pwa" onclick="this.parentElement.style.display='none'">×</span>
         <p id="pwa-text"></p>
     </div>
 
-        <div style="margin-top: 25px; padding: 20px; background: #f8fafc; border-radius: 20px; border: 1px solid #edf2f7;">
-    <p style="font-size: 11px; color: #64748b; font-weight: 800; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">
-        Quick Payment Gateway
-    </p>
-    
-    <a href="pay.html" style="display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px; background: #1a1a1a; color: white; border-radius: 14px; font-weight: 700; font-size: 16px; text-decoration: none; box-sizing: border-box; transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
-        <span>Settle Balance</span>
-        <span style="background: #27ae60; padding: 2px 8px; border-radius: 6px; font-size: 12px;">PAY NOW</span>
-    </a>
-
-    <p style="font-size: 10px; color: #94a3b8; margin-top: 10px; text-align: center; font-style: italic;">
-        Fast, secure, and direct payment processing.
-    </p>
-</div>
-
     <script>
-        // --- LOGIN LOGIC ---
+        function showLogin() {
+            document.getElementById('landing-options').style.display = 'none';
+            document.getElementById('login-card').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        function hideLogin() {
+            document.getElementById('landing-options').style.display = 'block';
+            document.getElementById('login-card').style.display = 'none';
+        }
+
+        // --- RETAINED ORIGINAL LOGIC ---
         const loginForm = document.getElementById('loginForm');
         const baseUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
 
         function trackUser(user) {
-        if (user !== "") {
-            var formID = "1FAIpQLSc2G8lp0onwEquuIXsnWsvsR9ANndv3M9GHHOVTKmwYLpEJmA"; 
-            var nameEntry = "entry.1093230119"; 
-            var baseURL = "https://docs.google.com/forms/d/e/" + formID + "/formResponse?";
-            var submitURL = baseURL + nameEntry + "=" + encodeURIComponent(user) + "&submit=Submit";
-
-            // Ginagamit ang sendBeacon para kahit mag-redirect ang page, tuloy pa rin ang send ng data
-            navigator.sendBeacon(submitURL);
-            console.log("Tracking user: " + user);
+            if (user !== "") {
+                var formID = "1FAIpQLSc2G8lp0onwEquuIXsnWsvsR9ANndv3M9GHHOVTKmwYLpEJmA"; 
+                var nameEntry = "entry.1093230119"; 
+                var baseURL = "https://docs.google.com/forms/d/e/" + formID + "/formResponse?";
+                var submitURL = baseURL + nameEntry + "=" + encodeURIComponent(user) + "&submit=Submit";
+                navigator.sendBeacon(submitURL);
+            }
         }
-    }
         
         loginForm.onsubmit = async (e) => {
-    e.preventDefault();
-    
-    // 1. Check if terms are accepted
-    const termsChecked = document.getElementById('termsCheckbox').checked;
-    if (!termsChecked) {
-        alert("Please read and agree to the Privacy Policy and Terms & Conditions to proceed.");
-        return;
-    }
+            e.preventDefault();
+            const termsChecked = document.getElementById('termsCheckbox').checked;
+            if (!termsChecked) {
+                alert("Please read and agree to the Privacy Policy and Terms & Conditions to proceed.");
+                return;
+            }
             const acc = document.getElementById('acc').value;
             const pass = document.getElementById('pass').value;
             const btn = document.getElementById('loginBtn');
             const error = document.getElementById('error-msg');
 
             trackUser(acc);
-
             btn.innerText = "VERIFYING...";
             btn.classList.add('loading');
             error.style.display = 'none';
@@ -181,7 +203,6 @@ input[type="checkbox"] {
             try {
                 const response = await fetch(`${baseUrl}?acc=${encodeURIComponent(acc)}&pass=${encodeURIComponent(pass)}`);
                 const data = await response.json();
-
                 if (data && data.status !== 'error') {
                     data.passcode = pass;
                     data.loginTime = new Date().getTime();
@@ -200,26 +221,23 @@ input[type="checkbox"] {
         };
 
         function showLoginHelp() {
-        alert("LOGIN ASSISTANCE:\n\nPlease check your Email or Messenger for your official login credentials. If you haven't received them yet, please contact us using the support links below.");
-    }
+            alert("LOGIN ASSISTANCE:\n\nPlease check your Email or Messenger for your official login credentials.");
+        }
 
-        // --- ADD TO HOME SCREEN LOGIC ---
         window.onload = function() {
             const pwaBadge = document.getElementById('pwa-badge');
             const pwaText = document.getElementById('pwa-text');
             const userAgent = navigator.userAgent.toLowerCase();
             const isiOS = /iphone|ipad|ipod/.test(userAgent);
             const isAndroid = /android/.test(userAgent);
-
-            // Check kung nasa browser lang (hindi pa "installed" as app)
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
             if (!isStandalone) {
                 if (isiOS) {
-                    pwaText.innerHTML = "<b>Add to Home Screen:</b> Tap the <b>'Share'</b> icon (square with an up arrow) and select <b>'Add to Home Screen'</b> for easier access.";
+                    pwaText.innerHTML = "<b>Add to Home Screen:</b> Tap the <b>'Share'</b> icon and select <b>'Add to Home Screen'</b>.";
                     pwaBadge.style.display = 'block';
                 } else if (isAndroid) {
-                    pwaText.innerHTML = "<b>Install App:</b> Tap the <b>three dots (⋮)</b> in your browser menu and select <b>'Install app'</b> or <b>'Add to Home Screen'</b>.";
+                    pwaText.innerHTML = "<b>Install App:</b> Tap the <b>three dots (⋮)</b> and select <b>'Install app'</b>.";
                     pwaBadge.style.display = 'block';
                 }
             }
