@@ -82,10 +82,13 @@
 
     <header class="app-header">
         <div style="display: flex; align-items: center; gap: 10px;">
-            <img src="images/logo.png" alt="ERRIHO" style="height: 35px; width: auto;">
-            <span style="font-weight: 800; color: #27ae60; font-size: 14px; letter-spacing: 0.5px;">ERRIHO PORTAL</span>
+            <a href="index.html" style="text-decoration: none; color: #64748b; background: #f1f5f9; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; border-radius: 10px; font-size: 18px;">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <img src="images/logo.png" alt="ERRIHO" style="height: 30px; width: auto;">
+            <span style="font-weight: 800; color: #27ae60; font-size: 13px; letter-spacing: 0.5px;">ERRIHO PORTAL</span>
         </div>
-        <a href="index.html" style="text-decoration: none; font-size: 12px; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 6px 12px; border-radius: 8px;">BACK</a>
+        <a href="faq.html" style="text-decoration: none; font-size: 11px; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 6px 12px; border-radius: 8px;">HELP</a>
     </header>
 
     <div class="main-container">
@@ -137,16 +140,19 @@
     <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
 
+    // 1. PHONE BACK BUTTON LOGIC
+    // Kapag pinindot ang back button ng phone, babalik siya sa index.html sa halip na lumabas ng portal
+    window.history.pushState(null, null, window.location.href);
+    window.onpopstate = function () {
+        window.location.replace("index.html");
+    };
+
+    // 2. AUTO-REFRESH PARA SA SECURITY
     window.addEventListener('pageshow', function(event) {
         if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
             window.location.reload();
         }
     });
-
-    window.history.pushState(null, null, window.location.href);
-    window.onpopstate = function () {
-        window.history.go(1);
-    };
 
     async function handlePay() {
         const pin = document.getElementById("passcode").value.trim();
@@ -172,6 +178,7 @@
                 sessionStorage.setItem("erriho_authorized", "TRUE");
                 document.getElementById("passcode").value = "";
                 loading.innerText = "Verifying account and retrieving bill...";
+                // Gagamit tayo ng replace para hindi na sila makabalik sa passcode screen gamit ang back button
                 window.location.replace(result.link);
             } else {
                 throw new Error("Invalid");
@@ -193,6 +200,6 @@
     document.getElementById("passcode").addEventListener("keyup", (e) => {
         if (e.key === "Enter") handlePay();
     });
-</script>
+    </script>
 </body>
 </html>
