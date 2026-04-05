@@ -60,99 +60,119 @@
 </head>
 <body>
 
-    <div id="landing-options">
-    <div style="margin: 20px 0 30px;">
-        <h2 style="font-size: 24px; font-weight: 800; margin: 0; color: #1a1a1a;">Welcome to ERRIHO PORTAL</h2>
-        <p style="font-size: 13px; color: #64748b; margin-top: 8px; line-height: 1.5;">
-            Your official digital gateway for <b>Flavi Deal</b> installments. 
-            Track your balance, view statements, and settle payments securely in real-time.
-        </p>
-    </div>
-
-    <a href="javascript:void(0)" onclick="showLogin()" class="action-card">
-        <div class="icon-circle" style="background: #f0fdf4; color: #27ae60;">📊</div>
-        <div style="flex: 1;">
-            <b style="display: block; color: #1a1a1a; font-size: 16px;">VIEW STATEMENT</b>
-            <span style="font-size: 12px; color: #64748b;">Check balance & account status</span>
+    <header class="app-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="images/logo.png" alt="ERRIHO" style="height: 35px; width: auto;">
+            <span style="font-weight: 800; color: #27ae60; font-size: 14px; letter-spacing: 0.5px;">ERRIHO PORTAL</span>
         </div>
-        <span style="color: #cbd5e1;">→</span>
-    </a>
+        <a href="faq.html" style="text-decoration: none; font-size: 12px; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 6px 12px; border-radius: 8px;">HELP</a>
+    </header>
 
-    <a href="pay.html" class="action-card">
-        <div class="icon-circle" style="background: #1a1a1a; color: white;">💳</div>
-        <div style="flex: 1;">
-            <b style="display: block; color: #1a1a1a; font-size: 16px;">PAY NOW</b>
-            <span style="font-size: 12px; color: #64748b;">Direct to payment gateway</span>
-        </div>
-        <span style="color: #cbd5e1;">→</span>
-    </a>
+    <div class="main-container">
 
-    <div class="action-card" style="opacity: 0.8; border-style: dashed; background: #fafafa; cursor: default;">
-        <div class="icon-circle" style="background: #f1f5f9; color: #64748b;">📝</div>
-        <div style="flex: 1;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <b style="color: #1a1a1a; font-size: 16px;">APPLY NOW</b>
-                <span style="background: #e2e8f0; color: #475569; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 6px; text-transform: uppercase;">Coming Soon</span>
+        <div id="landing-options">
+            <div style="margin: 20px 0 30px;">
+                <h2 style="font-size: 24px; font-weight: 800; margin: 0; color: #1a1a1a;">Welcome to ERRIHO PORTAL</h2>
+                <p style="font-size: 13px; color: #64748b; margin-top: 8px; line-height: 1.5;">
+                    Your official digital gateway for <b>Flavi Deal</b> installments. 
+                    Track your balance, view statements, and settle payments securely in real-time.
+                </p>
             </div>
-            <span style="font-size: 12px; color: #64748b;">New installment application</span>
-            <p style="font-size: 11px; color: #94a3b8; margin: 2px 0 0;">Stay tuned! We are upgrading our application system.</p>
-        </div>
-    </div>
 
-    <div class="action-card" style="opacity: 0.8; border-style: dashed; background: #fafafa; cursor: default;">
-        <div class="icon-circle" style="background: #fff7ed; color: #f59e0b;">💰</div>
-        <div style="flex: 1;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <b style="color: #1a1a1a; font-size: 16px;">PERSONAL INVESTMENT</b>
-                <span style="background: #fef3c7; color: #92400e; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 6px; text-transform: uppercase;">Soon</span>
+            <a href="javascript:void(0)" onclick="showLogin()" class="action-card">
+                <div class="icon-circle" style="background: #f0fdf4; color: #27ae60;">📊</div>
+                <div style="flex: 1;">
+                    <b style="display: block; color: #1a1a1a; font-size: 16px;">VIEW STATEMENT</b>
+                    <span style="font-size: 12px; color: #64748b;">Check balance & account status</span>
+                </div>
+                <span style="color: #cbd5e1;">→</span>
+            </a>
+
+            <a href="pay.html" class="action-card">
+                <div class="icon-circle" style="background: #1a1a1a; color: white;">💳</div>
+                <div style="flex: 1;">
+                    <b style="display: block; color: #1a1a1a; font-size: 16px;">PAY NOW</b>
+                    <span style="font-size: 12px; color: #64748b;">Direct to payment gateway</span>
+                </div>
+                <span style="color: #cbd5e1;">→</span>
+            </a>
+
+            <div class="action-card" style="opacity: 0.8; border-style: dashed; background: #fafafa; cursor: default;">
+                <div class="icon-circle" style="background: #f1f5f9; color: #64748b;">📝</div>
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <b style="color: #1a1a1a; font-size: 16px;">APPLY NOW</b>
+                        <span style="background: #e2e8f0; color: #475569; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 6px; text-transform: uppercase;">Coming Soon</span>
+                    </div>
+                    <span style="font-size: 12px; color: #64748b;">New installment application</span>
+                    <p style="font-size: 11px; color: #94a3b8; margin: 2px 0 0;">Stay tuned! We are upgrading our application system.</p>
+                </div>
             </div>
-            <span style="font-size: 12px; color: #27ae60; font-weight: 700;">Earn 8% Fixed Interest</span>
-            <p style="font-size: 11px; color: #94a3b8; margin: 2px 0 0;">Grow your savings with ERRIHO. Stay tuned!</p>
+
+            <div class="action-card" style="opacity: 0.8; border-style: dashed; background: #fafafa; cursor: default;">
+                <div class="icon-circle" style="background: #fff7ed; color: #f59e0b;">💰</div>
+                <div style="flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <b style="color: #1a1a1a; font-size: 16px;">PERSONAL INVESTMENT</b>
+                        <span style="background: #fef3c7; color: #92400e; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 6px; text-transform: uppercase;">Soon</span>
+                    </div>
+                    <span style="font-size: 12px; color: #27ae60; font-weight: 700;">Earn 8% Fixed Interest</span>
+                    <p style="font-size: 11px; color: #94a3b8; margin: 2px 0 0;">Grow your savings with ERRIHO. Stay tuned!</p>
+                </div>
+            </div>
+        </div> <div id="login-card" class="login-card">
+            <div style="text-align: left; margin-bottom: 25px;">
+                <button onclick="hideLogin()" style="border: none; background: #f1f5f9; padding: 8px 15px; border-radius: 10px; font-weight: 800; font-size: 12px; color: #64748b; cursor: pointer;">← BACK</button>
+            </div>
+
+            <div style="margin-bottom: 30px;">
+                <h2 style="color: #27ae60; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -1px;">AUTHORIZE LOGIN</h2>
+                <p style="font-size: 13px; color: #475569; margin-top: 10px;">Please provide your account credentials below.</p>
+            </div>
+
+            <div id="error-msg">❌ Invalid Username or Passcode</div>
+
+            <form id="loginForm">
+                <div style="text-align: left; margin-bottom: 15px;">
+                    <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-left: 5px;">Username</label>
+                    <input type="text" id="acc" placeholder="Enter username" required>
+                </div>
+                <div style="text-align: left; margin-bottom: 25px;">
+                    <label style="font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-left: 5px;">Passcode</label>
+                    <input type="password" id="pass" placeholder="Enter passcode" required>
+                </div>
+                <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; text-align: left; padding: 0 5px;">
+                    <input type="checkbox" id="termsCheckbox" style="width: 20px; height: 20px; accent-color: #27ae60; margin-top: 3px;" required>
+                    <label for="termsCheckbox" style="font-size: 12px; color: #64748b; line-height: 1.4; cursor: pointer;">
+                        I agree to the <a href="privacy.html" target="_blank" style="color: #27ae60; font-weight: 700; text-decoration: none;">Privacy Policy</a> 
+                        and <a href="terms.html" target="_blank" style="color: #27ae60; font-weight: 700; text-decoration: none;">Terms & Conditions</a> of ERRIHO Portal.
+                    </label>
+                </div>
+                <button type="submit" class="btn-login" id="loginBtn">AUTHORIZE LOGIN</button>
+            </form>
+
+            <div style="margin-top: 25px; border-top: 1px solid #f1f1f1; padding-top: 20px;">
+                <a href="javascript:void(0)" onclick="showLoginHelp()" style="font-size: 13px; color: #64748b; text-decoration: none; font-weight: 600; display: block; margin-bottom: 15px;">Can't sign in? View Login Guide</a>
+                <a href="update.html" style="font-size: 13px; color: #27ae60; text-decoration: none; font-weight: 700; display: block;">🔑 Forgot or Change Passcode?</a>
+            </div>
+        </div> <div style="margin-top: 40px; text-align: center; border-top: 1px solid #eee; padding-top: 30px; padding-bottom: 20px;">
+            <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;">
+                <a href="faq.html" style="text-decoration: none; color: #64748b; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">FAQ</a>
+                <span style="color: #cbd5e1;">•</span>
+                <a href="terms.html" style="text-decoration: none; color: #64748b; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Terms</a>
+                <span style="color: #cbd5e1;">•</span>
+                <a href="privacy.html" style="text-decoration: none; color: #64748b; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Privacy</a>
+            </div>
+            <p style="font-size: 10px; color: #cbd5e1; font-weight: 700; letter-spacing: 1px; margin: 0;">
+                © 2026 ERRIHO PERSONAL FINANCE
+            </p>
         </div>
-    </div>
-</div>
 
-<div id="login-card" class="login-card">
-    <div style="text-align: left; margin-bottom: 25px;">
-        <button onclick="hideLogin()" style="border: none; background: #f1f5f9; padding: 8px 15px; border-radius: 10px; font-weight: 800; font-size: 12px; color: #64748b; cursor: pointer;">← BACK</button>
-    </div>
-
-    <div style="margin-bottom: 30px;">
-        <h2 style="color: #27ae60; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -1px;">AUTHORIZE LOGIN</h2>
-        <p style="font-size: 13px; color: #475569; margin-top: 10px;">Please provide your account credentials below.</p>
-    </div>
-
-    <div id="error-msg">❌ Invalid Username or Passcode</div>
-
-    <form id="loginForm">
-        <button type="submit" class="btn-login" id="loginBtn">AUTHORIZE LOGIN</button>
-    </form>
-
-    <div style="margin-top: 25px; border-top: 1px solid #f1f1f1; padding-top: 20px;">
-        <a href="javascript:void(0)" onclick="showLoginHelp()" style="font-size: 13px; color: #64748b; text-decoration: none; font-weight: 600; display: block; margin-bottom: 15px;">Can't sign in? View Login Guide</a>
-        <a href="update.html" style="font-size: 13px; color: #27ae60; text-decoration: none; font-weight: 700; display: block;">🔑 Forgot or Change Passcode?</a>
-    </div>
-</div>
-
-      <div style="margin-top: 40px; text-align: center; border-top: 1px solid #eee; padding-top: 30px; padding-bottom: 20px;">
-    <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;">
-        <a href="faq.html" style="text-decoration: none; color: #64748b; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">FAQ</a>
-        <span style="color: #cbd5e1;">•</span>
-        <a href="terms.html" style="text-decoration: none; color: #64748b; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Terms</a>
-        <span style="color: #cbd5e1;">•</span>
-        <a href="privacy.html" style="text-decoration: none; color: #64748b; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Privacy</a>
-    </div>
-
-    <p style="font-size: 10px; color: #cbd5e1; font-weight: 700; letter-spacing: 1px; margin: 0;">
-        © 2026 ERRIHO PERSONAL FINANCE
-    </p>
-</div>
-
-    <div id="pwa-badge" class="pwa-badge">
+    </div> <div id="pwa-badge" class="pwa-badge">
         <span class="close-pwa" onclick="this.parentElement.style.display='none'">×</span>
         <p id="pwa-text"></p>
     </div>
-
+    
     <script>
         function showLogin() {
             document.getElementById('landing-options').style.display = 'none';
