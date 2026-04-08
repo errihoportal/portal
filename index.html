@@ -236,6 +236,15 @@
             try {
                 const response = await fetch(`${baseUrl}?acc=${encodeURIComponent(acc)}&pass=${encodeURIComponent(pass)}`);
                 const data = await response.json();
+
+                // 1. DAGDAG NA LOGIC PARA SA MAINTENANCE
+    if (data.status === 'maintenance') {
+        alert("📢 SYSTEM MAINTENANCE\n\n" + data.message);
+        btn.innerText = "AUTHORIZE LOGIN";
+        btn.classList.remove('loading');
+        return; // Itigil ang login
+    }
+                // 2. EXISTING LOGIC (Huwag galawin ang luma)
                 if (data && data.status !== 'error') {
                     data.passcode = pass;
                     data.loginTime = new Date().getTime();
