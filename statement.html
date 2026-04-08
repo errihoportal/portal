@@ -19,444 +19,268 @@
             --dark-black: #1a1a1a;    
             --danger-red: #e74c3c;
             --soft-gray: #f8f9fa;
+            --premium-gradient: linear-gradient(135deg, #1e272e 0%, #2f3640 100%);
+            --glass: rgba(255, 255, 255, 0.95);
         }
 
-        body { font-family: 'Inter', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: var(--dark-black); line-height: 1.6; }
-        .card { background: white; border-radius: 28px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); max-width: 550px; margin: auto; border-top: 8px solid var(--primary-green); position: relative; overflow: hidden; }
-        
-        /* Hero Section */
-        .hero-section { background: linear-gradient(135deg, #1a1a1a, #333); color: white; border-radius: 20px; padding: 25px; text-align: center; margin-bottom: 25px; }
-        .amount-hero { font-size: 42px; font-weight: 800; margin: 5px 0; color: #fff; line-height: 1.2; word-wrap: break-word; }
-        .due-label { font-size: 11px; font-weight: 600; color: #aaa; margin: 0; text-transform: uppercase; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #f1f4f8; 
+            margin: 0; 
+            padding: 15px; 
+            color: var(--dark-black); 
+            line-height: 1.5; 
+        }
 
-        /* Accordion Table */
-        .schedule-container { margin-top: 25px; }
-        .bill-row { border-bottom: 1px solid #f0f0f0; padding: 15px 0; cursor: pointer; transition: 0.2s; }
-        .bill-header { display: flex; justify-content: space-between; align-items: center; }
-        .bill-info { display: flex; flex-direction: column; }
-        .bill-amount-status { text-align: right; display: flex; align-items: center; gap: 10px; }
-        
-        .details-pane { display: none; background: var(--soft-gray); border-radius: 15px; padding: 15px; margin-top: 10px; font-size: 13px; border: 1px solid #eee; }
-        .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .detail-item { display: flex; flex-direction: column; }
-        .detail-label { font-size: 10px; color: #888; text-transform: uppercase; font-weight: 800; }
-        
-        .status { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .status-paid { background: #e6f9ed; color: #27ae60; }
-        .status-overdue { background: #fff1f0; color: #e74c3c; }
+        /* Premium Card Design */
+        .card { 
+            background: var(--glass); 
+            backdrop-filter: blur(10px);
+            border-radius: 32px; 
+            padding: 25px; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); 
+            max-width: 500px; 
+            margin: auto; 
+            border: 1px solid rgba(255,255,255,0.7);
+            position: relative;
+        }
 
-        .status-unpaid { background: #fff9eb; color: #f39c12; } /* Orange */
-.status-paid { background: #e6f9ed; color: #27ae60; }   /* Green */
-.status-overdue { background: #fff1f0; color: #e74c3c; } /* Red */
+        /* Floating Header Logo */
+        .brand-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-        .btn-pay-animated { background: var(--primary-green); color: white; border: none; padding: 18px; width: 100%; border-radius: 16px; font-weight: 800; cursor: pointer; font-size: 18px; margin-top: 10px; transition: 0.3s; display: block; text-align: center; text-decoration: none; }
-         
-        /* Pulse Animation */
-@keyframes pulse-green {
-    0% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7); }
-    70% { box-shadow: 0 0 0 15px rgba(39, 174, 96, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0); }
-}
+        .brand-logo {
+            height: 120px;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+            transition: transform 0.3s ease;
+        }
 
-/* Shimmer Effect para sa text */
-@keyframes shimmer {
-    0% { background-position: -100px; }
-    100% { background-position: 100px; }
-}
+        /* Hero Balance Section - Dark Premium */
+        .hero-section { 
+            background: var(--premium-gradient); 
+            color: white; 
+            border-radius: 24px; 
+            padding: 30px 20px; 
+            text-align: center; 
+            margin-bottom: 25px; 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
 
-.btn-pay-animated {
-    background: var(--primary-green);
-    color: white;
-    border: none;
-    padding: 18px;
-    width: 100%;
-    border-radius: 16px;
-    font-weight: 800;
-    cursor: pointer;
-    font-size: 18px;
-    margin-top: 10px;
-    transition: 0.3s;
-    display: block;
-    text-align: center;
-    text-decoration: none;
-    
-    /* I-apply ang Pulse Effect dito */
-    animation: pulse-green 2s infinite;
-    
-    /* Para sa text glow */
-    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+        }
 
-.btn-pay-animated:active {
-    transform: scale(0.96); /* Lulubog nang konti pag kine-click */
-}
+        .amount-hero { 
+            font-size: 38px; 
+            font-weight: 800; 
+            margin: 10px 0; 
+            letter-spacing: -1px;
+        }
 
-.btn-pay-animated span {
-    display: inline-block;
-    animation: bounce 2s infinite; /* Talon-talon yung emoji */
-}
+        .due-label { 
+            font-size: 10px; 
+            font-weight: 700; 
+            color: #27ae60; 
+            text-transform: uppercase; 
+            letter-spacing: 2px;
+        }
 
-/* 1. RED BLINK (Para sa Overdue - mas intense ang warning) */
-@keyframes blink-red {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.85; transform: scale(1.02); box-shadow: 0 0 20px rgba(214, 48, 49, 0.5); }
-    100% { opacity: 1; transform: scale(1); }
-}
+        /* Grid Info Boxes */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
 
-/* 2. BLUE PULSE (Para sa Due Today - Blue Theme) */
-@keyframes pulse-blue {
-    0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); transform: scale(1); }
-    70% { box-shadow: 0 0 0 15px rgba(52, 152, 219, 0); transform: scale(1.01); }
-    100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); transform: scale(1); }
-}
+        .info-box {
+            background: white;
+            padding: 15px;
+            border-radius: 18px;
+            border: 1px solid #edf2f7;
+            transition: all 0.3s ease;
+        }
 
-/* 3. CELEBRATE (Para sa Fully Settled - may konting "bounce" at "glow") */
-@keyframes celebrate {
-    0% { transform: translateY(0) scale(1); }
-    25% { transform: translateY(-4px) scale(1.01); }
-    50% { transform: translateY(0) scale(1.02); box-shadow: 0 10px 25px rgba(39, 174, 96, 0.4); }
-    75% { transform: translateY(-2px) scale(1.01); }
-    100% { transform: translateY(0) scale(1); }
-}
+        .info-box:active { transform: scale(0.98); }
 
-/* 4. SHIMMER (Optional: Dagdag na effect para magmukhang premium ang box) */
-@keyframes shimmer {
-    0% { background-position: -100% 0; }
-    100% { background-position: 100% 0; }
-}
+        .label-tiny {
+            font-size: 9px;
+            color: #a0aec0;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 4px;
+        }
 
-        
-        .active .details-pane { display: block; }
-        .action-circle { background: #eee; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #888; }
-        .active .action-circle { transform: rotate(45deg); background: var(--danger-red); color: white; }
+        .value-mid {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2d3748;
+        }
 
-        /* Modal */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 9999; }
-        .modal-box { background: white; border-radius: 28px; padding: 25px; text-align: center; }
+        /* Action Button */
+        .btn-pay-premium {
+            background: var(--primary-green);
+            color: white;
+            padding: 20px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 16px;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(39, 174, 96, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            animation: pulse-green 2s infinite;
+        }
 
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.5); }
+            70% { box-shadow: 0 0 0 15px rgba(39, 174, 96, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0); }
+        }
+
+        /* Schedule/List Styling */
+        .bill-row {
+            padding: 18px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .status-pill {
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        /* Animations for Modal */
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Responsive Fix for long names */
+        #dispName {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 5px;
+        }
+
     </style>
 </head>
 <body>
 
-<div id="welcomePortalModal" class="modal-overlay" style="display: flex; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
-    <div class="modal-box" style="width: 90%; max-width: 380px; padding: 30px; border-radius: 30px; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.2); text-align: center; animation: slideUp 0.4s ease-out;">
+<div id="welcomePortalModal" class="modal-overlay" style="display: flex; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000;">
+    <div class="modal-box" style="width: 85%; max-width: 380px; padding: 35px; border-radius: 35px; background: white; text-align: center; animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+        <div style="font-size: 45px; margin-bottom: 15px;">✨</div>
+        <h2 style="font-size: 22px; margin: 0; color: #1a1a1a;">Hello, <span id="modalGreeting" style="color: var(--primary-green);">User</span>!</h2>
+        <p style="font-size: 14px; color: #718096; margin: 15px 0 25px;">Welcome to your redesigned ERRIHO Portal. Managing your balance has never been this sleek.</p>
         
-        <div style="font-size: 50px; margin-bottom: 15px;">👋</div>
-        
-       <h2 style="font-size: 24px; margin: 0 0 10px 0; color: #1a1a1a;">
-    Hello, <span id="modalGreeting">User</span>!
-</h2>
-        
-        <p style="font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 25px;">
-            Welcome to your new ERRIHO Portal! We’ve upgraded our system to give you a smoother and more secure experience. Here’s what you can do:
-        </p>
-        
-        <div style="text-align: left; margin-bottom: 25px;">
-            <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 15px;">
-                <div style="background: #e8f5e9; color: #27ae60; min-width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px;">1</div>
-                <div style="font-size: 13px; color: #444; line-height: 1.4;"><strong>Quick Overview:</strong> Instantly see your balance and next due date on the main dashboard.</div>
-            </div>
-            
-            <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 15px;">
-                <div style="background: #e8f5e9; color: #27ae60; min-width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px;">2</div>
-                <div style="font-size: 13px; color: #444; line-height: 1.4;"><strong>Easy Payments:</strong> Tap "Proceed to Payment" to settle your bills via our secure channels.</div>
-            </div>
-            
-            <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 15px;">
-                <div style="background: #e8f5e9; color: #27ae60; min-width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px;">3</div>
-                <div style="font-size: 13px; color: #444; line-height: 1.4;"><strong>Detailed History:</strong> Tap any row to see Payment Dates, Reference Numbers, and breakdowns.</div>
-            </div>
-        </div>
-
-        <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 25px; padding: 10px; background: #f9f9f9; border-radius: 12px; cursor: pointer;">
-            <input type="checkbox" id="dontShowAgain" style="width: 18px; height: 18px; cursor: pointer; accent-color: #27ae60;">
-            <label for="dontShowAgain" style="font-size: 13px; color: #777; cursor: pointer; user-select: none; font-weight: 600;">Don't show this again</label>
-        </div>
-
-        <button onclick="closeWelcomeModal()" style="width: 100%; padding: 18px; font-size: 16px; border-radius: 18px; background: #27ae60; color: white; border: none; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);">
-            GOT IT, THANKS!
+        <button onclick="closeWelcomeModal()" class="btn-pay-premium" style="animation: none;">
+            GET STARTED
         </button>
     </div>
 </div>
 
 <div class="card" id="mainContent" style="display:none;">
-    <div style="text-align: right; margin-bottom: 15px;">
-        <a href="logout.html" style="text-decoration: none; font-size: 11px; font-weight: 800; color: #e74c3c; background: #fff1f0; padding: 8px 15px; border-radius: 10px; border: 1px solid #ffccc7;">Log Out ➔</a>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div style="background: #f1f5f9; padding: 8px 15px; border-radius: 12px;">
+            <span id="ratingColorContainer" style="font-size: 14px; font-weight: 800;">
+                <span id="dispRating">0</span>% <span style="font-size: 10px; opacity: 0.6;">RATING</span>
+            </span>
+        </div>
+        <a href="logout.html" style="text-decoration: none; font-size: 11px; font-weight: 700; color: #e74c3c;">Logout ➔</a>
     </div>
 
-    <div style="display: flex; flex-direction: column; align-items: center; border-bottom: 1px solid #f0f0f0; padding-bottom: 25px; margin-bottom: 25px;">
-        
-        <div style="text-align: center; margin-bottom: 20px;">
-            <img src="images/logo.png" alt="ERRIHO Logo" style="height: 180px; width: auto; object-fit: contain; margin: 0 auto; display: block;">
-            <div style="font-size: 18px; font-weight: 800; color: #bbb; letter-spacing: 3px; margin-top: -10px; text-transform: uppercase;">ERRIHO PORTAL</div>
-        </div>
-
-        <div style="background: #fff; border: 1.5px solid #eee; border-radius: 20px; padding: 10px 15px; text-align: center; min-width: 100px; box-shadow: 0 5px 15px rgba(0,0,0,0.03);">
-            <div style="font-size: 9px; font-weight: 800; color: #888; text-transform: uppercase; margin-bottom: 3px;">Credit Rating</div>
-            <div id="ratingColorContainer" style="font-size: 24px; font-weight: 900; line-height: 1;">
-                <span id="dispRating">0</span><span style="font-size: 12px;">%</span>
-            </div>
-            <div style="margin-top: 5px;" id="ratingStatusContainer"></div>
-        </div>
+    <div class="brand-header">
+        <img src="images/logo.png" class="brand-logo" alt="ERRIHO">
+        <div style="font-size: 10px; font-weight: 800; color: #cbd5e0; letter-spacing: 4px; margin-top: 5px;">PREMIUM PORTAL</div>
     </div>
 
-    <div style="margin-bottom: 25px;">
-        <h2 id="dispName" style="margin: 0; font-size: 18px; font-weight: 800; color: #1a1a1a; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: clip;">
-            ---
-        </h2>
-        
-        <div style="margin-top: 10px; display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 11px; font-weight: 800; color: #999; text-transform: uppercase;">Account No:</span>
-            <span id="dispAccRef" style="font-family: monospace; font-size: 14px; font-weight: 700; color: var(--primary-green); background: #e8f5e9; padding: 4px 10px; border-radius: 6px;">---</span>
+    <div style="margin-bottom: 30px;">
+        <h2 id="dispName">---</h2>
+        <div style="display: inline-flex; align-items: center; background: #e8f5e9; padding: 5px 12px; border-radius: 10px;">
+            <span style="font-size: 9px; font-weight: 800; color: #27ae60; margin-right: 8px;">ID:</span>
+            <span id="dispAccRef" style="font-family: monospace; font-size: 12px; font-weight: 700; color: #27ae60;">---</span>
         </div>
     </div>
 
     <div class="hero-section" id="heroBox">
-        <p class="due-label" id="heroLabel">STATUS LOADING</p>
+        <p class="due-label" id="heroLabel">TOTAL OUTSTANDING</p>
         <div class="amount-hero" id="heroAmount">₱0.00</div>
         <div id="heroSubContainer">
-             <p id="heroSub" style="font-size: 11px; opacity: 0.8; margin-top: 5px;">Please wait...</p>
+            <p id="heroSub" style="font-size: 11px; color: rgba(255,255,255,0.6);">Loading account details...</p>
         </div>
     </div>
-    
-    <div style="text-align: center; margin-top: 15px; margin-bottom: 25px;">
-    
+
     <a id="payLinkBtn" href="javascript:void(0)" onclick="goToPaymentPage()" style="text-decoration:none;">
-        <button class="btn-pay-animated" style="margin-bottom: 8px;">
-            <span>💸</span> PROCEED TO PAYMENT
+        <button class="btn-pay-premium">
+            <span>💳</span> PAY NOW
         </button>
     </a>
+    <p style="text-align: center; font-size: 10px; color: #a0aec0; margin-top: 12px;">Secure Redirect to Payment Gateway</p>
 
-    <div style="display: flex; align-items: center; justify-content: center; gap: 5px; color: #888;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-        </svg>
-        <span style="font-size: 10px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase;">
-            You will be redirected to our secure payment gateway
-        </span>
-    </div>
-
-</div>
-    
-    <div style="background: white; padding: 18px; border-radius: 15px; border: 1px solid #eee; margin-top: 30px; margin-bottom: 10px;">
-    <span class="detail-label" style="font-size: 10px; color: #888; text-transform: uppercase; font-weight: 800;">Loan Category</span>
-    <div id="dispLoanType" style="font-size: 11px; font-weight: 800; color: var(--primary-green); margin-top: 4px; letter-spacing: 0.5px;">---</div>
-</div>
-
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px;">
-    
-    <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
-        <span class="detail-label">Item / Purpose</span>
-        <div id="dispProductName" style="font-size: 13px; font-weight: 700; margin-top: 5px; color: #555;">---</div>
-    </div>
-
-    <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
-        <span class="detail-label">Payment Term</span>
-        <div id="dispPlan" style="font-size: 14px; font-weight: 700; margin-top: 5px;">---</div>
-    </div>
-
-    <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
-        <span class="detail-label">Interest Rate</span>
-        <div id="dispRate" style="font-size: 14px; font-weight: 700; margin-top: 5px; color: var(--primary-green);">0%</div>
-    </div>
-
-    <div style="background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee;">
-        <span class="detail-label">Progress</span>
-        <div id="dispStatusCount" style="font-size: 14px; font-weight: 700; margin-top: 5px;">0 of 0 Paid</div>
-    </div>
-    </div> <div style="background: white; border-radius: 20px; border: 1px solid #eee; padding: 20px; margin-bottom: 25px; margin-top: 25px;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-            <span style="color: #555; font-size: 13px;">Original Loan Amount</span>
-            <span id="breakLoan" style="font-weight: 700;">₱0.00</span>
+    <div class="info-grid" style="margin-top: 30px;">
+        <div class="info-box">
+            <span class="label-tiny">Category</span>
+            <div id="dispLoanType" class="value-mid" style="color: var(--primary-green);">---</div>
         </div>
-
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-            <span style="color: #555; font-size: 13px;">Monthly Interest Amount</span>
-            <span id="breakInt" style="font-weight: 700;">₱0.00</span>
+        <div class="info-box">
+            <span class="label-tiny">Plan Term</span>
+            <div id="dispPlan" class="value-mid">---</div>
         </div>
+        <div class="info-box">
+            <span class="label-tiny">Interest</span>
+            <div id="dispRate" class="value-mid">0%</div>
+        </div>
+        <div class="info-box">
+            <span class="label-tiny">Progress</span>
+            <div id="dispStatusCount" class="value-mid">---</div>
+        </div>
+    </div>
 
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-            <span style="color: #555; font-size: 13px;">Monthly Payment</span>
+    <div style="background: #f8fafc; border-radius: 24px; padding: 20px; margin-top: 10px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+            <span style="color: #718096; font-size: 12px;">Monthly Payment</span>
             <span id="breakMonthly" style="font-weight: 700; color: var(--primary-green);">₱0.00</span>
         </div>
-
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-            <span style="color: #555; font-size: 13px;">Processing Fee</span>
-            <span id="breakFee" style="font-weight: 700;">₱0.00</span>
-        </div>
-
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-            <span style="color: #555; font-size: 13px;">Total Late Payment Fees</span>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+            <span style="color: #718096; font-size: 12px;">Late Fees</span>
             <span id="breakLate" style="font-weight: 700; color: #e67e22;">₱0.00</span>
         </div>
-
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-            <span style="color: #555; font-size: 13px;">Total Daily Interest Charge</span>
-            <span id="breakDailyInt" style="font-weight: 700; color: #e67e22;">₱0.00</span>
-        </div>
-        
-        <div style="height: 1px; background: #f0f0f0; margin: 15px 0;"></div>
-        
-        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-            <span style="color: #555; font-size: 13px;">Total Amount Paid</span>
-            <span id="breakPaid" style="font-weight: 700; color: #27ae60;">₱0.00</span>
-        </div>
-        
-        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #f0f0f0;">
-    
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div style="font-weight: 800; color: #1a1a1a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">
-            Total Outstanding Balance
-        </div>
-        <div id="dispBalance" style="font-size: 26px; font-weight: 800; color: #e74c3c; letter-spacing: -1px;">
-            ₱0.00
+        <div style="border-top: 1px dashed #e2e8f0; margin: 15px 0; padding-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 800; font-size: 11px; text-transform: uppercase;">Current Balance</span>
+            <span id="dispBalance" style="font-size: 22px; font-weight: 800; color: #e74c3c;">₱0.00</span>
         </div>
     </div>
 
-    <div style="text-align: right; margin-top: 2px;">
-        <div id="asOfDate" style="font-size: 9px; color: #aaa; font-weight: 700; text-transform: uppercase;">
-            UPDATED TODAY
+    <div class="schedule-container" id="scheduleList" style="margin-top: 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <span style="font-size: 11px; font-weight: 800; color: #a0aec0; letter-spacing: 1px;">REPAYMENT HISTORY</span>
+            <span style="font-size: 10px; color: var(--primary-green); font-weight: 700;">View All</span>
         </div>
-    </div>
+        </div>
 
-    </div> <div class="schedule-container" id="scheduleList" style="margin-top: 40px; border-top: 1.5px solid #f0f0f0; padding-top: 25px;">
-        <div style="margin-bottom: 15px;">
-            <span style="font-size: 11px; font-weight: 800; color: #999; letter-spacing: 1px; text-transform: uppercase;">
-                Repayment Schedule
-            </span>
-        </div>
+    <div style="margin-top: 50px; text-align: center; opacity: 0.5;">
+        <p style="font-size: 9px; font-weight: 800; letter-spacing: 2px;">POWERED BY</p>
+        <img src="images/flavideal.png" style="height: 40px; filter: grayscale(1);">
     </div>
 </div>
-
-    <div style="background: #ffffff; border: 1px solid #eef2f3; border-left: 5px solid #27ae60; padding: 25px; border-radius: 16px; margin-top: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.04);">
-    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-        <span style="font-size: 18px;">📢</span>
-        <strong style="color: #27ae60; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Official Reminder</strong>
-    </div>
-    
-    <p style="font-size: 12px; color: #4b5563; line-height: 1.6; margin: 0; font-family: 'Inter', sans-serif;">
-        To maintain a good credit rating and avoid account suspension, please settle your outstanding balance immediately. Payments made after the due date are subject to the following charges:
-    </p>
-
-    <div style="margin-top: 18px; background: #f9fafb; padding: 15px; border-radius: 12px; border: 1px dashed #e5e7eb;">
-        <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
-            <div style="display: flex; gap: 10px; align-items: flex-start;">
-                <span style="color: #e74c3c; font-weight: bold;">•</span>
-                <div style="font-size: 11px; color: #374151; line-height: 1.4;">
-                    <strong style="color: #111827;">Late Penalty Fee:</strong> 10% of the overdue principal amount.
-                </div>
-            </div>
-            <div style="display: flex; gap: 10px; align-items: flex-start;">
-                <span style="color: #e74c3c; font-weight: bold;">•</span>
-                <div style="font-size: 11px; color: #374151; line-height: 1.4;">
-                    <strong style="color: #111827;">Daily Interest:</strong> (15% × Overdue Principal) × (Days Late ÷ 30).
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <p style="font-size: 10px; color: #9ca3af; margin-top: 15px; font-style: italic; text-align: center; border-top: 1px solid #f3f4f6; padding-top: 12px;">
-        Avoid further penalties by paying on or before your next due date. Thank you for your cooperation.
-    </p>
-</div>
-
-<div style="margin-top: 50px; text-align: center; border-top: 1px solid #f3f4f6; padding-top: 30px; padding-bottom: 50px; font-family: 'Inter', sans-serif;">
-    
-    <div style="font-size: 15px; font-weight: 800; color: #27ae60; letter-spacing: 2px; margin-bottom: 12px; text-transform: uppercase;">
-        ERRIHO Personal Finance
-    </div>
-    
-    <div style="max-width: 500px; margin: 0 auto;">
-        <p style="font-size: 11px; color: #6b7280; margin: 0; line-height: 1.8;">
-            Thank you for choosing <strong>ERRIHO Personal Finance</strong> as your partner for your Flavi Deal installment plans. 
-            As this service is funded through personal resources, your commitment to on-time payments allows us to continue providing a helping hand during unexpected financial needs.
-        </p>
-    </div>
-
-   <div style="margin-top: 40px; font-size: 9px; color: #d1d5db; text-transform: uppercase; letter-spacing: 3px; font-weight: 700;">
-        *** This is a system-generated document ***
-    </div>
-</div> 
-</div>
-
-    <div style="margin-top: 35px; font-family: 'Inter', sans-serif; text-align: center;">
-    
-    <div style="font-size: 10px; font-weight: 800; color: #9ca3af; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px;">
-        — Contact Us —
-    </div>
-
-    <div style="display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;">
-        
-        <a href="https://facebook.com/erriho" target="_blank" style="text-decoration: none; display: flex; align-items: center; gap: 8px; background: #f0f7ff; padding: 8px 16px; border-radius: 50px; border: 1px solid #d0e5ff; transition: 0.3s;">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" width="16">
-            <span style="font-size: 12px; font-weight: 700; color: #1877F2;">Facebook</span>
-        </a>
-
-        <a href="https://m.me/erriho" target="_blank" style="text-decoration: none; display: flex; align-items: center; gap: 8px; background: #f0f2ff; padding: 8px 16px; border-radius: 50px; border: 1px solid #d0d7ff; transition: 0.3s;">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/be/Facebook_Messenger_logo_2020.svg" width="16">
-            <span style="font-size: 12px; font-weight: 700; color: #0084FF;">Messenger</span>
-        </a>
-    </div>
-
-    <div style="display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap; padding: 10px; background: #fafafa; border-radius: 12px; max-width: fit-content; margin: 0 auto;">
-        
-        <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="font-size: 14px;">🌐</span>
-            <span style="font-size: 11px; color: #6b7280; font-weight: 600; letter-spacing: 0.3px;">errihoportal.flavideal.com</span>
-        </div>
-
-        <span style="color: #e5e7eb; font-weight: 300;">|</span>
-
-        <a href="mailto:errihoportal@flavideal.com" style="text-decoration: none; display: flex; align-items: center; gap: 6px;">
-            <span style="font-size: 14px;">📩</span>
-            <span style="font-size: 11px; color: #4b5563; font-weight: 700;">errihoportal@flavideal.com</span>
-        </a>
-    </div>
-</div>
-    
-    <div style="width: 100%; text-align: center; padding: 30px 0 50px 0; background: transparent;">
-
-    <div style="margin-bottom: 25px; text-align: center;">
-        <p style="font-size: 9px; color: #bbb; font-weight: 800; letter-spacing: 2px; margin-bottom: 10px;">OFFICIAL PARTNER</p>
-        <img src="images/flavideal.png" alt="Flavideal" 
-             style="height: 60px; width: auto; display: block; margin: 0 auto; opacity: 1;">
-    </div>
-        
-    <img src="images/forstatement.gif" alt="Special Promo" 
-         style="width: 90%; max-width: 400px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: block; margin: 0 auto;">
-    
-    <p style="font-size: 10px; color: #bbb; margin-top: 15px; font-weight: 700; letter-spacing: 1px;">
-        © 2026 ERRIHO PORTAL • 
-    </p>
-
-    <div style="margin-top: 10px; font-size: 10px;">
-        <a href="privacy.html" style="color: #bbb; text-decoration: none; font-weight: 600;">Privacy Policy</a> | 
-        <a href="terms.html" style="color: #bbb; text-decoration: none; font-weight: 600;">Terms & Conditions</a>
-    </div>
-</div>
-
-    <div id="timeoutModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; align-items:center; justify-content:center; padding:20px; backdrop-filter: blur(5px);">
-    <div style="background:white; padding:35px 25px; border-radius:30px; text-align:center; max-width:340px; width:100%; box-shadow:0 25px 50px rgba(0,0,0,0.3); border: 1px solid #eee;">
-        <div style="font-size:50px; margin-bottom:20px; animation: pulse 1.5s infinite;">⏳</div>
-        <h3 style="margin:0 0 10px 0; color:#1a1a1a; font-size: 22px; font-weight: 800;">Session Expiring</h3>
-        <p style="font-size:14px; color:#666; line-height: 1.5; margin-bottom:25px;">
-            Your session will end in <strong id="secondsLeft" style="color:#e74c3c; font-size: 18px;">30</strong> seconds due to inactivity. Do you want to stay?
-        </p>
-        <button onclick="stayLoggedIn()" style="width:100%; padding:18px; background:#27ae60; color:white; border:none; border-radius:18px; font-weight:800; font-size: 16px; cursor:pointer; box-shadow: 0 10px 20px rgba(39, 174, 96, 0.2);">
-            YES, KEEP ME LOGGED IN
-        </button>
-    </div>
-</div>
-
-<style>
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
-}
-</style>
 
 <script>
     // 1. BACK BUTTON PROTECTION
