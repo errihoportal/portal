@@ -266,7 +266,38 @@
             alert("LOGIN ASSISTANCE:\n\nPlease check your Email or Messenger for your official login credentials.");
         }
 
-        window.onload = function() {
+        window.onload = async function() {
+    // I-check ang Maintenance Status agad
+    try {
+        const response = await fetch(`${baseUrl}?action=checkStatus`); // Gumawa ng simpleng request
+        const data = await response.json();
+
+        if (data.status === 'maintenance') {
+            // Itago ang landing options at login card
+            document.getElementById('landing-options').style.display = 'none';
+            document.getElementById('login-card').style.display = 'none';
+            
+            // Gumawa at ipakita ang Maintenance Card
+            const container = document.querySelector('.main-container');
+            const maintenanceHTML = `
+                <div id="maintenance-ui" style="text-align: center; padding: 40px 20px; background: white; border-radius: 28px; box-shadow: 0 15px 40px rgba(0,0,0,0.08);">
+                    <div style="font-size: 50px; margin-bottom: 20px;">🛠️</div>
+                    <h2 style="color: #27ae60; font-weight: 800;">UNDER MAINTENANCE</h2>
+                    <p style="color: #64748b; font-size: 14px;">We are updating our systems to serve you better.</p>
+                    <div style="margin-top: 30px;">
+                        <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Estimated Time Remaining:</span>
+                        <div id="timer" style="font-size: 32px; font-weight: 800; color: #1a1a1a; margin-top: 10px; font-family: monospace;">--:--:--</div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = maintenanceHTML;
+
+            // Simulan ang Countdown Timer
+            startTimer(data.endTime);
+            return; // Huwag nang ituloy ang PWA logic sa baba
+        }
+    } catch (e) { console.log("Status check failed, proceeding normally."); }
+            
             const pwaBadge = document.getElementById('pwa-badge');
             const pwaText = document.getElementById('pwa-text');
             const userAgent = navigator.userAgent.toLowerCase();
@@ -284,6 +315,26 @@
                 }
             }
         };
+
+        function startTimer(endTimeStr) {
+    const countDownDate = new Date(endTimeStr).getTime();
+    const x = setInterval(function() {
+        const now = new Date().getTime();
+        const distance = countDownDate - now;
+
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById("timer").innerHTML = hours + "h " + minutes + "m " + seconds + "s ";
+
+        if (distance < 0) {
+            clearInterval(x);
+            document.getElementById("timer").innerHTML = "READY SOON";
+            location.reload(); // I-refresh ang page kapag tapos na
+        }
+    }, 1000);
+}
     </script>
 </body>
 </html>
