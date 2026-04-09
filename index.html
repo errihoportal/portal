@@ -56,6 +56,8 @@
         .pwa-badge b { color: #27ae60; }
         .close-pwa { float: right; cursor: pointer; font-weight: bold; color: #94a3b8; }
         input[type="checkbox"] { width: auto !important; margin-top: 0; cursor: pointer; }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -206,31 +208,39 @@
     </div>
     
     <script>
-        async function showLogin() {
-    // 1. Ipakita muna ang login card (loading state)
+    
+    async function showLogin() {
+    // 1. Show the card and the LOADING state immediately
     document.getElementById('landing-options').style.display = 'none';
     document.getElementById('login-card').style.display = 'block';
-    const formContent = document.getElementById('login-form-content');
-    const maintMsg = document.getElementById('maintenance-msg');
     
-    // Itago muna pareho habang nag-checheck
-    formContent.style.display = 'none';
-    maintMsg.style.display = 'none';
+    const loadingArea = document.getElementById('login-loading');
+    const formArea = document.getElementById('login-form-content');
+    const maintArea = document.getElementById('maintenance-msg');
+    
+    // Reset views: Show loading, hide others
+    loadingArea.style.display = 'block';
+    formArea.style.display = 'none';
+    maintArea.style.display = 'none';
 
     try {
-        // 2. Check sa Google Sheet
+        // 2. Fetch maintenance status
         const response = await fetch(`${baseUrl}?action=checkStatus`);
         const data = await response.json();
 
-        if (data.maintenance === 'ON') {
-            maintMsg.style.display = 'block';
-            startTimer(data.endTime); // Simulan ang countdown
+        // 3. Hide loading before showing the result
+        loadingArea.style.display = 'none';
+
+        if (data.maintenance === "ON") {
+            maintArea.style.display = 'block';
+            startTimer(data.endTime);
         } else {
-            formContent.style.display = 'block';
+            formArea.style.display = 'block';
         }
-    } catch (e) {
-        // Pag may error sa internet, ipakita na lang ang form
-        formContent.style.display = 'block';
+    } catch (err) {
+        // Kapag nag-error ang internet, hide loading at ipakita ang form (default)
+        loadingArea.style.display = 'none';
+        formArea.style.display = 'block';
     }
     window.scrollTo(0, 0);
 }
