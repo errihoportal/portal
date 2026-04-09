@@ -175,12 +175,15 @@
                         <input type="password" id="pass" placeholder="Enter passcode" required>
                     </div>
                     <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; text-align: left; padding: 0 5px;">
-                        <input type="checkbox" id="termsCheckbox" style="width: 20px; height: 20px; accent-color: #27ae60; margin-top: 3px;" required>
-                        <label for="termsCheckbox" style="font-size: 12px; color: #64748b; line-height: 1.4; cursor: pointer;">
-                            I agree to the <a href="privacy.html" target="_blank" style="color: #27ae60; font-weight: 700; text-decoration: none;">Privacy Policy</a> 
-                            and <a href="terms.html" target="_blank" style="color: #27ae60; font-weight: 700; text-decoration: none;">Terms & Conditions</a> of ERRIHO Portal.
-                        </label>
-                    </div>
+            <input type="checkbox" id="termsCheckbox" style="width: 20px; height: 20px; accent-color: #27ae60; margin-top: 3px;" required>
+            <label for="termsCheckbox" style="font-size: 12px; color: #64748b; line-height: 1.4; cursor: pointer;">
+                I acknowledge and agree to the 
+                <span onclick="openLegalPage('Privacy Policy')" style="color: #27ae60; font-weight: 700; text-decoration: underline;">Privacy Policy</span> 
+                and 
+                <span onclick="openLegalPage('Terms & Conditions')" style="color: #27ae60; font-weight: 700; text-decoration: underline;">Terms & Conditions</span> 
+                governing the ERRIHO Portal.
+            </label>
+        </div>
                     <button type="submit" class="btn-login" id="loginBtn">AUTHORIZE LOGIN</button>
                 </form>
 
@@ -188,7 +191,25 @@
                     <a href="javascript:void(0)" onclick="showLoginHelp()" style="font-size: 13px; color: #64748b; text-decoration: none; font-weight: 600; display: block; margin-bottom: 15px;">Can't sign in? View Login Guide</a>
                     <a href="update.html" style="font-size: 13px; color: #27ae60; text-decoration: none; font-weight: 700; display: block;">🔑 Forgot or Change Passcode?</a>
                 </div>
-            </div> </div> <div style="margin-top: 40px; text-align: center; border-top: 1px solid #eee; padding-top: 30px; padding-bottom: 20px;">
+            </div> 
+
+            <div id="legal-page-view" style="display:none; text-align: left; padding: 10px;">
+    <div style="margin-bottom: 20px;">
+        <button onclick="closeLegalPage()" style="border: none; background: #f1f5f9; padding: 8px 15px; border-radius: 10px; font-weight: 800; font-size: 12px; color: #64748b; cursor: pointer;">← BACK</button>
+    </div>
+
+    <h2 id="legalTitle" style="color: #27ae60; margin: 0; font-size: 20px; font-weight: 800;"></h2>
+    <hr style="border: 0; border-top: 1px solid #f1f1f1; margin: 15px 0;">
+    
+    <div id="legalBody" style="font-size: 13px; color: #475569; line-height: 1.6; max-height: 400px; overflow-y: auto; padding-right: 10px;">
+        </div>
+
+    <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #f1f1f1;">
+        <button onclick="closeLegalPage()" style="width: 100%; background: #27ae60; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer;">I UNDERSTAND</button>
+    </div>
+</div>
+             
+        </div> <div style="margin-top: 40px; text-align: center; border-top: 1px solid #eee; padding-top: 30px; padding-bottom: 20px;">
             <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;">
                 <a href="faq.html" style="text-decoration: none; color: #64748b; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">FAQ</a>
                 <span style="color: #cbd5e1;">•</span>
@@ -347,6 +368,35 @@
             setTimeout(() => { location.reload(); }, 2000); // Reload para mawala maintenance
         }
     }, 1000);
+}
+
+function openLegalPage(type) {
+    // Itago ang Login, Ipakita ang Legal
+    document.getElementById('login-form-content').style.display = 'none';
+    document.getElementById('legal-page-view').style.display = 'block';
+    
+    const title = document.getElementById('legalTitle');
+    const body = document.getElementById('legalBody');
+    title.innerText = type;
+
+    if (type === 'Privacy Policy') {
+        body.innerHTML = `
+            <p><strong>Your Privacy Matters</strong></p>
+            <p>ERRIHO Personal Finance is committed to protecting your data. We only collect information necessary to track your financing balances and payment schedules.</p>
+            <p>Your credentials are encrypted, and we never share your personal information with third parties.</p>
+        `;
+    } else {
+        body.innerHTML = `
+            <p><strong>Terms and Conditions</strong></p>
+            <p>By using this portal, you agree to access only your authorized account. Any attempt to compromise the system will result in account suspension.</p>
+            <p>Payment updates may have a slight delay depending on processing times. Penalty rules from your original agreement still apply.</p>
+        `;
+    }
+}
+
+function closeLegalPage() {
+    document.getElementById('legal-page-view').style.display = 'none';
+    document.getElementById('login-form-content').style.display = 'block';
 }
     </script>
 </body>
