@@ -372,7 +372,6 @@
 }
 
 async function openLegalPage(type) {
-    // Itago ang login, ipakita ang view area
     document.getElementById('login-form-content').style.display = 'none';
     document.getElementById('legal-page-view').style.display = 'block';
     
@@ -382,21 +381,27 @@ async function openLegalPage(type) {
     title.innerText = type;
     body.innerHTML = "<i>Loading content, please wait...</i>";
 
-    // Tukuyin kung anong file ang kukunin
     const fileName = (type === 'Privacy Policy') ? 'privacy.html' : 'terms.html';
 
     try {
         const response = await fetch(fileName);
         const htmlContent = await response.text();
         
-        // Gagamit tayo ng DOMParser para kunin lang ang laman ng <body> ng privacy/terms page
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlContent, 'text/html');
-        const content = doc.querySelector('body') ? doc.querySelector('body').innerHTML : htmlContent;
+
+        // --- DITO NATIN I-HAI-HIDE ANG HEADER/BACK BUTTON ---
+        // Kung ang text mo sa privacy.html ay nasa loob ng isang container:
+        let cleanContent = doc.querySelector('.main-content') || doc.querySelector('.container') || doc.querySelector('body');
         
-        body.innerHTML = content;
+        // Burahin natin ang mga elements na ayaw nating lumitaw sa login card
+        const elementsToRemove = cleanContent.querySelectorAll('header, footer, .back-btn, .nav, button');
+        elementsToRemove.forEach(el => el.remove());
+
+        body.innerHTML = cleanContent.innerHTML;
+        
     } catch (err) {
-        body.innerHTML = "Error loading content. Please check your internet connection or try again later.";
+        body.innerHTML = "Error loading content. Please check your internet connection.";
     }
     
     window.scrollTo(0, 0);
