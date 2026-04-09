@@ -198,11 +198,12 @@
         <button onclick="closeLegalPage()" style="border: none; background: #f1f5f9; padding: 8px 15px; border-radius: 10px; font-weight: 800; font-size: 12px; color: #64748b; cursor: pointer;">← BACK</button>
     </div>
 
-    <h2 id="legalTitle" style="color: #27ae60; margin: 0; font-size: 20px; font-weight: 800;"></h2>
+    <h2 id="legalTitle" style="color: #27ae60; margin: 0; font-size: 20px; font-weight: 800; text-transform: uppercase;"></h2>
     <hr style="border: 0; border-top: 1px solid #f1f1f1; margin: 15px 0;">
     
-    <div id="legalBody" style="font-size: 13px; color: #475569; line-height: 1.6; max-height: 400px; overflow-y: auto; padding-right: 10px;">
-        </div>
+    <div id="legalBody" style="font-size: 13px; color: #475569; line-height: 1.6; max-height: 450px; overflow-y: auto; padding-right: 10px; border: 1px solid #f8fafc; padding: 10px; border-radius: 8px;">
+        <p>Loading document...</p>
+    </div>
 
     <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #f1f1f1;">
         <button onclick="closeLegalPage()" style="width: 100%; background: #27ae60; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer;">I UNDERSTAND</button>
@@ -370,28 +371,35 @@
     }, 1000);
 }
 
-function openLegalPage(type) {
-    // Itago ang Login, Ipakita ang Legal
+async function openLegalPage(type) {
+    // Itago ang login, ipakita ang view area
     document.getElementById('login-form-content').style.display = 'none';
     document.getElementById('legal-page-view').style.display = 'block';
     
     const title = document.getElementById('legalTitle');
     const body = document.getElementById('legalBody');
+    
     title.innerText = type;
+    body.innerHTML = "<i>Loading content, please wait...</i>";
 
-    if (type === 'Privacy Policy') {
-        body.innerHTML = `
-            <p><strong>Your Privacy Matters</strong></p>
-            <p>ERRIHO Personal Finance is committed to protecting your data. We only collect information necessary to track your financing balances and payment schedules.</p>
-            <p>Your credentials are encrypted, and we never share your personal information with third parties.</p>
-        `;
-    } else {
-        body.innerHTML = `
-            <p><strong>Terms and Conditions</strong></p>
-            <p>By using this portal, you agree to access only your authorized account. Any attempt to compromise the system will result in account suspension.</p>
-            <p>Payment updates may have a slight delay depending on processing times. Penalty rules from your original agreement still apply.</p>
-        `;
+    // Tukuyin kung anong file ang kukunin
+    const fileName = (type === 'Privacy Policy') ? 'privacy.html' : 'terms.html';
+
+    try {
+        const response = await fetch(fileName);
+        const htmlContent = await response.text();
+        
+        // Gagamit tayo ng DOMParser para kunin lang ang laman ng <body> ng privacy/terms page
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlContent, 'text/html');
+        const content = doc.querySelector('body') ? doc.querySelector('body').innerHTML : htmlContent;
+        
+        body.innerHTML = content;
+    } catch (err) {
+        body.innerHTML = "Error loading content. Please check your internet connection or try again later.";
     }
+    
+    window.scrollTo(0, 0);
 }
 
 function closeLegalPage() {
