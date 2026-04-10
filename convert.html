@@ -99,6 +99,14 @@
     <h2>Installment Conversion</h2>
     <p class="subtitle">Convert your outstanding balance into easy payments.</p>
 
+    <div style="margin-top: 15px; padding: 15px; border: 1px solid #dfe6e9; border-radius: 10px; font-size: 12px; background: #fff;">
+        <strong style="color: var(--primary); display: block; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 5px;">CUSTOMER INFORMATION</strong>
+        <div>Full Name: <strong id="infoName">---</strong></div>
+        <div>Email: <strong id="infoEmail">---</strong></div>
+        <div>Contact: <strong id="infoContact">---</strong></div>
+        <div>Address: <strong id="infoAddress">---</strong></div>
+    </div>
+
     <div class="dues-card">
         <span class="dues-title">⚠️ CURRENT OUTSTANDING BREAKDOWN</span>
         <div id="duesList">
@@ -218,10 +226,22 @@
     const signaturePad = new SignaturePad(canvas);
 
     window.onload = function() {
-        if(!data) { window.location.href="index.html"; return; }
-        loadDuesBreakdown();
-        resizeCanvas();
-    };
+    if(!data) { window.location.href="index.html"; return; }
+    loadDuesBreakdown();
+    resizeCanvas();
+
+    // DAGDAG ITO: Populate Customer Info
+    document.getElementById('infoName').innerText = data.name || "N/A";
+    document.getElementById('infoEmail').innerText = data.email || "N/A";
+    document.getElementById('infoContact').innerText = data.contact || "N/A";
+    document.getElementById('infoAddress').innerText = data.address || "N/A";
+
+    // DAGDAG ITO: Digital Audit Trail Text
+    document.getElementById('auditTrail').innerHTML = `
+        Digital Audit Trail ID: ${data.accRef}-${Date.now()}<br>
+        Document Generated: ${new Date().toLocaleString()}
+    `;
+};
 
     function loadDuesBreakdown() {
         const duesList = document.getElementById('duesList');
@@ -329,46 +349,43 @@
     canvas.addEventListener("mouseup", toggleBtn);
 
     async function submitRequest() {
-        const btn = document.getElementById('submitBtn');
-        btn.innerText = "Processing...";
-        btn.disabled = true;
+    const btn = document.getElementById('submitBtn');
+    btn.innerText = "Processing PDF...";
+    btn.disabled = true;
 
-        try {
-            const capture = document.getElementById('captureArea');
-            const canvasImg = await html2canvas(capture);
-            const imgData = canvasImg.toDataURL("image/jpeg", 0.7);
+    // Kunin lang ang Signature (Base64)
+    const sigImg = canvas.toDataURL("image/png");
 
-            const payload = {
-                action: "conversion",
-                accRef: data.accRef,
-                name: data.name,
-                email: data.email,
-                image: imgData,
-                filename: `CONV_${data.accRef}_${Date.now()}.jpg`,
-                details: {
-                    principal: grandTotalPrincipal,
-                    terms: document.getElementById('termsSelect').value,
-                    monthly: document.getElementById('monthlyAmort').innerText
-                }
-            };
-
-            const scriptUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec"; // PASTE YOUR WEB APP URL HERE
-
-            await fetch(scriptUrl, {
-                method: "POST",
-                mode: "no-cors",
-                body: JSON.stringify(payload)
-            });
-
-            alert("CONVERSION SUCCESSFUL!\nAng iyong request ay ipapadala sa aming team para sa validation.");
-            window.location.href = "statement.html";
-
-        } catch(e) {
-            alert("Error: " + e.message);
-            btn.disabled = false;
-            btn.innerText = "Confirm & Apply";
+    const payload = {
+        action: "conversion",
+        accRef: data.accRef,
+        name: data.name,
+        email: data.email,
+        contact: data.contact,
+        address: data.address,
+        signature: sigImg, 
+        details: {
+            principal: grandTotalPrincipal.toFixed(2),
+            terms: document.getElementById('termsSelect').value,
+            grandTotal: document.getElementById('grandTotalInstallment').innerText
         }
+    };
+
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
+
+    try {
+        await fetch(scriptUrl, {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify(payload)
+        });
+        alert("AGREEMENT SIGNED!\nA PDF copy has been sent to your email.");
+        window.location.href = "statement.html";
+    } catch(e) {
+        alert("Error: " + e.message);
+        btn.disabled = false;
     }
+}
 
     function clearSignature() { signaturePad.clear(); toggleBtn(); }
     
