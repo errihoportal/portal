@@ -243,22 +243,31 @@
 
         runningTotal += amountForThisMonth;
         
-        // Formatting for the table rows
+        // 1. Formatting for the table rows (Strict 2 Decimals)
         const formattedAmount = amountForThisMonth.toLocaleString('en-US', {
             minimumFractionDigits: 2, 
             maximumFractionDigits: 2
         });
 
+        // 2. Formatting the Date (Full Date: April 10, 2026)
+        const fullDate = nextMonth.toLocaleDateString('en-US', {
+            month: 'long', 
+            day: 'numeric', 
+            year: 'numeric'
+        });
+
+        // 3. Build the Row
         schedHtml += `
             <tr style="${i === 1 ? 'background: #fff9e6; font-weight: bold;' : ''}">
-                <td style="padding: 10px; border-bottom: 1px solid #eee;">
-                    ${i}${i==1?'st':i==2?'nd':i==3?'rd':'th'} Pay (${nextMonth.toLocaleDateString('en-US', {month:'short', day:'2-digit'})})
+                <td style="padding: 10px; border-bottom: 1px solid #eee; font-size: 11px;">
+                    ${i}${i==1?'st':i==2?'nd':i==3?'rd':'th'} Pay<br>
+                    <span style="color: #555;">${fullDate}</span>
                 </td>
-                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">
-                    ₱ ${formattedAmount} ${i === 1 ? '<br><small style="font-size:10px; color:#e67e22;">+ ₱300 Fee</small>' : ''}
+                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right; vertical-align: middle;">
+                    <b>₱ ${formattedAmount}</b> 
+                    ${i === 1 ? '<br><small style="font-size:10px; color:#e67e22;">+ ₱300 Processing Fee</small>' : ''}
                 </td>
             </tr>`;
-    }
 
     schedBody.innerHTML = schedHtml;
 
