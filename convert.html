@@ -390,28 +390,33 @@
         return;
     }
 
-    btn.disabled = true;
+   btn.disabled = true;
     btn.innerText = "Processing...";
 
-    let rawAmount = parseFloat(grandTotalPrincipal.toString().replace(/,/g, ''));
-    let amountInWords = numberToWords(rawAmount);
+    // 1. Linisin ang principal amount (Isang beses lang dapat i-parse)
+    let principalValue = parseFloat(grandTotalPrincipal.toString().replace(/,/g, ''));
+
+    // 2. Compute ang Words at Interest (5%)
+    let amountInWords = numberToWords(principalValue);
+    let monthlyIntAmount = principalValue * 0.05;
 
     const payload = {
         action: "conversion",
         accRef: data.accRef,
         name: data.name,
         email: updatedEmail,
-        contact: updatedContact, // Ito ang papasok sa Column AJ
-        address: updatedAddress, // Ito ang papasok sa Column AL
+        contact: updatedContact,
+        address: updatedAddress,
+        amountInWords: amountInWords, // <--- DAPAT NANDITO ITO PARA LUMABAS SA PDF
         signature: signaturePad.toDataURL("image/png"),
         details: {
-        principal: grandTotalPrincipal,
-        terms: document.getElementById('termsSelect').value,
-        interestRate: 5, // Halimbawa: kung 5% ang rate mo
-        monthlyInterest: (grandTotalPrincipal * 0.05).toLocaleString(), // Compute monthly interest
-        grandTotal: document.getElementById('grandTotalInstallment').innerText
-    }
-};
+            principal: principalValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
+            terms: document.getElementById('termsSelect').value,
+            interestRate: "5.00", 
+            monthlyInterest: monthlyIntAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}),
+            grandTotal: document.getElementById('grandTotalInstallment').innerText
+        }
+    };
 
     const scriptUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
 
