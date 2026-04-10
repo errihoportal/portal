@@ -244,12 +244,13 @@
     window.onload = function() {
     if(!data) { window.location.href="index.html"; return; }
     
-    // Pangalan (Hindi editable para sa security)
-    document.getElementById('infoName').innerText = data.name || "N/A";
+    // Display Name (Read-only)
+    document.getElementById('infoName').innerText = data.name || "---";
     
-    // Mga editable fields (ilalagay ang laman kung meron na sa record)
+    // I-populate ang mga input boxes mula sa data na nakuha sa login
+    // Note: 'mobile' ang tawag natin sa data galing Column AJ
     document.getElementById('editEmail').value = data.email || "";
-    document.getElementById('editContact').value = data.contact || ""; // Galing AJ
+    document.getElementById('editContact').value = data.mobile || ""; 
     document.getElementById('editAddress').value = data.address || "";
 
     loadDuesBreakdown();
@@ -362,26 +363,29 @@
     canvas.addEventListener("mouseup", toggleBtn);
 
     async function submitRequest() {
+    const btn = document.getElementById('submitBtn');
     const updatedEmail = document.getElementById('editEmail').value;
     const updatedContact = document.getElementById('editContact').value;
     const updatedAddress = document.getElementById('editAddress').value;
 
-    // Validation: Huwag hayaang blanko
     if (!updatedEmail || !updatedContact || !updatedAddress) {
         alert("Please complete your Email, Contact, and Address information.");
         return;
     }
 
+    btn.disabled = true;
+    btn.innerText = "Processing...";
+
     const payload = {
         action: "conversion",
         accRef: data.accRef,
         name: data.name,
-        email: updatedEmail,   // Updated
-        contact: updatedContact, // Updated
-        address: updatedAddress, // Updated
-        signature: canvas.toDataURL("image/png"),
+        email: updatedEmail,
+        contact: updatedContact, // Ito ang papasok sa Column AJ
+        address: updatedAddress, // Ito ang papasok sa Column AL
+        signature: signaturePad.toDataURL("image/png"),
         details: {
-            principal: data.principal,
+            principal: grandTotalPrincipal,
             terms: document.getElementById('termsSelect').value,
             grandTotal: document.getElementById('grandTotalInstallment').innerText
         }
@@ -390,16 +394,20 @@
     const scriptUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
 
     try {
+        // Gagamit tayo ng fetch. Dahil 'no-cors', hindi natin mababasa ang success response 
+        // pero gagana ang script sa background.
         await fetch(scriptUrl, {
             method: "POST",
             mode: "no-cors",
             body: JSON.stringify(payload)
         });
-        alert("AGREEMENT SIGNED!\nA PDF copy has been sent to your email.");
+        
+        alert("SUCCESS!\nYour installment plan is being processed. Please wait 24hrs for the portal update.");
         window.location.href = "statement.html";
     } catch(e) {
         alert("Error: " + e.message);
         btn.disabled = false;
+        btn.innerText = "Confirm & Apply";
     }
 }
 
