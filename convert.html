@@ -405,11 +405,13 @@
         address: updatedAddress, // Ito ang papasok sa Column AL
         signature: signaturePad.toDataURL("image/png"),
         details: {
-            principal: grandTotalPrincipal,
-            terms: document.getElementById('termsSelect').value,
-            grandTotal: document.getElementById('grandTotalInstallment').innerText
-        }
-    };
+        principal: grandTotalPrincipal,
+        terms: document.getElementById('termsSelect').value,
+        interestRate: 5, // Halimbawa: kung 5% ang rate mo
+        monthlyInterest: (grandTotalPrincipal * 0.05).toLocaleString(), // Compute monthly interest
+        grandTotal: document.getElementById('grandTotalInstallment').innerText
+    }
+};
 
     const scriptUrl = "https://script.google.com/macros/s/AKfycbxu7hJeghA8ZEroQisS7V-7VxG8lFojZiz0WP8WHDkA5mugOaEzaYURBAN4gyB2f81Z_Q/exec";
 
