@@ -393,6 +393,8 @@
     btn.disabled = true;
     btn.innerText = "Processing...";
 
+    let amountInWords = numberToWords(grandTotalPrincipal);
+
     const payload = {
         action: "conversion",
         accRef: data.accRef,
