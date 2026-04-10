@@ -393,7 +393,8 @@
     btn.disabled = true;
     btn.innerText = "Processing...";
 
-    let amountInWords = numberToWords(grandTotalPrincipal);
+    let rawAmount = parseFloat(grandTotalPrincipal.toString().replace(/,/g, ''));
+    let amountInWords = numberToWords(rawAmount);
 
     const payload = {
         action: "conversion",
