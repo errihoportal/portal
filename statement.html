@@ -896,19 +896,20 @@ if(greet) {
 
        // --- 4. CONVERSION BUTTON LOGIC ---
         // TANDAAN: Dapat "CONVERSION" (All Caps) ang nasa Sheets Column K
-        if (data.accountStatus === "CONVERSION") {
-            const hSubCont = document.getElementById('heroSubContainer');
-            if (hSubCont) {
-                hSubCont.innerHTML += `
-                    <div id="conversionBtnWrapper" style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px; width: 100%;">
-                        <button onclick="window.location.href='convert.html'" 
-                                style="width: 100%; background: #ff9800; color: #ffffff; border: none; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 8px;">
-                            💳 CONVERT TO INSTALLMENT
-                        </button>
-                    </div>
-                `;
-            }
-        }
+        // --- 4. CONVERSION BUTTON ---
+// Gagamit din ng 'actionType' pero ibang word naman ang hahanapin
+if (data.actionType === "CONVERSION") {
+    const hSubCont = document.getElementById('heroSubContainer');
+    if (hSubCont) {
+        hSubCont.innerHTML += `
+            <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px; width: 100%;">
+                <button onclick="window.location.href='convert.html'" 
+                        style="width: 100%; background: #ff9800; color: #ffffff; border: none; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    💳 CONVERT TO INSTALLMENT
+                </button>
+            </div>`;
+    }
+}
 } // End of populateData
 
     function closeWelcomeModal() {
