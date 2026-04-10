@@ -100,12 +100,28 @@
     <p class="subtitle">Convert your outstanding balance into easy payments.</p>
 
     <div style="margin-top: 15px; padding: 15px; border: 1px solid #dfe6e9; border-radius: 10px; font-size: 12px; background: #fff;">
-        <strong style="color: var(--primary); display: block; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 5px;">CUSTOMER INFORMATION</strong>
-        <div>Full Name: <strong id="infoName">---</strong></div>
-        <div>Email: <strong id="infoEmail">---</strong></div>
-        <div>Contact: <strong id="infoContact">---</strong></div>
-        <div>Address: <strong id="infoAddress">---</strong></div>
+    <strong style="color: var(--primary); display: block; margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 5px;">CUSTOMER INFORMATION</strong>
+    
+    <div style="margin-bottom: 8px;">
+        Full Name: <br>
+        <strong id="infoName" style="color: #555;">---</strong>
     </div>
+
+    <div style="margin-bottom: 8px;">
+        Email Address: <small style="color: #e67e22;">(Make sure this is active)</small>
+        <input type="email" id="editEmail" style="width: 100%; border: 1px solid #ddd; padding: 5px; border-radius: 4px;" placeholder="Input active email here">
+    </div>
+
+    <div style="margin-bottom: 8px;">
+        Contact Number: <small style="color: #e67e22;">(For payment reminders)</small>
+        <input type="text" id="editContact" style="width: 100%; border: 1px solid #ddd; padding: 5px; border-radius: 4px;" placeholder="Input active contact no.">
+    </div>
+
+    <div style="margin-bottom: 8px;">
+        Home Address:
+        <input type="text" id="editAddress" style="width: 100%; border: 1px solid #ddd; padding: 5px; border-radius: 4px;" placeholder="Input complete address here">
+    </div>
+</div>
 
     <div class="dues-card">
         <span class="dues-title">⚠️ CURRENT OUTSTANDING BREAKDOWN</span>
@@ -227,20 +243,17 @@
 
     window.onload = function() {
     if(!data) { window.location.href="index.html"; return; }
+    
+    // Pangalan (Hindi editable para sa security)
+    document.getElementById('infoName').innerText = data.name || "N/A";
+    
+    // Mga editable fields (ilalagay ang laman kung meron na sa record)
+    document.getElementById('editEmail').value = data.email || "";
+    document.getElementById('editContact').value = data.contact || ""; // Galing AJ
+    document.getElementById('editAddress').value = data.address || "";
+
     loadDuesBreakdown();
     resizeCanvas();
-
-    // DAGDAG ITO: Populate Customer Info
-    document.getElementById('infoName').innerText = data.name || "N/A";
-    document.getElementById('infoEmail').innerText = data.email || "N/A";
-    document.getElementById('infoContact').innerText = data.contact || "N/A";
-    document.getElementById('infoAddress').innerText = data.address || "N/A";
-
-    // DAGDAG ITO: Digital Audit Trail Text
-    document.getElementById('auditTrail').innerHTML = `
-        Digital Audit Trail ID: ${data.accRef}-${Date.now()}<br>
-        Document Generated: ${new Date().toLocaleString()}
-    `;
 };
 
     function loadDuesBreakdown() {
@@ -349,23 +362,26 @@
     canvas.addEventListener("mouseup", toggleBtn);
 
     async function submitRequest() {
-    const btn = document.getElementById('submitBtn');
-    btn.innerText = "Processing PDF...";
-    btn.disabled = true;
+    const updatedEmail = document.getElementById('editEmail').value;
+    const updatedContact = document.getElementById('editContact').value;
+    const updatedAddress = document.getElementById('editAddress').value;
 
-    // Kunin lang ang Signature (Base64)
-    const sigImg = canvas.toDataURL("image/png");
+    // Validation: Huwag hayaang blanko
+    if (!updatedEmail || !updatedContact || !updatedAddress) {
+        alert("Please complete your Email, Contact, and Address information.");
+        return;
+    }
 
     const payload = {
         action: "conversion",
         accRef: data.accRef,
         name: data.name,
-        email: data.email,
-        contact: data.contact,
-        address: data.address,
-        signature: sigImg, 
+        email: updatedEmail,   // Updated
+        contact: updatedContact, // Updated
+        address: updatedAddress, // Updated
+        signature: canvas.toDataURL("image/png"),
         details: {
-            principal: grandTotalPrincipal.toFixed(2),
+            principal: data.principal,
             terms: document.getElementById('termsSelect').value,
             grandTotal: document.getElementById('grandTotalInstallment').innerText
         }
