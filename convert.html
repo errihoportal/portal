@@ -497,6 +497,59 @@ function closeTerms() {
         console.log("Kailangan buksan pareho ang Terms at Privacy.");
     }
 }
+
+function numberToWords(amount) {
+  const words = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
+  const teens = ["Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+  const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+  
+  function convertGroup(n) {
+    let res = "";
+    if (n >= 100) {
+      res += words[Math.floor(n / 100)] + " Hundred ";
+      n %= 100;
+    }
+    if (n >= 10 && n <= 19) {
+      res += teens[n - 10] + " ";
+    } else if (n >= 20 || (n > 0 && n < 10)) {
+      res += tens[Math.floor(n / 10)] + " " + words[n % 10] + " ";
+    }
+    return res;
+  }
+
+  // Paghiwalayin ang Pesos at Centavos
+  let parts = amount.toFixed(2).split(".");
+  let pesos = parseInt(parts[0]);
+  let cents = parseInt(parts[1]);
+
+  let result = "";
+  
+  // Convert Pesos part
+  if (pesos === 0) {
+    result = "Zero";
+  } else {
+    if (Math.floor(pesos / 1000000) > 0) {
+      result += convertGroup(Math.floor(pesos / 1000000)) + "Million ";
+      pesos %= 1000000;
+    }
+    if (Math.floor(pesos / 1000) > 0) {
+      result += convertGroup(Math.floor(pesos / 1000)) + "Thousand ";
+      pesos %= 1000;
+    }
+    result += convertGroup(pesos);
+  }
+
+  result = result.trim() + " Pesos";
+
+  // Idagdag ang Centavos kung meron
+  if (cents > 0) {
+    result += " and " + cents + "/100";
+  } else {
+    result += " Only";
+  }
+
+  return result.toUpperCase(); // Ginawa ko nang automatic na All Caps para sa template mo
+}
         
 </script>
 
