@@ -246,77 +246,74 @@
     }
 
     function calculateInstallment() {
-    const termsSelect = document.getElementById('termsSelect');
-    const terms = parseInt(termsSelect.value);
-    const area = document.getElementById('computationArea');
-    
-    if (!terms) return;
-    area.style.display = 'block';
-
-    // 1. Compute Monthly Interest & Base Amortization
-    const monthlyInterest = grandTotalPrincipal * INT_RATE;
-    const basePrincipalPerMonth = grandTotalPrincipal / terms;
-    const regularMonthlyAmort = basePrincipalPerMonth + monthlyInterest;
-
-    // Ipakita ang Monthly Interest Amount (Fixed 2 Decimals)
-    document.getElementById('monthlyIntAmt').innerText = "₱ " + monthlyInterest.toLocaleString('en-US', {
-        minimumFractionDigits: 2, 
-        maximumFractionDigits: 2
-    });
-
-    // 2. Generate Schedule Table
-    const schedBody = document.getElementById('schedBody');
-    let schedHtml = '';
-    let today = new Date();
-    let runningTotal = 0;
-
-    for(let i = 1; i <= terms; i++) {
-        let nextMonth = new Date(today.getFullYear(), today.getMonth() + i, today.getDate());
-        let amountForThisMonth = regularMonthlyAmort;
-
-        // Add Processing Fee (₱300) to the 1st Bill ONLY
-        if (i === 1) {
-            amountForThisMonth += PROCESSING_FEE;
-        }
-
-        runningTotal += amountForThisMonth;
+        const termsSelect = document.getElementById('termsSelect');
+        const terms = parseInt(termsSelect.value);
+        const area = document.getElementById('computationArea');
         
-        // 1. Formatting for the table rows (Strict 2 Decimals)
-        const formattedAmount = amountForThisMonth.toLocaleString('en-US', {
+        if (!terms) return;
+        area.style.display = 'block';
+
+        // 1. Compute Monthly Interest & Base Amortization
+        const monthlyInterest = grandTotalPrincipal * INT_RATE;
+        const basePrincipalPerMonth = grandTotalPrincipal / terms;
+        const regularMonthlyAmort = basePrincipalPerMonth + monthlyInterest;
+
+        // Ipakita ang Monthly Interest Amount
+        document.getElementById('monthlyIntAmt').innerText = "₱ " + monthlyInterest.toLocaleString('en-US', {
             minimumFractionDigits: 2, 
             maximumFractionDigits: 2
         });
 
-        // 2. Formatting the Date (Full Date: April 10, 2026)
-        const fullDate = nextMonth.toLocaleDateString('en-US', {
-            month: 'long', 
-            day: 'numeric', 
-            year: 'numeric'
+        // 2. Generate Schedule Table
+        const schedBody = document.getElementById('schedBody');
+        let schedHtml = '';
+        let today = new Date();
+        let runningTotal = 0;
+
+        for(let i = 1; i <= terms; i++) {
+            let nextMonth = new Date(today.getFullYear(), today.getMonth() + i, today.getDate());
+            let amountForThisMonth = regularMonthlyAmort;
+
+            if (i === 1) {
+                amountForThisMonth += PROCESSING_FEE;
+            }
+
+            runningTotal += amountForThisMonth;
+            
+            const formattedAmount = amountForThisMonth.toLocaleString('en-US', {
+                minimumFractionDigits: 2, 
+                maximumFractionDigits: 2
+            });
+
+            const fullDate = nextMonth.toLocaleDateString('en-US', {
+                month: 'long', 
+                day: 'numeric', 
+                year: 'numeric'
+            });
+
+            schedHtml += `
+                <tr style="${i === 1 ? 'background: #fff9e6; font-weight: bold;' : ''}">
+                    <td style="padding: 10px; border-bottom: 1px solid #eee; font-size: 11px;">
+                        ${i}${i==1?'st':i==2?'nd':i==3?'rd':'th'} Pay<br>
+                        <span style="color: #555;">${fullDate}</span>
+                    </td>
+                    <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right; vertical-align: middle;">
+                        <b>₱ ${formattedAmount}</b> 
+                        ${i === 1 ? '<br><small style="font-size:10px; color:#e67e22;">+ ₱300 Processing Fee</small>' : ''}
+                    </td>
+                </tr>`;
+        } // <--- DITO ANG KULANG MO KANINA (Closing loop)
+
+        schedBody.innerHTML = schedHtml;
+
+        // 3. Grand Total
+        document.getElementById('grandTotalInstallment').innerText = "₱ " + runningTotal.toLocaleString('en-US', {
+            minimumFractionDigits: 2, 
+            maximumFractionDigits: 2
         });
-
-        // 3. Build the Row
-        schedHtml += `
-            <tr style="${i === 1 ? 'background: #fff9e6; font-weight: bold;' : ''}">
-                <td style="padding: 10px; border-bottom: 1px solid #eee; font-size: 11px;">
-                    ${i}${i==1?'st':i==2?'nd':i==3?'rd':'th'} Pay<br>
-                    <span style="color: #555;">${fullDate}</span>
-                </td>
-                <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right; vertical-align: middle;">
-                    <b>₱ ${formattedAmount}</b> 
-                    ${i === 1 ? '<br><small style="font-size:10px; color:#e67e22;">+ ₱300 Processing Fee</small>' : ''}
-                </td>
-            </tr>`;
-
-    schedBody.innerHTML = schedHtml;
-
-    // 3. Grand Total (Fixed 2 Decimals)
-    document.getElementById('grandTotalInstallment').innerText = "₱ " + runningTotal.toLocaleString('en-US', {
-        minimumFractionDigits: 2, 
-        maximumFractionDigits: 2
-    });
-    
-    toggleBtn();
-}
+        
+        toggleBtn();
+    }
 
     function toggleBtn() {
         const checked = document.getElementById('agreeCheck').checked;
