@@ -78,23 +78,28 @@
         </select>
     </div>
 
-    <div id="computationArea">
-        <label>REPAYMENT PLAN</label>
-        <div class="comp-row"><span>One-time Processing Fee:</span><span id="procFee">₱ 300.00</span></div>
-        <div class="comp-row"><span>Interest Rate:</span><span>5% Monthly</span></div>
-        
-        <table class="sched-table">
-            <thead>
-                <tr><th>Date</th><th>Amount</th></tr>
-            </thead>
-            <tbody id="schedBody"></tbody>
-        </table>
-
-        <div class="comp-total">
-            <span style="font-size: 12px; color: #666; font-weight: 400;">Monthly Amortization:</span><br>
-            <span id="monthlyAmort">₱ 0.00</span>
-        </div>
+    <<div id="computationArea">
+    <label>REPAYMENT PLAN</label>
+    <div class="comp-row">
+        <span>Monthly Interest (5%):</span>
+        <span id="monthlyIntAmt" style="color: #d63031; font-weight: bold;">₱ 0.00</span>
     </div>
+    <div class="comp-row" style="font-size: 11px; color: #666;">
+        <span>*One-time Processing Fee (₱300) added to 1st bill.</span>
+    </div>
+    
+    <table class="sched-table">
+        <thead>
+            <tr><th>Billing Period</th><th>Amount Due</th></tr>
+        </thead>
+        <tbody id="schedBody"></tbody>
+    </table>
+
+    <div class="comp-total">
+        <span style="font-size: 12px; color: #666; font-weight: 400;">Total Amount to be Paid:</span><br>
+        <span id="grandTotalInstallment">₱ 0.00</span>
+    </div>
+</div>
 
     <label style="margin-top: 20px;">Digital Signature</label>
     <div class="signature-wrapper">
@@ -156,28 +161,49 @@
     }
 
     function calculateInstallment() {
-        const terms = parseInt(document.getElementById('termsSelect').value);
-        const area = document.getElementById('computationArea');
-        area.style.display = 'block';
+    const terms = parseInt(document.getElementById('termsSelect').value);
+    const area = document.getElementById('computationArea');
+    area.style.display = 'block';
 
-        const totalInterest = (grandTotalPrincipal * INT_RATE) * terms;
-        const totalToPay = grandTotalPrincipal + totalInterest + PROCESSING_FEE;
-        const monthly = totalToPay / terms;
+    // 1. Compute Monthly Interest & Base Amortization
+    const monthlyInterest = grandTotalPrincipal * INT_RATE;
+    const basePrincipalPerMonth = grandTotalPrincipal / terms;
+    const regularMonthlyAmort = basePrincipalPerMonth + monthlyInterest;
 
-        document.getElementById('monthlyAmort').innerText = "₱ " + monthly.toLocaleString(undefined, {minimumFractionDigits:2});
+    // ipakita ang Monthly Interest Amount sa taas
+    document.getElementById('monthlyIntAmt').innerText = "₱ " + monthlyInterest.toLocaleString(undefined, {minimumFractionDigits:2});
 
-        // Generate Sample Schedule
-        const schedBody = document.getElementById('schedBody');
-        let schedHtml = '';
-        let today = new Date();
-        
-        for(let i=1; i<=terms; i++) {
-            let nextMonth = new Date(today.getFullYear(), today.getMonth() + i, today.getDate());
-            schedHtml += `<tr><td>${nextMonth.toLocaleDateString('en-US', {month:'short', day:'2-digit', year:'numeric'})}</td><td>₱ ${monthly.toLocaleString(undefined, {minimumFractionDigits:2})}</td></tr>`;
+    // 2. Generate Schedule
+    const schedBody = document.getElementById('schedBody');
+    let schedHtml = '';
+    let today = new Date();
+    let runningTotal = 0;
+
+    for(let i=1; i<=terms; i++) {
+        let nextMonth = new Date(today.getFullYear(), today.getMonth() + i, today.getDate());
+        let amountForThisMonth = regularMonthlyAmort;
+
+        // ACTION: Add Processing Fee (₱300) to the 1st Bill ONLY
+        if (i === 1) {
+            amountForThisMonth += PROCESSING_FEE;
         }
-        schedBody.innerHTML = schedHtml;
-        toggleBtn();
+
+        runningTotal += amountForThisMonth;
+        
+        schedHtml += `
+            <tr style="${i === 1 ? 'background: #fff9e6; font-weight: bold;' : ''}">
+                <td>${i}${i==1?'st':i==2?'nd':i==3?'rd':'th'} Pay (${nextMonth.toLocaleDateString('en-US', {month:'short', day:'2-digit'})})</td>
+                <td>₱ ${amountForThisMonth.toLocaleString(undefined, {minimumFractionDigits:2})} ${i === 1 ? '<br><small style="font-size:9px; color:orange;">+ Fee</small>' : ''}</td>
+            </tr>`;
     }
+
+    schedBody.innerHTML = schedHtml;
+
+    // 3. Ipakita ang Total na babayaran sa dulo (Grand Total)
+    document.getElementById('grandTotalInstallment').innerText = "₱ " + runningTotal.toLocaleString(undefined, {minimumFractionDigits:2});
+    
+    toggleBtn();
+}
 
     function toggleBtn() {
         const checked = document.getElementById('agreeCheck').checked;
