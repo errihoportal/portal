@@ -382,31 +382,45 @@ let termsOpened = false;
 let privacyOpened = false;
 
 async function openTerms(page, type) {
-    // I-track kung alin ang binuksan
     if (type === 'terms') termsOpened = true;
     if (type === 'privacy') privacyOpened = true;
 
     const modal = document.getElementById('termsModal');
     const content = document.getElementById('termsContent');
     modal.style.display = 'block';
-    content.innerHTML = "Loading...";
+    content.innerHTML = "<div style='text-align:center; padding:20px;'>Loading...</div>";
 
     try {
         const response = await fetch(page);
         const text = await response.text();
+        
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = text;
 
-        // Tanggalin ang header/back button sa loob ng popup
-        const header = tempDiv.querySelector('header') || tempDiv.querySelector('.header');
-        if (header) header.remove();
+        // --- DITO NATIN TATANGGALIN ANG HEADER NA MAY BACK BUTTON ---
+        // Hinahanap natin ang div na may background #ffffff at may shadow
+        const allDivs = tempDiv.querySelectorAll('div');
+        allDivs.forEach(div => {
+            // Check natin kung ito yung header base sa unique styles niya
+            if (div.style.position === 'sticky' || div.innerHTML.includes('BACK')) {
+                div.remove(); // Buburahin ang header
+            }
+        });
 
+        // O kaya, kung gusto mong mas sigurado, hanapin natin ang mismong link ng BACK
+        const backBtn = tempDiv.querySelector('a[onclick*="window.history.back"]');
+        if (backBtn && backBtn.parentElement.parentElement) {
+            backBtn.parentElement.parentElement.remove(); // Tatanggalin ang buong header row
+        }
+
+        // I-set ang malinis na content sa modal
         content.innerHTML = tempDiv.innerHTML;
+        
     } catch (error) {
-        content.innerHTML = "Error loading content.";
+        content.innerHTML = "<div style='color:red; padding:20px;'>Error loading content.</div>";
     }
 }
-
+    
 function closeTerms() {
     document.getElementById('termsModal').style.display = 'none';
     
