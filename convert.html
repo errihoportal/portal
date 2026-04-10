@@ -173,12 +173,12 @@
 </div>
 
     <div class="terms-area">
-    <input type="checkbox" id="agreeCheck" onchange="toggleBtn()">
-    <label for="agreeCheck" style="font-weight: 400;">
+    <input type="checkbox" id="agreeCheck" onchange="toggleBtn()" disabled> 
+    <label for="agreeCheck" style="font-weight: 400; color: #888;" id="termsLabel">
         I have read and agree to the 
-        <a href="javascript:void(0)" onclick="openTerms('terms.html')">Terms & Conditions</a> 
+        <a href="javascript:void(0)" onclick="openTerms('terms.html', 'terms')">Terms & Conditions</a> 
         and 
-        <a href="javascript:void(0)" onclick="openTerms('privacy.html')">Privacy Policy</a>.
+        <a href="javascript:void(0)" onclick="openTerms('privacy.html', 'privacy')">Privacy Policy</a>.
     </label>
 </div>
 
@@ -377,30 +377,50 @@
     }
     window.onresize = resizeCanvas;
 
-async function openTerms(page) {
+// Flags para malaman kung nabuksan na
+let termsOpened = false;
+let privacyOpened = false;
+
+async function openTerms(page, type) {
+    // I-track kung alin ang binuksan
+    if (type === 'terms') termsOpened = true;
+    if (type === 'privacy') privacyOpened = true;
+
     const modal = document.getElementById('termsModal');
     const content = document.getElementById('termsContent');
     modal.style.display = 'block';
     content.innerHTML = "Loading...";
 
     try {
-        // Kukunin ang content ng terms.html o privacy.html
         const response = await fetch(page);
         const text = await response.text();
-        
-        // Gagamit tayo ng regex para kunin lang ang laman ng <body> ng terms.html
-        const bodyContent = text.match(/<body[^>]*>([\s\S.]*)<\/body>/i);
-        content.innerHTML = bodyContent ? bodyContent[1] : text;
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = text;
+
+        // Tanggalin ang header/back button sa loob ng popup
+        const header = tempDiv.querySelector('header') || tempDiv.querySelector('.header');
+        if (header) header.remove();
+
+        content.innerHTML = tempDiv.innerHTML;
     } catch (error) {
-        content.innerHTML = "Error loading content. Please check your internet connection.";
+        content.innerHTML = "Error loading content.";
     }
 }
 
 function closeTerms() {
     document.getElementById('termsModal').style.display = 'none';
-    // Automatic na i-check ang checkbox pagkatapos basahin (Optional)
-    document.getElementById('agreeCheck').checked = true;
-    toggleBtn(); // I-refresh ang submit button status
+    
+    // I-check kung pareho nang nabuksan ang Terms at Privacy
+    if (termsOpened && privacyOpened) {
+        const checkbox = document.getElementById('agreeCheck');
+        checkbox.disabled = false; // Enable na ang checkbox
+        document.getElementById('termsLabel').style.color = "#333"; // Gawing dark uli ang text
+        checkbox.checked = true; // Auto-check para sa convenience ng user
+        toggleBtn(); // I-update ang Confirm button
+    } else {
+        // Optional: Pwedeng mag-alert kung isa pa lang ang nabubuksan
+        console.log("Kailangan buksan pareho ang Terms at Privacy.");
+    }
 }
         
 </script>
