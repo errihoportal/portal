@@ -173,14 +173,35 @@
 </div>
 
     <div class="terms-area">
-        <input type="checkbox" id="agreeCheck" onchange="toggleBtn()">
-        <label for="agreeCheck" style="font-weight: 400;">
-            I have read and agree to the <a href="terms.html">Terms & Conditions</a> and <a href="privacy.html">Privacy Policy</a> of ERRIHO.
-        </label>
-    </div>
+    <input type="checkbox" id="agreeCheck" onchange="toggleBtn()">
+    <label for="agreeCheck" style="font-weight: 400;">
+        I have read and agree to the 
+        <a href="javascript:void(0)" onclick="openTerms('terms.html')">Terms & Conditions</a> 
+        and 
+        <a href="javascript:void(0)" onclick="openTerms('privacy.html')">Privacy Policy</a>.
+    </label>
+</div>
 
     <button class="btn-submit" id="submitBtn" disabled onclick="submitRequest()">Confirm & Apply</button>
     <a href="statement.html" style="display:block; text-align:center; margin-top:15px; font-size:12px; color:#999; text-decoration:none;">Cancel Request</a>
+</div>
+
+<div id="termsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000;">
+    <div style="background:white; width:90%; max-width:400px; margin:5% auto; border-radius:15px; overflow:hidden; display:flex; flex-direction:column; height:80vh;">
+        <div style="background:#2c3e50; color:white; padding:15px; text-align:center; font-weight:800;">
+            TERMS & CONDITIONS
+        </div>
+        
+        <div id="termsContent" style="padding:20px; overflow-y:auto; flex-grow:1; font-size:13px; line-height:1.6; color:#444;">
+            <p>Loading terms...</p>
+        </div>
+
+        <div style="padding:15px; border-top:1px solid #eee; text-align:center;">
+            <button onclick="closeTerms()" style="background:#27ae60; color:white; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer; width:100%;">
+                I UNDERSTAND AND AGREE
+            </button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -358,6 +379,33 @@
         canvas.getContext("2d").scale(ratio, ratio);
     }
     window.onresize = resizeCanvas;
+
+async function openTerms(page) {
+    const modal = document.getElementById('termsModal');
+    const content = document.getElementById('termsContent');
+    modal.style.display = 'block';
+    content.innerHTML = "Loading...";
+
+    try {
+        // Kukunin ang content ng terms.html o privacy.html
+        const response = await fetch(page);
+        const text = await response.text();
+        
+        // Gagamit tayo ng regex para kunin lang ang laman ng <body> ng terms.html
+        const bodyContent = text.match(/<body[^>]*>([\s\S.]*)<\/body>/i);
+        content.innerHTML = bodyContent ? bodyContent[1] : text;
+    } catch (error) {
+        content.innerHTML = "Error loading content. Please check your internet connection.";
+    }
+}
+
+function closeTerms() {
+    document.getElementById('termsModal').style.display = 'none';
+    // Automatic na i-check ang checkbox pagkatapos basahin (Optional)
+    document.getElementById('agreeCheck').checked = true;
+    toggleBtn(); // I-refresh ang submit button status
+}
+        
 </script>
 
 </body>
