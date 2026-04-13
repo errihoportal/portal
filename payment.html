@@ -682,73 +682,63 @@
 </div>
 
     <div id="card-content" class="option-content">
-        <div class="bank-details" style="text-align: left;">
-            <div style="background: #fff5f5; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #e74c3c;">
-                <p style="margin: 0; font-size: 11px; color: #c0392b; line-height: 1.4;">
-                    <b>⚠️ Card Payment Notice:</b> Card transactions are processed via <b>GCash for Business (Tap to Pay)</b> terminals at our authorized Hubs. 
-                    A <b>3.20% Convenience Fee</b> is applied by the payment provider. This fee does not go to Erriho.
-                </p>
-            </div>
-
-            <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 15px; border: 1px solid #eee;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                    <span>Bill Amount:</span> 
-                    <span id="cardBaseAmount" style="font-weight: 600;">₱0.00</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #e74c3c;">
-                    <span>Convenience Fee (3.20%):</span> 
-                    <span id="cardFeeAmount">+ ₱0.00</span>
-                </div>
-
-                <hr style="border:0; border-top:1px solid #ddd; margin: 8px 0;">
-                <div style="display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 15px; color: #2c3e50;">
-                    <span>Total to Tap:</span> 
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span id="cardTotalAmount">₱0.00</span>
-                        <button onclick="copyAmount('cardTotalAmount')" style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; padding: 4px 8px; color: #475569; font-size: 10px; font-weight: 700;">
-                            📋 COPY
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div style="font-size: 12px; line-height: 1.6;">
-                <b style="color: #2980b9;">📍 AUTHORIZED HUBS:</b><br>
-                <div style="margin-top: 8px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-                   <b>• Butuan Hub (Main)</b> <span style="color: #e67e22; font-size: 10px;">(Open 10:00 AM - 5:00 PM)</span><br>
-                    <span style="color: #555;">Address: P8 Taurus Street, South Montilla Boulevard, Brgy. J.p Rizal 25, Agusan Del Norte, Butuan 8600</span><br>
-                    Person-in-charge: <b>Jerric Jhon Dela Cruz</b><br>
-                    Contact: <b>0917-130-1470</b>
-                </div>
-
-                <div style="margin-top: 8px; color: #95a5a6;">
-                    <i>• Caloocan Hub - (Coming Soon)</i><br>
-                    <i>• Masbate Hub - (Coming Soon)</i>
-                </div>
-            </div>
-
-            <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
-<label style="display: flex; gap: 10px; font-size: 12px; cursor: pointer; align-items: center; background: #fdfdfd; padding: 10px; border-radius: 5px; border: 1px solid #f0f0f0; margin-bottom: 10px;">
-    <input type="checkbox" id="feeAgree" style="transform: scale(1.2);">
-    <span style="color: #444;">I agree to the <b>3.20% Convenience Fee</b>.</span>
-</label>
-
-<div style="background: #fff9db; padding: 12px; border-radius: 8px; border: 1px solid #fab005; margin-bottom: 15px;">
-    <p style="margin: 0; font-size: 11px; color: #856404; line-height: 1.5; text-align: left;">
-        <b>⚠️ IMPORTANT REMINDER:</b><br>
-        After swiping or tapping your card at the Hub, please check your <b>Email Inbox</b>. 
-        GCash for Business will send your official receipt there. 
-        <b>Please upload a screenshot of that email receipt</b> in the "Tap to upload Proof of Payment" section below to verify your payment.
-    </p>
-</div>
-    <div style="text-align: center; margin-top: 20px; padding-bottom: 10px; opacity: 0.7;">
-        <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
-            <img src="images/g4b.png" style="height: 50px; width: auto; vertical-align: middle;" alt="GCash for Business">
+    <div class="bank-details" style="text-align: left;">
+        <div style="background: #f0fff4; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #20c997;">
+            <p style="margin: 0; font-size: 11px; color: #0b6623; line-height: 1.4;">
+                <b>⚠️ Card Payment Notice:</b> We are now accepting payments via <b>Credit / Debit Card</b> powered by <b>Maya Business Payment Links</b>. 
+                A <b>3.20% Convenience Fee</b> is applied by the payment provider. This fee does not go to Erriho.
+            </p>
         </div>
-        <span style="font-size: 10px; color: #7f8c8d; display: block; margin-top: 5px; font-weight: 500; letter-spacing: 0.3px;">
-            Securely powered by <b>GCash for Business</b>
-        </span>
-    </div> </div> </div> </div>
+
+        <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 15px; border: 1px solid #eee;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <span>Bill Amount:</span> 
+                <span id="cardBaseAmount" style="font-weight: 600;">₱0.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #e74c3c;">
+                <span>Convenience Fee (3.20%):</span> 
+                <span id="cardFeeAmount">+ ₱0.00</span>
+            </div>
+
+            <hr style="border:0; border-top:1px solid #ddd; margin: 8px 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 15px; color: #2c3e50;">
+                <span>Total to Pay:</span> 
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span id="cardTotalAmount">₱0.00</span>
+                    <button onclick="copyAmount('cardTotalAmount')" style="background: #f0fff4; border: 1px solid #20c997; border-radius: 6px; cursor: pointer; padding: 4px 8px; color: #0b6623; font-size: 10px; font-weight: 700;">
+                        📋 COPY
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div style="font-size: 12px; line-height: 1.6;">
+            <b style="color: #20c997;">🔗 PAYMENT LINK INSTRUCTIONS:</b><br>
+            <div style="margin-top: 8px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+               1. Click the <b>Generated Payment Link</b> (will be sent via chat/SMS).<br>
+               2. Enter your Card details securely on the Maya Checkout page.<br>
+               3. Once successful, take a screenshot of the <b>Maya Confirmation Page</b>.<br>
+               4. Upload the screenshot in the "Proof of Payment" section below.
+            </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
+        
+        <label style="display: flex; gap: 10px; font-size: 12px; cursor: pointer; align-items: center; background: #fdfdfd; padding: 10px; border-radius: 5px; border: 1px solid #f0f0f0; margin-bottom: 10px;">
+            <input type="checkbox" id="feeAgree" style="transform: scale(1.2);">
+            <span style="color: #444;">I agree to the <b>3.20% Convenience Fee</b>.</span>
+        </label>
+
+        <div style="text-align: center; margin-top: 20px; padding-bottom: 10px; opacity: 0.9;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <img src="images/maya_logo.png" style="height: 30px; width: auto; vertical-align: middle;" alt="Maya Business">
+            </div>
+            <span style="font-size: 10px; color: #7f8c8d; display: block; margin-top: 5px; font-weight: 500; letter-spacing: 0.3px;">
+                Securely processed by <b>Maya Business</b>
+            </span>
+        </div>
+    </div>
+</div> </div>
 
         
 
