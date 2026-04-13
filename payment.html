@@ -342,9 +342,9 @@
         <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 15px;">
             <div class="total-amount" style="font-size: 36px; font-weight: 900; color: #111827; letter-spacing: -1px;">₱<span id="totalAmount">0.00</span></div>
             <span id="copyBtnWrapper">
-                <button onclick="copyAmount()" style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer; padding: 8px 12px; color: #475569; font-size: 11px; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                    📋 COPY
-                </button>
+                <button onclick="copyAmount('totalAmount')" style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer; padding: 8px 12px; color: #475569; font-size: 11px; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+    📋 COPY AMOUNT
+</button>
             </span>
         </div>
         
@@ -700,12 +700,17 @@
                     <span id="cardFeeAmount">+ ₱0.00</span>
                 </div>
 
-                <hr style="border:0; border-top:1px solid #ddd; margin: 8px 0;">
-                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 15px; color: #2c3e50;">
-                    <span>Total to Tap:</span> 
-                    <span id="cardTotalAmount">₱0.00</span>
-                </div>
-            </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 15px; color: #2c3e50;">
+    <span>Total to Tap:</span> 
+    <div style="display: flex; align-items: center; gap: 8px;">
+        <span id="cardTotalAmount">₱0.00</span>
+        <button onclick="copyAmount('cardTotalAmount')" style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer; padding: 8px 12px; color: #475569; font-size: 11px; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+    📋 COPY TOTAL TO PAY
+</button>
+            <span id="copyText">COPY</span>
+        </button>
+    </div>
+</div>
 
             <div style="font-size: 12px; line-height: 1.6;">
                 <b style="color: #2980b9;">📍 AUTHORIZED HUBS:</b><br>
@@ -1478,10 +1483,17 @@ if (document.getElementById('cardTotalAmount'))
         document.getElementById('instrModal').style.display = show ? 'flex' : 'none';
     }
 
-    function copyAmount() {
-        const amountText = document.getElementById('totalAmount').innerText.replace(/,/g, '');
-        navigator.clipboard.writeText(amountText).then(() => { alert("Amount successfully copied: ₱" + amountText); });
-    }
+    function copyAmount(elementId) {
+    const targetElement = document.getElementById(elementId);
+    if (!targetElement) return;
+
+    // Alisin ang symbols at commas para malinis na number ang ma-copy
+    const amountText = targetElement.innerText.replace('₱', '').replace(/,/g, '').trim();
+
+    navigator.clipboard.writeText(amountText).then(() => {
+        alert("Amount successfully copied: ₱" + amountText);
+    });
+}
 
     function startLiveCountdown(targetTime, mode) {
     if (window.graceInterval) clearInterval(window.graceInterval);
