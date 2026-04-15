@@ -417,60 +417,70 @@ function updateComputation() {
     let promiseDate = new Date(pDateVal);
     promiseDate.setHours(0,0,0,0);
     
-    // --- SETTINGS ---
-    const paymentDate = new Date("2026-04-15"); // Petsa ng bayad
+    // --- MGA VALUES ---
+    const paymentDate = new Date("2026-04-15");
     const marchDueDate = new Date("2026-03-12");
     const paymentAmount = 5000.00;
     const febOriginal = 2675.27;
     const marchOriginal = 7998.33;
 
-    // 1. February Calculation (Fully Paid by 5k)
-    let sukliMulaFeb = paymentAmount - febOriginal; // 2,324.73 ang itatapyas sa March
+    let totalOverall = 0;
+    let tableHtml = "";
 
-    // 2. March Principal Adjustment
-    let marchPrincipalRemaining = marchOriginal - sukliMulaFeb; // Ito na lang ang may interest moving forward
+    // 1. PAYMENT ROW (Para makita niya na binawas yung 5k)
+    tableHtml += `
+        <tr style="border-bottom:1px solid #ffeeba; background-color: #e8f5e9;">
+            <td style="padding:8px;"><b>April 15 Payment</b></td>
+            <td colspan="3" style="padding:8px; font-style: italic;">Partial Payment Received</td>
+            <td style="padding:8px; text-align:right; color: green; font-weight:bold;">-₱5,000.00</td>
+        </tr>`;
 
-    // 3. Late Fee (Fixed - Base sa Original March Principal)
+    // 2. FEBRUARY COMPUTATION (Pakita natin na 0 na ito)
+    tableHtml += `
+        <tr style="border-bottom:1px solid #ffeeba; opacity: 0.6;">
+            <td style="padding:8px;">Feb 12 Bill</td>
+            <td style="padding:8px;">₱2,675.27</td>
+            <td style="padding:8px;">₱0.00</td>
+            <td style="padding:8px;">₱0.00</td>
+            <td style="padding:8px; text-align:right;">₱0.00</td>
+        </tr>`;
+
+    // 3. MARCH COMPUTATION (Dito ang math ng interest)
+    let sukliMulaFeb = paymentAmount - febOriginal; // 2,324.73
+    let marchPrincipalRemaining = marchOriginal - sukliMulaFeb; // 5,673.60
+    
+    // Late Fee (Fixed 10% base sa original)
     let lateFee = parseFloat((marchOriginal * 0.10).toFixed(2));
 
-    // 4. Interest Computation (Split into two phases)
-    let interestPhase1 = 0; // March 12 to April 15 (Full)
-    let interestPhase2 = 0; // April 15 to Promise Date (Reduced)
+    // Interest Phase 1: March 12 to April 15 (Base sa Full Amount)
+    let diff1 = Math.ceil((paymentDate - marchDueDate) / (1000 * 60 * 60 * 24));
+    let interestP1 = (marchOriginal * 0.005 * diff1); // 0.5% daily
 
-    // Phase 1: 34 Days (March 12 to April 15)
-    let diffTime1 = paymentDate.getTime() - marchDueDate.getTime();
-    let diffDays1 = Math.ceil(diffTime1 / (1000 * 60 * 60 * 24));
-    interestPhase1 = (marchOriginal * 0.15) * (diffDays1 / 30);
-
-    // Phase 2: April 15 to Promise Date (Kung ang Promise Date ay mas malayo sa April 15)
+    // Interest Phase 2: April 15 to Promise Date (Base sa Reduced Amount)
+    let interestP2 = 0;
     if (promiseDate > paymentDate) {
-        let diffTime2 = promiseDate.getTime() - paymentDate.getTime();
-        let diffDays2 = Math.ceil(diffTime2 / (1000 * 60 * 60 * 24));
-        interestPhase2 = (marchPrincipalRemaining * 0.15) * (diffDays2 / 30);
+        let diff2 = Math.ceil((promiseDate - paymentDate) / (1000 * 60 * 60 * 24));
+        interestP2 = (marchPrincipalRemaining * 0.005 * diff2);
     }
 
-    let totalInterest = parseFloat((interestPhase1 + interestPhase2).toFixed(2));
+    let totalInterest = parseFloat((interestP1 + interestP2).toFixed(2));
     let marchSubtotal = marchPrincipalRemaining + lateFee + totalInterest;
+    
+    totalOverall = marchSubtotal;
 
-    // --- UI DISPLAY ---
-    let tableHtml = `
-        <tr style="border-bottom:1px solid #eee; background-color: #e8f5e9;">
-            <td style="padding:8px;"><b>Payment Applied</b></td>
-            <td colspan="3" style="padding:8px;">Less ₱5,000.00 (Applied to Feb & March)</td>
-            <td style="padding:8px; text-align:right; color: green;">-₱5,000.00</td>
-        </tr>
-        <tr style="border-bottom:1px solid #eee;">
-            <td style="padding:8px;"><b>March 12</b></td>
+    tableHtml += `
+        <tr style="border-bottom:1px solid #ffeeba;">
+            <td style="padding:8px;"><b>March 12 Bill</b></td>
             <td style="padding:8px;">₱${marchPrincipalRemaining.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
             <td style="padding:8px; color: red;">₱${lateFee.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
             <td style="padding:8px; color: red;">₱${totalInterest.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
             <td style="padding:8px; text-align:right;"><b>₱${marchSubtotal.toLocaleString('en-US',{minimumFractionDigits:2})}</b></td>
         </tr>`;
 
-    // I-update ang mga IDs sa Page
+    // --- DISPLAY SA SCREEN ---
     document.getElementById('breakdownBody').innerHTML = tableHtml;
     
-    let totalOverall = marchSubtotal; // Isama ang iba pang months kung meron
+    // --- TOTALS ---
     const finalStr = totalOverall.toLocaleString('en-US', {minimumFractionDigits:2});
     document.getElementById('projectedTotal').innerText = "₱ " + finalStr;
     document.getElementById('amountNum').innerText = "(₱ " + finalStr + ")";
