@@ -417,78 +417,67 @@ function updateComputation() {
     let promiseDate = new Date(pDateVal);
     promiseDate.setHours(0,0,0,0);
     
-    let paymentAmount = 5000.00; // Ang binayad niya ngayong April 15
-    let totalOverall = 0;
-    let tableHtml = "";
+    // --- SETTINGS ---
+    const paymentDate = new Date("2026-04-15"); // Petsa ng bayad
+    const marchDueDate = new Date("2026-03-12");
+    const paymentAmount = 5000.00;
+    const febOriginal = 2675.27;
+    const marchOriginal = 7998.33;
 
-    // --- 1. FEBRUARY 12 (PREVIOUS BALANCE) ---
-    let febPrincipalOriginal = 2675.27;
-    let febRemaining = 0;
+    // 1. February Calculation (Fully Paid by 5k)
+    let sukliMulaFeb = paymentAmount - febOriginal; // 2,324.73 ang itatapyas sa March
 
-    // Ibawas ang payment sa Feb
-    if (paymentAmount >= febPrincipalOriginal) {
-        paymentAmount -= febPrincipalOriginal;
-        febRemaining = 0; // Paid na ang Feb
-    } else {
-        febRemaining = febPrincipalOriginal - paymentAmount;
-        paymentAmount = 0;
+    // 2. March Principal Adjustment
+    let marchPrincipalRemaining = marchOriginal - sukliMulaFeb; // Ito na lang ang may interest moving forward
+
+    // 3. Late Fee (Fixed - Base sa Original March Principal)
+    let lateFee = parseFloat((marchOriginal * 0.10).toFixed(2));
+
+    // 4. Interest Computation (Split into two phases)
+    let interestPhase1 = 0; // March 12 to April 15 (Full)
+    let interestPhase2 = 0; // April 15 to Promise Date (Reduced)
+
+    // Phase 1: 34 Days (March 12 to April 15)
+    let diffTime1 = paymentDate.getTime() - marchDueDate.getTime();
+    let diffDays1 = Math.ceil(diffTime1 / (1000 * 60 * 60 * 24));
+    interestPhase1 = (marchOriginal * 0.15) * (diffDays1 / 30);
+
+    // Phase 2: April 15 to Promise Date (Kung ang Promise Date ay mas malayo sa April 15)
+    if (promiseDate > paymentDate) {
+        let diffTime2 = promiseDate.getTime() - paymentDate.getTime();
+        let diffDays2 = Math.ceil(diffTime2 / (1000 * 60 * 60 * 24));
+        interestPhase2 = (marchPrincipalRemaining * 0.15) * (diffDays2 / 30);
     }
 
-    // Isali sa table kung may tira pa sa Feb
-    if (febRemaining > 0) {
-        totalOverall += febRemaining;
-        tableHtml += `
-            <tr style="border-bottom:1px solid #eee; background-color: #fff5f5;">
-                <td style="padding:8px;"><b>Feb 12 (Rem. Bal)</b></td>
-                <td style="padding:8px;">₱${febRemaining.toLocaleString('en-US', {minimumFractionDigits:2})}</td>
-                <td style="padding:8px; color: #ccc;">₱0.00</td>
-                <td style="padding:8px; color: #ccc;">₱0.00</td>
-                <td style="padding:8px; text-align:right;"><b>₱${febRemaining.toLocaleString('en-US', {minimumFractionDigits:2})}</b></td>
-            </tr>`;
-    }
+    let totalInterest = parseFloat((interestPhase1 + interestPhase2).toFixed(2));
+    let marchSubtotal = marchPrincipalRemaining + lateFee + totalInterest;
 
-    // --- 2. MARCH 12 (DITO IBABAWAS ANG SOBRANG PAYMENT) ---
-    let marchPrincipalOriginal = 7998.33;
-    let marchDueDate = new Date("2026-03-12");
-    marchDueDate.setHours(0,0,0,0);
-
-    // Dito natin ibabawas ang natirang sukli mula sa 5k
-    let marchPrincipalCurrent = marchPrincipalOriginal - paymentAmount;
-    
-    let marchLateFee = 0;
-    let marchInterest = 0;
-
-    if (promiseDate > marchDueDate) {
-        // Ang Late Fee (10%) at Interest (15%) ay ibabase na sa NATIRANG principal
-        marchLateFee = parseFloat((marchPrincipalCurrent * 0.10).toFixed(2));
-        
-        const diffTime = promiseDate.getTime() - marchDueDate.getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-        marchInterest = parseFloat(((marchPrincipalCurrent * 0.15) * (diffDays / 30)).toFixed(2));
-    }
-
-    let marchSubtotal = marchPrincipalCurrent + marchLateFee + marchInterest;
-    totalOverall += marchSubtotal;
-
-    tableHtml += `
+    // --- UI DISPLAY ---
+    let tableHtml = `
+        <tr style="border-bottom:1px solid #eee; background-color: #e8f5e9;">
+            <td style="padding:8px;"><b>Payment Applied</b></td>
+            <td colspan="3" style="padding:8px;">Less ₱5,000.00 (Applied to Feb & March)</td>
+            <td style="padding:8px; text-align:right; color: green;">-₱5,000.00</td>
+        </tr>
         <tr style="border-bottom:1px solid #eee;">
-            <td style="padding:8px;"><b>March 12 (Adj. Bal)</b></td>
-            <td style="padding:8px;">₱${marchPrincipalCurrent.toLocaleString('en-US', {minimumFractionDigits:2})}</td>
-            <td style="padding:8px; color: red;">₱${marchLateFee.toLocaleString('en-US', {minimumFractionDigits:2})}</td>
-            <td style="padding:8px; color: red;">₱${marchInterest.toLocaleString('en-US', {minimumFractionDigits:2})}</td>
-            <td style="padding:8px; text-align:right;"><b>₱${marchSubtotal.toLocaleString('en-US', {minimumFractionDigits:2})}</b></td>
+            <td style="padding:8px;"><b>March 12</b></td>
+            <td style="padding:8px;">₱${marchPrincipalRemaining.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+            <td style="padding:8px; color: red;">₱${lateFee.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+            <td style="padding:8px; color: red;">₱${totalInterest.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+            <td style="padding:8px; text-align:right;"><b>₱${marchSubtotal.toLocaleString('en-US',{minimumFractionDigits:2})}</b></td>
         </tr>`;
 
-    // --- 3. OTHER MONTHS (LOOP SA SHEET DATA) ---
-    // (Same logic as before for other future bills...)
+    // I-update ang mga IDs sa Page
+    document.getElementById('breakdownBody').innerHTML = tableHtml;
     
-    // Update UI (Total, Words, etc.)
+    let totalOverall = marchSubtotal; // Isama ang iba pang months kung meron
     const finalStr = totalOverall.toLocaleString('en-US', {minimumFractionDigits:2});
     document.getElementById('projectedTotal').innerText = "₱ " + finalStr;
     document.getElementById('amountNum').innerText = "(₱ " + finalStr + ")";
     document.getElementById('amountNum2').innerText = finalStr;
     document.getElementById('amountWords').innerText = convertAmountToWords(totalOverall);
 }
+    
     
     function updateDateDisplay() { 
         updateComputation(); 
