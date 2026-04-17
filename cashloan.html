@@ -3,324 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ERRIHO Loan Application</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Apply - ERRIHO PORTAL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* --- Core CSS --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        :root {
+            --primary: #27ae60;
+            --bg: #f8fafc;
+            --text: #0f172a;
+            --secondary: #64748b;
+            --white: #ffffff;
         }
 
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
-            line-height: 1.6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); -webkit-font-smoothing: antialiased; }
+        
+        /* Fixed Premium Header */
+        .app-header { 
+            background: var(--white); 
+            padding: 16px 24px; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
         }
 
-        /* --- Main Container (Responsive) --- */
-        .app-container {
-            background-color: #ffffff;
-            width: 100%;
-            max-width: 600px; /* Sukat para sa Desktop */
-            padding: 40px 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-        }
-
-        /* --- Branding --- */
-        .logo-section {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        /* Dito mo ilalagay ang link ng logo image mo */
-        .logo-img {
-            max-width: 150px;
-            height: auto;
-            margin-bottom: 10px;
-        }
-
-        .main-title {
-            color: #008148; /* Itong berde ay kinuha sa logo */
-            font-weight: 700;
-            font-size: 1.8rem;
-            text-transform: uppercase;
-        }
-
-        .sub-title {
-            color: #333;
-            font-weight: 600;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            margin-top: -5px;
-        }
-
-        /* --- Form Elements --- */
-        form {
-            display: grid;
-            gap: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        label {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #555;
-            font-size: 0.9rem;
-        }
-
-        input, select {
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1rem;
-            transition: border-color 0.2s ease;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #008148;
-            box-shadow: 0 0 0 3px rgba(0, 129, 72, 0.1);
-        }
-
-        /* --- Dynamic Section Styling --- */
-        .dynamic-fields {
-            margin-top: -10px;
-        }
-
-        .express-badge {
-            background-color: #e6fdf1;
-            border: 2px solid #008148;
-            padding: 15px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .premier-badge {
-            background-color: #fff9e6;
-            border: 2px solid #f2c94c;
-            padding: 15px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .icon {
-            font-size: 1.4rem;
-        }
-
-        .badge-text {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* --- Submit Button --- */
-        .submit-btn {
-            background-color: #000000;
-            color: #ffffff;
-            border: none;
-            padding: 18px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 1.1rem;
+        .main-container { max-width: 480px; margin: 0 auto; padding: 24px; min-height: 85vh; }
+        
+        /* Navigation Buttons */
+        .back-btn { 
+            text-decoration: none; 
+            color: var(--secondary); 
+            font-size: 12px; 
+            font-weight: 700; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            margin-bottom: 24px; 
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            border: none;
+            background: none;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
-        .submit-btn:hover {
-            background-color: #333;
-        }
+        /* Animation & State Control */
+        .hidden { display: none; }
+        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- Response Message --- */
-        #responseMessage {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: 600;
-        }
-        #responseMessage.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        #responseMessage.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        /* Welcome & Typography */
+        .welcome-section h1 { font-size: 28px; font-weight: 800; margin: 0; color: var(--text); letter-spacing: -0.5px; }
+        .welcome-section p { font-size: 15px; color: var(--secondary); margin-top: 10px; line-height: 1.6; margin-bottom: 32px; }
 
-        /* --- Media Queries (Mobile First) --- */
-        @media (max-width: 600px) {
-            .app-container {
-                padding: 30px 20px;
-                border-radius: 0; /* Full width sa mobile */
-            }
-            .main-title {
-                font-size: 1.5rem;
-            }
-            input, select, .submit-btn {
-                font-size: 0.9rem;
-                padding: 12px;
-            }
+        /* Professional Selection Cards */
+        .loan-card {
+            background: var(--white);
+            padding: 24px;
+            border-radius: 24px;
+            margin-bottom: 16px;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: block;
+            width: 100%;
+            text-align: left;
         }
+        .loan-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,0,0,0.06); }
+
+        .icon-box { width: 52px; height: 52px; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 24px; margin-bottom: 16px; }
+        .card-title { font-size: 16px; font-weight: 700; display: block; margin-bottom: 6px; color: var(--text); }
+        .card-desc { font-size: 13.5px; color: var(--secondary); line-height: 1.5; }
+
+        /* Form Controls */
+        .form-group { margin-bottom: 24px; }
+        label { display: block; font-weight: 700; font-size: 12px; margin-bottom: 8px; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        input {
+            width: 100%;
+            padding: 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: 0.2s;
+            background: #fff;
+        }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.1); }
+
+        .code-input { text-align: center; font-size: 28px !important; letter-spacing: 12px; font-weight: 800; color: var(--primary); text-transform: uppercase; }
+        .code-input::placeholder { letter-spacing: normal; font-size: 16px; opacity: 0.3; }
+
+        /* Professional Action Button */
+        .primary-btn {
+            background: #111827;
+            color: white;
+            width: 100%;
+            padding: 20px;
+            border-radius: 18px;
+            border: none;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: background 0.2s;
+        }
+        .primary-btn:hover { background: #1f2937; }
+        .primary-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+        .footer-note { text-align: center; margin-top: 48px; font-size: 12px; color: #94a3b8; font-weight: 600; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <div class="logo-section">
-            <img src="your_logo_url_here.png" alt="ERRIHO Logo" class="logo-img">
-            <h1 class="main-title">ERRIHO</h1>
-            <h2 class="sub-title">PERSONAL FINANCE</h2>
+    <header class="app-header">
+        <img src="images/logo.png" alt="ERRIHO" style="height: 28px; width: auto;">
+        <span style="font-weight: 800; color: var(--primary); font-size: 13px; letter-spacing: 0.5px;">ERRIHO PORTAL</span>
+    </header>
+
+    <div class="main-container">
+        
+        <div id="step-welcome" class="fade-in">
+            <button class="back-btn" onclick="window.location.href='index.html'">← Return to Dashboard</button>
+            <div class="welcome-section">
+                <h1>Loan Application</h1>
+                <p>Select your preferred financial service to continue. Please ensure your details are accurate.</p>
+            </div>
+
+            <div class="loan-card" onclick="showStep('step-code')">
+                <div class="icon-box" style="background: #ecfdf5; color: #059669;">⚡</div>
+                <b class="card-title">QUICKCASH DISBURSEMENT</b>
+                <span class="card-desc">Short-term financial aid. Requires an <b>Offer Code</b> for instant document-free processing.</span>
+            </div>
+
+            <div class="loan-card" onclick="startApplication('Personal Loan')">
+                <div class="icon-box" style="background: #eff6ff; color: #2563eb;">🏦</div>
+                <b class="card-title">PERSONAL INSTALLMENT LOAN</b>
+                <span class="card-desc">Extended terms up to 12 months. Requires standard income verification documents.</span>
+            </div>
         </div>
 
-        <form id="loanApplicationForm">
+        <div id="step-code" class="hidden fade-in">
+            <button class="back-btn" onclick="showStep('step-welcome')">← Back</button>
+            <div class="welcome-section">
+                <h1>Verification</h1>
+                <p>Please enter the 6-digit <b>Offer Code</b> sent to your registered mobile number or email.</p>
+            </div>
             <div class="form-group">
-                <label for="fullName">Pangalan (Full Name):</label>
-                <input type="text" id="fullName" name="fullName" placeholder="Hal: Juan Dela Cruz" required>
+                <label>Offer Code</label>
+                <input type="text" id="offerCodeInput" class="code-input" maxlength="6" placeholder="••••••">
+            </div>
+            <button class="primary-btn" onclick="verifyCode()">Proceed to Application</button>
+        </div>
+
+        <div id="step-form" class="hidden fade-in">
+            <button class="back-btn" onclick="showStep('step-welcome')">← Cancel</button>
+            <div class="welcome-section">
+                <h1 id="form-title">Application Detail</h1>
+                <p>Please provide your professional and contact information to finalize your request.</p>
             </div>
 
-            <div class="form-group">
-                <label for="loanType">Anong loan ang kukunin mo?</label>
-                <select id="loanType" name="loanType">
-                    <option value="QuickCash">ErriHo QuickCash (1 Month)</option>
-                    <option value="Personal Loan">ErriHo Personal Loan (Up to 12 Months)</option>
-                </select>
-            </div>
+            <form id="mainLoanForm">
+                <input type="hidden" id="loan_type" name="loan_type">
+                <input type="hidden" id="applied_code" name="applied_code">
 
-            <div class="form-group">
-                <label for="appType">Paano ka mag-a-apply?</label>
-                <select id="appType" name="appType" onchange="toggleFormSections()">
-                    <option value="Express Apply">Express Apply (Need Code)</option>
-                    <option value="Premier Apply">Premier Apply (Standard)</option>
-                </select>
-            </div>
+                <div class="form-group">
+                    <label>Full Legal Name</label>
+                    <input type="text" name="full_name" placeholder="Juan A. Dela Cruz" required>
+                </div>
 
-            <div class="dynamic-fields">
-                <div id="expressSection">
-                    <div class="express-badge">
-                        <span class="icon">⚡</span>
-                        <span class="badge-text">Wala na itong Income Documents. Siguraduhin lang na tama ang Offer Code mo.</span>
-                    </div>
+                <div class="form-group">
+                    <label>Social Media Profile (Facebook)</label>
+                    <input type="url" name="fb_link" placeholder="https://facebook.com/yourprofile" required>
+                </div>
+
+                <div id="personal-loan-fields" class="hidden">
                     <div class="form-group">
-                        <label for="offerCode">Ilagay ang iyong Offer Code:</label>
-                        <input type="text" id="offerCode" name="offerCode" placeholder="Enter your 6-digit code">
+                        <label>Declared Monthly Income (PHP)</label>
+                        <input type="number" name="income" placeholder="0.00">
                     </div>
                 </div>
 
-                <div id="premierSection" class="hidden">
-                    <div class="premier-badge">
-                        <span class="icon">📋</span>
-                        <span class="badge-text">Dahil wala kang Offer Code, hihingan ka namin ng dagdag na dokumento para ma-verify ang iyong kakayahang magbayad.</span>
-                    </div>
-                    <div class="form-group">
-                        <label>Income Level (Kalahatang Kita sa isang buwan):</label>
-                        <input type="text" name="incomeLevel" placeholder="Hal: PHP 25,000">
-                    </div>
-                    <div class="form-group">
-                        <label>Paano ka namin mabe-verify? (Link/Note):</label>
-                        <input type="text" name="verificationNote" placeholder="Hal: Payslip uploaded via drive link / I'm a permanent employee">
-                    </div>
-                </div>
-            </div>
-
-            <button type="submit" class="submit-btn" id="submitBtn">Submit Application</button>
+                <button type="submit" class="primary-btn" id="submitBtn">Submit Application</button>
+            </form>
         </div>
-    </form>
-    
-    <div id="responseMessage" class="hidden"></div>
+
+        <div id="step-success" class="hidden fade-in" style="text-align: center; padding-top: 40px;">
+            <div style="font-size: 64px; margin-bottom: 24px;">🛡️</div>
+            <h1>Submission Received</h1>
+            <p>Your application is currently being reviewed by our underwriting team. Please expect a notification via SMS shortly.</p>
+            <button class="primary-btn" onclick="window.location.reload()">Return Home</button>
+        </div>
+
+        <div class="footer-note">
+            SECURED BY ERRIHO PERSONAL FINANCE © 2026
+        </div>
+
+    </div>
 
     <script>
-        /* --- JS Logic for Toggling and Submission --- */
-        
-        // Function para tago/pakita ang tamang fields
-        function toggleFormSections() {
-            var appType = document.getElementById("appType").value;
-            var expressSection = document.getElementById("expressSection");
-            var premierSection = document.getElementById("premierSection");
-            var offerCodeInput = document.getElementById("offerCode");
+        function showStep(stepId) {
+            document.querySelectorAll('.main-container > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById(stepId).classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
 
-            if (appType === "Express Apply") {
-                expressSection.classList.remove("hidden");
-                premierSection.classList.add("hidden");
-                offerCodeInput.setAttribute("required", ""); // Required kung Express
+        function verifyCode() {
+            const code = document.getElementById('offerCodeInput').value;
+            if(code.trim().length >= 4) {
+                document.getElementById('applied_code').value = code;
+                startApplication('QuickCash');
             } else {
-                expressSection.classList.add("hidden");
-                premierSection.classList.remove("hidden");
-                offerCodeInput.removeAttribute("required"); // Hindi required kung Premier
+                alert("The code entered is invalid. Please check and try again.");
             }
         }
 
-        // Tawagin muna ito para tama ang default state
-        toggleFormSections();
-
-        // Submit Logic (Kabit sa Google Apps Script mo)
-        document.getElementById("loanApplicationForm").addEventListener("submit", function(event) {
-            event.preventDefault(); // Huwag muna mag-refresh
+        function startApplication(type) {
+            document.getElementById('loan_type').value = type;
+            document.getElementById('form-title').innerText = type === 'QuickCash' ? 'QuickCash Request' : 'Personal Loan Detail';
             
-            var submitBtn = document.getElementById("submitBtn");
-            var responseMessage = document.getElementById("responseMessage");
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Processing...";
-            responseMessage.classList.add("hidden");
-
-            // Kuhanin ang data
-            var formData = new FormData(event.target);
-            var object = {};
-            formData.forEach((value, key) => { object[key] = value });
+            const extraFields = document.getElementById('personal-loan-fields');
+            if(type === 'Personal Loan') {
+                extraFields.classList.remove('hidden');
+            } else {
+                extraFields.classList.add('hidden');
+            }
             
-            // Lagyan ng timestamp
-            object["timestamp"] = new Date().toLocaleString();
+            showStep('step-form');
+        }
 
-            // *** DITO MO ILALAGAY ANG GOOGLE APPS SCRIPT WEB APP URL MO ***
-            const webAppUrl = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+        document.getElementById('mainLoanForm').onsubmit = function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "PROCESSING...";
+            btn.disabled = true;
 
-            fetch(webAppUrl, {
-                method: 'POST',
-                mode: 'no-cors', // Important para sa cross-origin submission
-                cache: 'no-cache',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(object)
-            })
-            .then(response => {
-                // Dahil 'no-cors' ang gamit, mahirap malaman ang server response
-                // kaya assume na natin na pumasok (mas mabilis din para sa customer)
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Submit Application";
-                responseMessage.innerText = "Aplikasyon matagumpay na natanggap! Ipo-proseso namin ito agad. Salamat!";
-                responseMessage.className = "success";
-                responseMessage.classList.remove("hidden");
-                event.target.reset(); // I-clear ang form
-                toggleFormSections(); // I-reset ang dynamic fields
-            })
-            .catch(error => {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Submit Application";
-                responseMessage.innerText = "Pasensya na, nagkaroon ng error. Subukan muli.";
-                responseMessage.className = "error";
-                responseMessage.classList.remove("hidden");
-                console.error('Error:', error);
-            });
-        });
+            // Replace with your actual Google Apps Script Web App URL
+            const scriptURL = 'YOUR_APPS_SCRIPT_URL'; 
+            
+            fetch(scriptURL, { method: 'POST', body: new FormData(this)})
+                .then(response => {
+                    showStep('step-success');
+                })
+                .catch(error => {
+                    alert('Submission error. Please verify your connection and try again.');
+                    btn.disabled = false;
+                    btn.innerText = "Submit Application";
+                });
+        };
     </script>
+
 </body>
 </html>
