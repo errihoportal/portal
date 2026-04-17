@@ -6,272 +6,189 @@
     <title>Apply - ERRIHO PORTAL</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #27ae60;
-            --bg: #f8fafc;
-            --text: #0f172a;
-            --secondary: #64748b;
-            --white: #ffffff;
-        }
-
+        :root { --primary: #27ae60; --bg: #f8fafc; --text: #0f172a; --secondary: #64748b; --white: #ffffff; }
         * { box-sizing: border-box; }
-
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: var(--bg); 
-            margin: 0; 
-            padding: 0; 
-            color: var(--text); 
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
-        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: var(--text); overflow-x: hidden; }
         
-        /* --- AUTO-FIT HEADER --- */
         .app-header { 
-            background: var(--white); 
-            padding: 16px 5%; /* Flexible padding based on screen width */
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; /* Keeps logo left, text right */
-            position: sticky; 
-            top: 0; 
-            z-index: 1000; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            width: 100%;
+            background: #ffffff; padding: 15px 5%; display: flex; align-items: center; gap: 10px; 
+            position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; 
         }
 
-        .header-brand { display: flex; align-items: center; gap: 12px; }
-
-        /* --- RESPONSIVE CONTAINER --- */
-        .main-container { 
-            width: 92%; /* Uses most of the screen on mobile */
-            max-width: 600px; /* Wider for Tablet/Desktop comfort */
-            margin: 0 auto; 
-            padding: 40px 0; 
-            min-height: 85vh; 
-        }
+        .main-container { width: 92%; max-width: 500px; margin: 0 auto; padding: 25px 0; min-height: 85vh; }
         
-        .back-btn { 
-            text-decoration: none; 
-            color: var(--secondary); 
-            font-size: 12px; 
-            font-weight: 700; 
-            display: flex; 
-            align-items: center; 
-            gap: 6px; 
-            margin-bottom: 24px; 
-            cursor: pointer;
-            border: none;
-            background: none;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
         .hidden { display: none; }
-        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .welcome-section h1 { font-size: clamp(24px, 5vw, 32px); font-weight: 800; margin: 0; color: var(--text); letter-spacing: -0.5px; }
-        .welcome-section p { font-size: 15px; color: var(--secondary); margin-top: 10px; line-height: 1.6; margin-bottom: 32px; }
-
-        /* --- CARDS: Responsive Grid for Tablet --- */
-        .loan-card {
-            background: var(--white);
-            padding: 28px;
-            border-radius: 24px;
-            margin-bottom: 16px;
-            border: 1px solid #e2e8f0;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            display: block;
-            width: 100%;
-            text-align: left;
+        /* Calculator Summary Card */
+        .loan-summary-card {
+            background: #111827; color: white; padding: 25px; border-radius: 28px; 
+            margin-bottom: 30px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
         }
-        .loan-card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 12px 24px rgba(0,0,0,0.06); }
+        .summary-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+        .summary-value { font-size: 36px; font-weight: 800; margin: 8px 0; color: #fff; }
+        .summary-grid { border-top: 1px solid #374151; margin-top: 20px; padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .interest-badge { background: var(--primary); color: white; padding: 2px 8px; border-radius: 6px; font-size: 12px; margin-left: 5px; }
 
-        .icon-box { width: 56px; height: 56px; border-radius: 18px; display: flex; justify-content: center; align-items: center; font-size: 26px; margin-bottom: 16px; }
-        .card-title { font-size: 17px; font-weight: 700; display: block; margin-bottom: 6px; color: var(--text); }
-        .card-desc { font-size: 14px; color: var(--secondary); line-height: 1.5; }
+        /* Form Styling */
+        .form-group { margin-bottom: 22px; }
+        label { display: block; font-weight: 700; font-size: 12px; margin-bottom: 10px; color: var(--secondary); text-transform: uppercase; }
+        input, select { 
+            width: 100%; padding: 18px; border: 1.5px solid #e2e8f0; border-radius: 20px; 
+            font-size: 16px; outline: none; transition: 0.2s; background: #fff;
+        }
+        input:focus { border-color: var(--primary); background: #fff; }
 
-        /* --- FORM CONTROLS --- */
-        .form-group { margin-bottom: 24px; }
-        label { display: block; font-weight: 700; font-size: 12px; margin-bottom: 8px; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.5px; }
-        input {
-            width: 100%;
-            padding: 18px;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 18px;
-            font-size: 16px;
-            font-family: 'Inter', sans-serif;
-            outline: none;
+        .primary-btn { 
+            background: #111827; color: white; width: 100%; padding: 22px; border-radius: 20px; 
+            border: none; font-weight: 800; font-size: 16px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
             transition: 0.2s;
-            background: #fff;
         }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.1); }
-
-        .code-input { text-align: center; font-size: 32px !important; letter-spacing: 12px; font-weight: 800; color: var(--primary); text-transform: uppercase; }
-
-        .primary-btn {
-            background: #111827;
-            color: white;
-            width: 100%;
-            padding: 22px;
-            border-radius: 20px;
-            border: none;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 12px;
-            transition: all 0.2s;
-        }
-        .primary-btn:hover { background: #1f2937; transform: translateY(-1px); }
-
-        .footer-note { text-align: center; margin: 60px 0 30px; font-size: 12px; color: #94a3b8; font-weight: 600; letter-spacing: 0.5px; }
-
-        /* --- TABLET & DESKTOP ADJUSTMENTS --- */
-        @media (min-width: 768px) {
-            .main-container { padding: 60px 0; }
-            .welcome-section { text-align: center; }
-            .loan-card { padding: 35px; }
-        }
+        .primary-btn:hover { background: #1f2937; transform: scale(1.02); }
+        .back-link { display: block; text-align: center; margin-top: 20px; color: var(--secondary); text-decoration: none; font-size: 14px; font-weight: 600; }
     </style>
 </head>
 <body>
 
     <header class="app-header">
-        <div class="header-brand">
-            <img src="images/logo.png" alt="ERRIHO" style="height: 30px; width: auto;">
-        </div>
-        <span style="font-weight: 800; color: var(--primary); font-size: 14px; letter-spacing: 1px;">PORTAL</span>
+        <img src="images/logo.png" alt="ERRIHO" style="height: 30px; width: auto;">
+        <span style="font-weight: 800; color: #27ae60; font-size: 14px;">ERRIHO PORTAL</span>
     </header>
 
     <div class="main-container">
         
-        <div id="step-welcome" class="fade-in">
-            <button class="back-btn" onclick="window.location.href='index.html'">← Dashboard</button>
-            <div class="welcome-section">
-                <h1>Loan Application</h1>
-                <p>Select your preferred financial service to continue. Please ensure all provided information is accurate.</p>
+        <div id="step-choice" class="fade-in">
+            <h1 style="font-size: 28px; font-weight: 800; margin-bottom: 10px;">Apply for a Loan</h1>
+            <p style="color: var(--secondary); margin-bottom: 30px;">Choose how you want to proceed with your application.</p>
+            
+            <div style="background: #fff; padding: 25px; border-radius: 24px; border: 1.5px solid #e2e8f0; cursor: pointer; margin-bottom: 15px;" onclick="startFlow('Easy')">
+                <b style="font-size: 18px; display: block;">ERRIHO EASY (Invite-Only)</b>
+                <p style="font-size: 13px; color: var(--secondary);">Unlock special rates as low as 3.95% using your code.</p>
             </div>
 
-            <div class="loan-card" onclick="showStep('step-code')">
-                <div class="icon-box" style="background: #ecfdf5; color: #059669;">⚡</div>
-                <b class="card-title">QUICKCASH DISBURSEMENT</b>
-                <span class="card-desc">Short-term financial aid. Use your <b>Offer Code</b> for instant, document-free processing today.</span>
-            </div>
-
-            <div class="loan-card" onclick="startApplication('Personal Loan')">
-                <div class="icon-box" style="background: #eff6ff; color: #2563eb;">🏦</div>
-                <b class="card-title">PERSONAL INSTALLMENT LOAN</b>
-                <span class="card-desc">Extended payment terms up to 12 months. Standard income verification and credit assessment apply.</span>
+            <div style="background: #fff; padding: 25px; border-radius: 24px; border: 1.5px solid #e2e8f0; cursor: pointer;" onclick="startFlow('Regular')">
+                <b style="font-size: 18px; display: block;">REGULAR APPLICATION</b>
+                <p style="font-size: 13px; color: var(--secondary);">Standard application with a fixed 5% monthly interest.</p>
             </div>
         </div>
 
         <div id="step-code" class="hidden fade-in">
-            <button class="back-btn" onclick="showStep('step-welcome')">← Back</button>
-            <div class="welcome-section">
-                <h1>Verification</h1>
-                <p>Please enter the 6-digit <b>Offer Code</b> sent to your registered account or invitation.</p>
-            </div>
-            <div class="form-group">
-                <label>Offer Code</label>
-                <input type="text" id="offerCodeInput" class="code-input" maxlength="6" placeholder="••••••">
-            </div>
-            <button class="primary-btn" onclick="verifyCode()">Proceed to Application</button>
+            <h1 style="font-size: 24px; font-weight: 800;">Special Offer Code</h1>
+            <p style="color: var(--secondary); margin-bottom: 25px;">Enter the code provided to you to unlock special interest rates.</p>
+            <input type="text" id="offerCode" placeholder="ENTER CODE" style="text-align: center; font-weight: 800; font-size: 24px; letter-spacing: 5px;">
+            <button class="primary-btn" style="margin-top: 20px;" onclick="applyCode()">Unlock Special Rate</button>
+            <a href="#" class="back-link" onclick="location.reload()">Back to Selection</a>
         </div>
 
         <div id="step-form" class="hidden fade-in">
-            <button class="back-btn" onclick="showStep('step-welcome')">← Cancel</button>
-            <div class="welcome-section">
-                <h1 id="form-title">Details</h1>
-                <p>Complete the fields below to finalize your application. Our team will review your request shortly.</p>
+            <div class="loan-summary-card">
+                <span class="summary-label">Estimated Monthly Payment</span>
+                <div class="summary-value" id="calc-monthly">₱0.00</div>
+                
+                <div class="summary-grid">
+                    <div>
+                        <span class="summary-label">Interest Rate</span>
+                        <div style="font-weight: 700; margin-top: 5px;">
+                            <span id="display-rate">5.00</span>% <span class="interest-badge" id="rate-tag">Standard</span>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="summary-label">Loan Type</span>
+                        <div id="display-type" style="font-weight: 700; margin-top: 5px; color: #27ae60;">Regular</div>
+                    </div>
+                </div>
             </div>
 
-            <form id="mainLoanForm">
-                <input type="hidden" id="loan_type" name="loan_type">
-                <input type="hidden" id="applied_code" name="applied_code">
+            <form id="loanForm">
+                <div class="form-group">
+                    <label>How much do you need? (PHP)</label>
+                    <input type="number" id="loanAmount" placeholder="10000" oninput="updateCalculation()" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Payment Term (Months)</label>
+                    <select id="loanTerm" onchange="updateCalculation()">
+                        <option value="1">1 Month</option>
+                        <option value="3">3 Months</option>
+                        <option value="6">6 Months</option>
+                    </select>
+                </div>
 
                 <div class="form-group">
                     <label>Full Legal Name</label>
-                    <input type="text" name="full_name" placeholder="Ex: Juan A. Dela Cruz" required>
+                    <input type="text" name="fullName" placeholder="Juan Dela Cruz" required>
                 </div>
 
-                <div class="form-group">
-                    <label>Social Media Profile (Facebook URL)</label>
-                    <input type="url" name="fb_link" placeholder="https://facebook.com/yourname" required>
-                </div>
-
-                <div id="personal-loan-fields" class="hidden">
-                    <div class="form-group">
-                        <label>Monthly Declared Income (PHP)</label>
-                        <input type="number" name="income" placeholder="0.00">
-                    </div>
-                </div>
-
-                <button type="submit" class="primary-btn" id="submitBtn">Submit Request</button>
+                <button type="submit" class="primary-btn">GET THIS LOAN NOW</button>
+                <a href="#" class="back-link" onclick="location.reload()">Cancel and Restart</a>
             </form>
-        </div>
-
-        <div id="step-success" class="hidden fade-in" style="text-align: center; padding-top: 50px;">
-            <div style="font-size: 72px; margin-bottom: 24px;">🛡️</div>
-            <h1>Request Received</h1>
-            <p>Your application is now under review. Please keep your communication lines open for our update.</p>
-            <button class="primary-btn" onclick="window.location.reload()">Finish</button>
-        </div>
-
-        <div class="footer-note">
-            SECURED BY ERRIHO PERSONAL FINANCE © 2026
         </div>
 
     </div>
 
     <script>
-        function showStep(stepId) {
-            document.querySelectorAll('.main-container > div').forEach(div => div.classList.add('hidden'));
-            document.getElementById(stepId).classList.remove('hidden');
-            window.scrollTo(0,0);
-        }
+        let currentRate = 0.05; // 5% default for Regular
+        let mode = 'Regular';
 
-        function verifyCode() {
-            const code = document.getElementById('offerCodeInput').value;
-            if(code.trim().length >= 4) {
-                document.getElementById('applied_code').value = code;
-                startApplication('QuickCash');
+        function startFlow(type) {
+            mode = type;
+            if (type === 'Easy') {
+                showStep('step-code');
             } else {
-                alert("Please enter a valid Offer Code.");
+                currentRate = 0.05;
+                setupForm();
             }
         }
 
-        function startApplication(type) {
-            document.getElementById('loan_type').value = type;
-            document.getElementById('form-title').innerText = type === 'QuickCash' ? 'QuickCash Detail' : 'Personal Loan Detail';
+        function applyCode() {
+            const code = document.getElementById('offerCode').value;
+            if(code.length >= 4) {
+                currentRate = 0.0395; // 3.95% for Easy
+                setupForm();
+            } else {
+                alert("Please enter a valid code.");
+            }
+        }
+
+        function setupForm() {
+            document.getElementById('display-type').innerText = mode;
+            document.getElementById('display-rate').innerText = (currentRate * 100).toFixed(2);
             
-            const extraFields = document.getElementById('personal-loan-fields');
-            if(type === 'Personal Loan') {
-                extraFields.classList.remove('hidden');
+            const tag = document.getElementById('rate-tag');
+            if(mode === 'Easy') {
+                tag.innerText = "Special Offer";
+                tag.style.background = "#27ae60";
             } else {
-                extraFields.classList.add('hidden');
+                tag.innerText = "Standard";
+                tag.style.background = "#64748b";
             }
+            
             showStep('step-form');
         }
 
-        document.getElementById('mainLoanForm').onsubmit = function(e) {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            btn.innerText = "SENDING...";
-            btn.disabled = true;
-
-            const scriptURL = 'YOUR_APPS_SCRIPT_URL'; 
+        function updateCalculation() {
+            const amount = parseFloat(document.getElementById('loanAmount').value) || 0;
+            const term = parseInt(document.getElementById('loanTerm').value);
             
-            fetch(scriptURL, { method: 'POST', body: new FormData(this)})
-                .then(response => {
-                    showStep('step-success');
-                })
-                .catch(error => {
-                    alert('Submission error. Please check your connection.');
-                    btn.disabled = false;
-                    btn.innerText = "Submit Request";
-                });
+            // Formula: (Principal / Term) + (Principal * Rate)
+            const monthlyPrincipal = amount / term;
+            const monthlyInterest = amount * currentRate;
+            const totalMonthly = monthlyPrincipal + monthlyInterest;
+
+            document.getElementById('calc-monthly').innerText = "₱" + totalMonthly.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        function showStep(id) {
+            document.querySelectorAll('.main-container > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
+
+        document.getElementById('loanForm').onsubmit = function(e) {
+            e.preventDefault();
+            alert("Application submitted! Thank you.");
+            // Dito ilalagay ang Fetch function papuntang Google Sheets mo
         };
     </script>
 </body>
