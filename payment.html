@@ -396,36 +396,34 @@
         <span id="arrow-qrph" style="font-weight: bold; margin-left: 10px;">▼</span>
     </div>
 
-            <div id="qrph-content" class="option-content">
-
-                <img src="images/qrphdesign.png" style="width: 100%; max-width: 300px; margin-bottom: 10px;">
-
-                <br>
-
-                <img src="" id="qrImg" class="qr-code">
-
-                <p style="margin-top: 10px; font-size: 11px; color: #636e72; font-style: italic;">
-
-                    👆 <b>Long press</b> the QR code to <b>Save</b> or <b>Download</b>
-
-                </p>
-
-                <p style="font-size: 11px; margin-top: 10px; color: #7f8c8d;">Scan via GCash, Maya, or any Bank App</p>
-
-                <button class="btn-how-to" onclick="toggleModal(true)">❓ How to pay?</button>
-
-                <div style="margin-top: 15px; padding: 10px; background: #fff9db; border-radius: 8px; border: 1px solid #fab005;">
-
-    <p style="margin: 0; font-size: 11px; color: #856404; line-height: 1.4;">
-
-        <b>⚠️ IMPORTANT:</b> After your successful transaction, please <b>take a screenshot</b> of the confirmation and <b>upload it below</b> in the "Tap to upload Proof of Payment" section to verify your payment.
-
-    </p>
-
-</div>
-
+           <div id="qrph-content" class="option-content" style="text-align: center;">
+    <img src="images/qrphdesign.png" style="width: 100%; max-width: 300px; margin-bottom: 10px;">
+    <br>
+    
+    <img src="" id="qrImg" class="qr-code" style="max-width: 250px; border: 2px solid #eee; padding: 5px; border-radius: 8px;">
+    
+    <div style="margin-top: 10px;">
+        <a id="downloadQR" href="" download="FlaviDeal-QRPH.png" style="text-decoration: none;">
+            <button type="button" style="background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-size: 12px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                📥 DOWNLOAD QR CODE
+            </button>
+        </a>
     </div>
 
+    <p style="margin-top: 8px; font-size: 11px; color: #636e72; font-style: italic;">
+        (Or <b>Long press</b> the image above to Save)
+    </p>
+
+    <p style="font-size: 11px; margin-top: 10px; color: #7f8c8d;">Scan via GCash, Maya, or any Bank App</p>
+    
+    <button class="btn-how-to" onclick="toggleModal(true)">❓ How to pay?</button>
+
+    <div style="margin-top: 15px; padding: 10px; background: #fff9db; border-radius: 8px; border: 1px solid #fab005; text-align: left;">
+        <p style="margin: 0; font-size: 11px; color: #856404; line-height: 1.4;">
+            <b>⚠️ IMPORTANT:</b> After your successful transaction, please <b>take a screenshot</b> of the confirmation and <b>upload it below</b> in the "Tap to upload Proof of Payment" section to verify your payment.
+        </p>
+    </div>
+</div>
 </div>
 
 
@@ -1587,6 +1585,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function updateDownloadLink() {
+        const qrImgSrc = document.getElementById('qrImg').src;
+        if(qrImgSrc) {
+            document.getElementById('downloadQR').href = qrImgSrc;
+        }
+    }
+    // Tawagin ito kapag na-load na ang QR image mo
+    document.getElementById('qrImg').onload = updateDownloadLink;
 </script>
 </body>
 </html>
