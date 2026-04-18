@@ -522,19 +522,19 @@
 
 
 <div class="option-item" id="palawanPaySection">
-    
     <div class="option-header" onclick="toggleOption('palawan-content')" style="display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; flex-direction: column; gap: 4px;">
-            <span style="font-size: 14px; font-weight: bold;">
-                🟢 PALAWAN BRANCH (CASH-IN) 
-                <span class="fee-badge bg-free" style="font-size: 9px; vertical-align: middle;">ZERO FEES</span>
-            </span>
+        <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-right: 10px;">
+                <span style="font-size: 14px; font-weight: bold;">🟢 PALAWAN BRANCH (CASH-IN)</span>
+                <span class="fee-badge bg-free" style="font-size: 9px; padding: 2px 6px; border-radius: 3px; font-weight: bold; background: #27ae60; color: white;">ZERO FEES</span>
+            </div>
 
             <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
                 <img src="images/palawanpay.png" style="height: 30px; width: auto;" alt="PalawanPay">
             </div>
         </div>
-        <span id="arrow-palawan" style="font-weight: bold;">▼</span>
+        <span id="arrow-palawan" style="font-weight: bold; margin-left: 10px;">▼</span>
     </div>
     <div id="palawan-content" class="option-content">
         <div class="bank-details">
@@ -572,21 +572,22 @@
 
         
 
-        <div class="option-item">
-
+    <div class="option-item">
     <div class="option-header" onclick="toggleOption('bank-content')" style="display: flex; justify-content: space-between; align-items: center;">
-    <div style="display: flex; flex-direction: column; gap: 4px;">
-        <span style="font-size: 14px; font-weight: bold;">
-            🟢 BANK DEPOSIT / TRANSFER 
-            <span class="fee-badge bg-free" style="font-size: 9px; vertical-align: middle;">ZERO FEES</span>
-        </span>
-        <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
-            <img src="images/bpi.png" style="height: 50px; width: auto;" alt="BPI">
-            <img src="images/bdo.png" style="height: 50px; width: auto;" alt="BDO">
+        <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-right: 10px;">
+                <span style="font-size: 14px; font-weight: bold;">🟢 BANK DEPOSIT / TRANSFER</span>
+                <span class="fee-badge bg-free" style="font-size: 9px; padding: 2px 6px; border-radius: 3px; font-weight: bold; background: #27ae60; color: white;">ZERO FEES</span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+                <img src="images/bpi.png" style="height: 40px; width: auto;" alt="BPI">
+                <img src="images/bdo.png" style="height: 40px; width: auto;" alt="BDO">
+            </div>
         </div>
+        <span id="arrow-bank" style="font-weight: bold; margin-left: 10px;">▼</span>
     </div>
-    <span id="arrow-bank" style="font-weight: bold;">▼</span>
-</div>
     <div id="bank-content" class="option-content">
         <div class="bank-details">
             <div style="background: #eef2f7; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #00529b;">
@@ -635,22 +636,23 @@
 
 <div class="option-item">
     <div class="option-header" onclick="toggleOption('card-content')" style="display: flex; justify-content: space-between; align-items: center;">
-    <div style="display: flex; flex-direction: column; gap: 4px;">
-        <span style="font-size: 14px; font-weight: bold;">
-            🟠 CREDIT / DEBIT CARD
-            <span class="fee-badge bg-with-fee" style="font-size: 9px; vertical-align: middle;">WITH FEES</span>
-        </span>
+        <div style="display: flex; flex-direction: column; gap: 4px; width: 100%;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-right: 10px;">
+                <span style="font-size: 14px; font-weight: bold;">🟠 CREDIT / DEBIT CARD</span>
+                <span class="fee-badge bg-with-fee" style="font-size: 9px; padding: 2px 6px; border-radius: 3px; font-weight: bold; background: #e74c3c; color: white;">WITH FEES</span>
+            </div>
 
-        <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
-            <img src="images/visa.png" style="height: 50px; width: auto;" alt="Visa">
-            <img src="images/mc.png" style="height: 50px; width: auto;" alt="Mastercard">
-            <img src="images/ae.png" style="height: 50px; width: auto;" alt="AmericanExpress">
-            <img src="images/jcb.png" style="height: 50px; width: auto;" alt="Jcb">
-            <img src="images/gpay.png" style="height: 50px; width: auto;" alt="GPay">
+            <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px; flex-wrap: wrap;">
+                <img src="images/visa.png" style="height: 35px; width: auto;" alt="Visa">
+                <img src="images/mc.png" style="height: 35px; width: auto;" alt="Mastercard">
+                <img src="images/ae.png" style="height: 35px; width: auto;" alt="AmericanExpress">
+                <img src="images/jcb.png" style="height: 35px; width: auto;" alt="Jcb">
+                <img src="images/gpay.png" style="height: 35px; width: auto;" alt="GPay">
+            </div>
         </div>
+        <span id="arrow-card" style="font-weight: bold; margin-left: 10px;">▼</span>
     </div>
-    <span id="arrow-card" style="font-weight: bold;">▼</span>
-</div>
 
     <div id="card-content" class="option-content">
     <div class="bank-details" style="text-align: left;">
