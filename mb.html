@@ -6,7 +6,7 @@
     <title>Card Payment Maintenance - Flavi Deal</title>
     <style>
         * {
-            box-sizing: border-box; /* Ito ang fix para hindi lumagpas ang button */
+            box-sizing: border-box;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -62,31 +62,17 @@
             margin-bottom: 5px;
             color: #2d3436;
         }
-        /* FIXED BUTTON STYLE */
-        .btn-back {
+        .contact-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
             background: #0084ff;
             color: white;
-            border: none;
-            padding: 14px;
+            text-decoration: none;
             border-radius: 8px;
             font-weight: bold;
-            cursor: pointer;
-            width: 100%;
             font-size: 14px;
-            text-decoration: none;
-            display: block; /* Ginawang block para sakop ang width */
-            margin-top: 15px;
-        }
-        .btn-back:hover {
-            background: #0073e6;
-        }
-        .contact-link {
-            display: block;
-            margin-top: 15px;
-            font-size: 12px;
-            color: #0084ff;
-            text-decoration: none;
-            font-weight: 600;
+            width: 100%;
         }
     </style>
 </head>
@@ -94,8 +80,8 @@
 
 <div class="container">
     <div class="maintenance-icon">🛠️</div>
-    <h2>Online Card Payment Under Maintenance</h2>
-    <p>Our online card payment is currently unavailable, but you may still pay via card at our physical hubs:</p>
+    <h2>Card Payment Maintenance</h2>
+    <p>Online card payment is currently unavailable. You may still pay via card at our physical hubs:</p>
 
     <div class="hub-box">
         <span class="hub-title">📍 Official Hubs (Tap to Pay)</span>
@@ -108,7 +94,7 @@
 
             <div class="detail">
                 <b>🏝️ Masbate Hub:</b><br>
-               Balud, Masbate
+                Balud, Masbate
             </div>
 
             <div class="detail">
@@ -128,13 +114,11 @@
         </div>
     </div>
 
-    <p style="font-size: 12px;">For assistance, please contact Jerric directly.</p>
+    <p style="font-size: 12px; margin-bottom: 15px;">Please use your phone's back button to return to the payment portal.</p>
 
-    <a href="#" onclick="window.history.back(); return false;" class="btn-back">
-        Go Back to Payment Options
+    <a href="https://m.me/jerricisjhon" target="_blank" class="contact-link">
+        Message Jerric for Assistance
     </a>
-
-    <a href="https://m.me/jerricisjhon" target="_blank" class="contact-link">Contact Jerric via Messenger</a>
 </div>
 
 </body>
