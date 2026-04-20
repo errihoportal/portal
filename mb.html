@@ -5,19 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Card Payment Maintenance - Flavi Deal</title>
     <style>
+        * {
+            box-sizing: border-box; /* Ito ang fix para hindi lumagpas ang button */
+        }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f9fa;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             padding: 20px;
         }
         .container {
             background: white;
-            padding: 30px;
+            padding: 25px;
             border-radius: 15px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             max-width: 400px;
@@ -51,7 +54,7 @@
             font-weight: bold;
             font-size: 13px;
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             text-transform: uppercase;
         }
         .detail {
@@ -59,19 +62,20 @@
             margin-bottom: 5px;
             color: #2d3436;
         }
+        /* FIXED BUTTON STYLE */
         .btn-back {
             background: #0084ff;
             color: white;
             border: none;
-            padding: 12px 25px;
+            padding: 14px;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
             width: 100%;
             font-size: 14px;
-            transition: 0.3s;
             text-decoration: none;
-            display: inline-block;
+            display: block; /* Ginawang block para sakop ang width */
+            margin-top: 15px;
         }
         .btn-back:hover {
             background: #0073e6;
@@ -91,43 +95,44 @@
 <div class="container">
     <div class="maintenance-icon">🛠️</div>
     <h2>Online Card Payment Under Maintenance</h2>
-    <p>Sorry for the inconvenience. Our online card payment is currently unavailable, but you may still pay using your card at our physical hub:</p>
+    <p>Our online card payment is currently unavailable, but you may still pay via card at our physical hubs:</p>
 
-    <div class="hub-box" style="background: #fff5f5; border: 1px solid #ffc9c9; padding: 15px; border-radius: 10px; text-align: left; margin: 20px 0;">
-    <span class="hub-title" style="color: #e03131; font-weight: bold; font-size: 13px; display: block; margin-bottom: 10px; text-transform: uppercase;">
-        📍 Official Hubs (Tap to Pay Available)
-    </span>
-    
-    <div style="display: flex; flex-direction: column; gap: 12px;">
-        <div class="detail" style="font-size: 12px; line-height: 1.4; color: #2d3436;">
-            <b>🏙️ Metro Manila Hub:</b><br>
-            Caloocan City, Metro Manila
-        </div>
+    <div class="hub-box">
+        <span class="hub-title">📍 Official Hubs (Tap to Pay)</span>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="detail">
+                <b>🏙️ Metro Manila Hub:</b><br>
+                Caloocan City, Metro Manila
+            </div>
 
-        <div class="detail" style="font-size: 12px; line-height: 1.4; color: #2d3436;">
-            <b>🏝️ Masbate Hub:</b><br>
-            Caloocan Amapro, Balud, Masbate
-        </div>
+            <div class="detail">
+                <b>🏝️ Masbate Hub:</b><br>
+                Caloocan Amapro, Balud, Masbate
+            </div>
 
-        <div class="detail" style="font-size: 12px; line-height: 1.4; color: #2d3436;">
-            <b>🏠 Butuan City Hub:</b><br>
-            Butuan City (Main Branch)
-        </div>
+            <div class="detail">
+                <b>🏠 Butuan City Hub:</b><br>
+                Butuan City (Main Branch)
+            </div>
 
-        <hr style="border: 0; border-top: 1px solid #ffc9c9; margin: 5px 0;">
+            <hr style="border: 0; border-top: 1px solid #ffc9c9; margin: 5px 0;">
 
-        <div class="detail" style="font-size: 12px; color: #2d3436;">
-            <b>👤 Contact Person:</b> Jerric Jhon Dela Cruz<br>
-            <b>📞 Contact Number:</b> <a href="tel:09127430456" style="color: #0084ff; text-decoration: none; font-weight: bold;">
-        0912 743 0456
-    </a>
+            <div class="detail">
+                <b>👤 Contact Person:</b> Jerric Jhon Dela Cruz<br>
+                <b>📞 Contact Number:</b> 
+                <a href="tel:09127430456" style="color: #0084ff; text-decoration: none; font-weight: bold;">
+                    0912 743 0456
+                </a>
+            </div>
         </div>
     </div>
-</div>
 
-    <p style="font-size: 12px;">For additional assistance and concerns, please contact Jerric directly.</p>
+    <p style="font-size: 12px;">For assistance, please contact Jerric directly.</p>
 
-    <a href="javascript:history.back()" class="btn-back">Go Back to Payment Options</a>
+    <a href="#" onclick="window.history.back(); return false;" class="btn-back">
+        Go Back to Payment Options
+    </a>
 
     <a href="https://m.me/jerricjhondelacruz" target="_blank" class="contact-link">Contact Jerric via Messenger</a>
 </div>
