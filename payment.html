@@ -631,84 +631,86 @@
     </div>
 
     <div id="seven-eleven-content" class="option-content">
-        <div class="bank-details" style="text-align: left;">
-            <div style="background: #fff9f0; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #f39c12;">
-                <p style="margin: 0; font-size: 11px; color: #a67c00; line-height: 1.4;">
-                    <b>⚠️ 7-Eleven Payment Notice:</b> Pay at any 7-Eleven branch nationwide. 
-                    A <b>₱15.00 Fixed Convenience Fee</b> is applied per transaction. This fee is for the payment gateway service.
-                </p>
+    <div class="bank-details" style="text-align: left;">
+        <div style="background: #fff9f0; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #f39c12;">
+            <p style="margin: 0; font-size: 11px; color: #a67c00; line-height: 1.4;">
+                <b>⚠️ 7-Eleven Payment Notice:</b> Pay at any 7-Eleven branch nationwide. 
+                A <b>₱15.00 Personal Transfer Fee</b> is applied per transaction. This fee is charged by the payment provider and does not go to Flavi Deal.
+            </p>
+        </div>
+
+        <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 15px; border: 1px solid #eee;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <span>Bill Amount:</span> 
+                <span id="sevenElevenBaseAmount" style="font-weight: 600;">₱0.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #e74c3c;">
+                <span>Personal Transfer Fee:</span> 
+                <span id="sevenElevenFeeAmount">+ ₱15.00</span>
             </div>
 
-            <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 15px; border: 1px solid #eee;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                    <span>Bill Amount:</span> 
-                    <span id="sevenElevenBaseAmount" style="font-weight: 600;">₱0.00</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #e74c3c;">
-                    <span>Convenience Fee (Fixed):</span> 
-                    <span id="sevenElevenFeeAmount">+ ₱15.00</span>
-                </div>
-
-                <hr style="border:0; border-top:1px solid #ddd; margin: 8px 0;">
-                <div style="display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 15px; color: #2c3e50;">
-                    <span>Total to Pay:</span> 
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span id="sevenElevenTotalAmount">₱0.00</span>
-                        <button onclick="copyAmount('sevenElevenTotalAmount')" style="background: #f0fff4; border: 1px solid #20c997; border-radius: 6px; cursor: pointer; padding: 4px 8px; color: #0b6623; font-size: 10px; font-weight: 700;">
-                            📋 COPY
-                        </button>
-                    </div>
+            <hr style="border:0; border-top:1px solid #ddd; margin: 8px 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 15px; color: #2c3e50;">
+                <span>Total to Pay:</span> 
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span id="sevenElevenTotalAmount">₱0.00</span>
+                    <button onclick="copyAmount('sevenElevenTotalAmount')" style="background: #f0fff4; border: 1px solid #20c997; border-radius: 6px; cursor: pointer; padding: 4px 8px; color: #0b6623; font-size: 10px; font-weight: 700;">
+                        📋 COPY
+                    </button>
                 </div>
             </div>
+        </div>
 
             <div style="font-size: 13px; line-height: 1.6; background: #ffffff; padding: 15px; border-radius: 10px; border: 1px solid #e9ecef;">
-                <b style="color: #e67e22; display: flex; align-items: center; gap: 8px; font-size: 14px;">
-                    🔗 HOW TO PAY AT 7-ELEVEN:
-                </b>
-                
-                <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 12px;">
-                    <div style="display: flex; gap: 10px;">
-                        <span style="background: #e67e22; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; font-weight: bold;">1</span>
-                        <span>Copy the <b>Total to Pay</b> amount and click the button below to generate your <b>7-Eleven Barcode</b>.</span>
-                    </div>
+    <b style="color: #e67e22; display: flex; align-items: center; gap: 8px; font-size: 14px;">
+        🔗 HOW TO PAY AT 7-ELEVEN:
+    </b>
+    
+    <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; gap: 10px;">
+            <span style="background: #e67e22; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; font-weight: bold;">1</span>
+            <span>Copy the <b>Total to Pay</b> amount (kasama ang ₱15.00 transfer fee).</span>
+        </div>
 
-                    <div style="display: flex; gap: 10px;">
-                        <span style="background: #e67e22; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; font-weight: bold;">2</span>
-                        <span>Show the barcode to the 7-Eleven cashier and inform them you are paying for <b>Maya/The Figu Store</b>.</span>
-                    </div>
+        <div style="display: flex; gap: 10px;">
+            <span style="background: #e67e22; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; font-weight: bold;">2</span>
+            <span>Click <b>"Message Jerric"</b> below para mag-request ng <b>7-Eleven Barcode</b>. Ipakita ang barcode sa cashier para makapagbayad.</span>
+        </div>
 
-                    <div style="display: flex; gap: 10px;">
-                        <span style="background: #e67e22; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; font-weight: bold;">3</span>
-                        <span>Once paid, <b>Screenshot or take a photo</b> of your receipt.</span>
-                    </div>
+        <div style="display: flex; gap: 10px;">
+            <span style="background: #e67e22; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; font-weight: bold;">3</span>
+            <span>After magbayad, <b>picturan nang malinaw</b> ang iyong official receipt.</span>
+        </div>
 
-                    <div style="display: flex; gap: 10px;">
-                        <span style="background: #e67e22; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; font-weight: bold;">4</span>
-                        <span>Upload the receipt here and click <b>SUBMIT PAYMENT</b> to notify us.</span>
-                    </div>
-                </div>
-            </div>
+        <div style="display: flex; gap: 10px;">
+            <span style="background: #e67e22; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; font-weight: bold;">4</span>
+            <span>I-upload ang litrato ng resibo rito at i-click ang <b>SUBMIT PAYMENT</b>.</span>
+        </div>
+    </div>
+</div>
+
+        <div id="sevenElevenButtonContainer" style="margin-top: 15px; text-align: center;">
+    <button type="button" onclick="messageJerric()" style="width: 100%; background: #e67e22; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 6px rgba(230, 126, 34, 0.2); transition: 0.3s;">
+        💬 MESSAGE JERRIC FOR BARCODE
+    </button>
+</div>
             
             <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
             
             <label style="display: flex; gap: 10px; font-size: 12px; cursor: pointer; align-items: center; background: #fdfdfd; padding: 10px; border-radius: 5px; border: 1px solid #f0f0f0; margin-bottom: 10px;">
-                <input type="checkbox" id="feeAgree711" style="transform: scale(1.2);">
-                <span style="color: #444;">I agree to the <b>₱15.00 Convenience Fee</b>.</span>
-            </label>
-
-            <div id="sevenElevenButtonContainer" style="margin-top: 15px; text-align: center;">
-                <a href="https://errihoportal.flavideal.com/mb" target="_blank" style="text-decoration: none; display: block;">
-                    <button type="button" style="width: 100%; background: #e67e22; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 6px rgba(230, 126, 34, 0.2); transition: 0.3s;">
-                        GENERATE 7-ELEVEN BARCODE
-                    </button>
-                </a>
-            </div>
+            <input type="checkbox" id="feeAgree711" style="transform: scale(1.2);">
+            <span style="color: #444;">I agree to the <b>₱15.00 Personal Transfer Fee</b>.</span>
+        </label>
 
             <div style="text-align: center; margin-top: 20px; padding-bottom: 10px; opacity: 0.9;">
-                <span style="font-size: 10px; color: #7f8c8d; display: block; font-weight: 500;">
-                    Securely processed by <b>Maya Business</b>
-                </span>
-            </div>
+    <span style="font-size: 10px; color: #7f8c8d; display: block; font-weight: 500; line-height: 1.5;">
+        Processed via <b>Salmon Personal Transfer</b><br>
+        Account Name: <b>Jerric Jhon Dela Cruz</b>
+    </span>
+    <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px;">
+        <img src="images/salmon_logo.png" style="height: 20px; width: auto; vertical-align: middle;" alt="Salmon">
+    </div>
+</div>
         </div>
     </div>
 </div>
