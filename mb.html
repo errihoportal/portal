@@ -140,6 +140,37 @@
 </div>
 </div>
 
+<script>
+    // 1. Kunin ang data mula sa URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const userName = urlParams.get('name') || "Customer";
+    const billNum = urlParams.get('bill') || "N/A";
+    const amount = urlParams.get('amount') || "N/A";
+
+    function copyAndMessage() {
+        // 2. I-format ang message
+        const textToCopy = `Hi Jerric! Card payment is under maintenance. I need help with:
+Name: ${userName}
+Bill #: ${billNum}
+Amount: ₱${amount}`;
+
+        // 3. Copy to clipboard
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert("✅ ACCOUNT DETAILS COPIED!\n\nI-hold at i-PASTE ang message sa Messenger ni Jerric para sa manual assistance.");
+            window.open("https://m.me/jerricisjhon", "_blank");
+        }).catch(err => {
+            // Backup kung sakaling block ang clipboard
+            window.open("https://m.me/jerricisjhon", "_blank");
+        });
+    }
+
+    // 4. I-bind ang function sa button
+    document.querySelector('.contact-link').onclick = function(e) {
+        e.preventDefault(); // Pigilan ang normal na pag-open ng link
+        copyAndMessage();
+    };
+</script>
+
 
 
 </body>
