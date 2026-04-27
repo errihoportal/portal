@@ -483,21 +483,19 @@
                 </div>
             </div>
 
-            <div style="text-align: center;">
-                <a href="https://m.me/jerricisjhon" target="_blank" style="text-decoration: none; display: block;">
-                    <button type="button" style="width: 100%; background: #0084ff; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 6px rgba(0, 132, 255, 0.2);">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/be/Facebook_Messenger_logo_2020.svg" style="height: 20px; width: auto;" alt="Messenger">
-                        MESSAGE JERRIC FOR QR
-                    </button>
-                </a>
+           <div style="text-align: center;">
+    <button type="button" onclick="requestInstallmentQR()" style="width: 100%; background: #0084ff; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 6px rgba(0, 132, 255, 0.2);">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/be/Facebook_Messenger_logo_2020.svg" style="height: 20px; width: auto;" alt="Messenger">
+        MESSAGE JERRIC FOR QR
+    </button>
 
-                <div style="font-size: 11px; color: #333; text-align: left; margin-top: 15px; line-height: 1.5; background: #fff5f5; padding: 12px; border-radius: 8px; border: 1px solid #ffc9c9;">
-                    <b style="color: #e03131;">⚠️ IMPORTANT REMINDER:</b><br>
-                    Huwag gamitin ang regular QRPH option sa taas para sa installment. Ang <b>SPayLater at BillEase</b> ay nangangailangan ng <b>Unique QRPH</b> na ise-send ni Jerric. 
-                    <br><br>
-                    <i>Note: Ang Unique QRPH code na ibibigay ay may <b>90 seconds validity</b> lamang at ma-e-expire agad.</i>
-                </div>
-            </div>
+    <div style="font-size: 11px; color: #333; text-align: left; margin-top: 15px; line-height: 1.5; background: #fff5f5; padding: 12px; border-radius: 8px; border: 1px solid #ffc9c9;">
+        <b style="color: #e03131;">⚠️ IMPORTANT REMINDER:</b><br>
+        Huwag gamitin ang regular QRPH option sa taas para sa installment. Ang <b>SPayLater at BillEase</b> ay nangangailangan ng <b>Unique QRPH</b> na ise-send ni Jerric. 
+        <br><br>
+        <i>Note: Ang Unique QRPH code na ibibigay ay may <b>90 seconds validity</b> lamang at ma-e-expire agad.</i>
+    </div>
+</div>
         </div> </div> </div>
 
 
@@ -1738,6 +1736,30 @@ Total Amount: ${amount}`;
     }).catch(err => {
         // Fallback kung sakaling may error sa clipboard
         window.open(`https://m.me/jerricisjhon`, '_blank');
+    });
+}
+
+function requestInstallmentQR() {
+    // 1. Kunin ang data mula sa billData (Outstanding amount ang kukunin dito)
+    const name = billData.name || "Customer";
+    const billNum = billData.bill || "N/A";
+    const amount = document.getElementById('outstandingAmount').innerText; // Siguraduhin na ito ang ID ng main amount mo
+
+    // 2. Ang message na mada-copy
+    const textToCopy = `Hi Jerric! I would like to request an Installment QR (SPayLater/BillEase) for:
+Name: ${name}
+Bill #: ${billNum}
+Total Amount: ${amount}`;
+
+    // 3. Automatic Copy to Clipboard
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        // 4. Alert Confirmation
+        alert("✅ INSTALLMENT DETAILS COPIED!\n\nI-hold at i-PASTE ang message sa Messenger ni Jerric para ma-send ang QR code.");
+        
+        // 5. Buksan ang Messenger
+        window.open("https://m.me/jerricisjhon", "_blank");
+    }).catch(err => {
+        window.open("https://m.me/jerricisjhon", "_blank");
     });
 }
 </script>
