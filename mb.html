@@ -141,32 +141,32 @@
 </div>
 
 <script>
-    // 1. Kunin ang data mula sa URL
+    // 1. Kunin ang data mula sa URL (Galing sa payment.html na may 3.20% fee na)
     const urlParams = new URLSearchParams(window.location.search);
     const userName = urlParams.get('name') || "Customer";
     const billNum = urlParams.get('bill') || "N/A";
     const amount = urlParams.get('amount') || "N/A";
 
     function copyAndMessage() {
-        // 2. I-format ang message
-        const textToCopy = `Hi Jerric! Card payment is under maintenance. I need help with:
+        // 2. I-format ang message (Nilinaw natin na Card Tap-to-Pay ang kailangan)
+        const textToCopy = `Hi Jerric! Online Card Payment is under maintenance. I want to pay via Card Tap-to-Pay (Physical Hub):
 Name: ${userName}
 Bill #: ${billNum}
-Amount: ₱${amount}`;
+Total Amount (w/ fee): ₱${amount}`;
 
         // 3. Copy to clipboard
         navigator.clipboard.writeText(textToCopy).then(() => {
-            alert("✅ ACCOUNT DETAILS COPIED!\n\nI-hold at i-PASTE ang message sa Messenger ni Jerric para sa manual assistance.");
+            // In-update ang Alert para malinaw ang instructions
+            alert("✅ DETAILS COPIED!\n\nOnline Card Payment is currently unavailable, but you can pay via Card Tap-to-Pay at our hubs.\n\nI-PASTE ang details sa Messenger ni Jerric para ma-assist ka sa pinakamalapit na Hub.");
             window.open("https://m.me/jerricisjhon", "_blank");
         }).catch(err => {
-            // Backup kung sakaling block ang clipboard
             window.open("https://m.me/jerricisjhon", "_blank");
         });
     }
 
     // 4. I-bind ang function sa button
     document.querySelector('.contact-link').onclick = function(e) {
-        e.preventDefault(); // Pigilan ang normal na pag-open ng link
+        e.preventDefault(); 
         copyAndMessage();
     };
 </script>
