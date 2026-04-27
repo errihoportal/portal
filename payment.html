@@ -1099,11 +1099,16 @@ dateDisplay.innerText = mainDueDate.toLocaleDateString('en-US', {
     if (feesArea) feesArea.innerHTML = "";
     activeSec.style.display = 'block';
 
-    // 5. CARD FEE
+// 5. CARD FEE
 const feeMultiplier = 0.032;
 const cardFee = displayTotal * feeMultiplier;
 const cardTotal = displayTotal + cardFee;
 
+// DAGDAG MO ITO: 7-Eleven Fixed Fee Logic
+const sevenElevenFee = 15.00; // Fixed 15 pesos
+const sevenElevenTotal = displayTotal + sevenElevenFee;
+
+// Card
 if (document.getElementById('cardBaseAmount')) 
     document.getElementById('cardBaseAmount').innerText = "₱" + displayTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
@@ -1112,6 +1117,11 @@ if (document.getElementById('cardFeeAmount'))
 
 if (document.getElementById('cardTotalAmount')) 
     document.getElementById('cardTotalAmount').innerText = "₱" + cardTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+// DAGDAG MO ITO: Display for 7-Eleven
+if (document.getElementById('sevenElevenBaseAmount')) document.getElementById('sevenElevenBaseAmount').innerText = "₱" + displayTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
+if (document.getElementById('sevenElevenFeeAmount')) document.getElementById('sevenElevenFeeAmount').innerText = "+ ₱" + sevenElevenFee.toLocaleString('en-US', {minimumFractionDigits: 2});
+if (document.getElementById('sevenElevenTotalAmount')) document.getElementById('sevenElevenTotalAmount').innerText = "₱" + sevenElevenTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
         
     // --- 6. MAIN STATUS LOGIC (FIXED STRUCTURE) ---
     if (status === "maintenance") {
@@ -1487,23 +1497,40 @@ if (document.getElementById('cardTotalAmount'))
     }
 
     function uploadFile() {
-        if (globalTimer) { 
+    if (globalTimer) { 
         clearInterval(globalTimer); 
         console.log("Timer stopped because upload started.");
     }
-        const fileInput = document.getElementById('fileInput');
-        const submitBtn = document.getElementById('submitBtn');
-        
-        if (fileInput.files.length === 0) { alert("Please select a photo of your receipt."); return; }
-        // --- ADD THIS: Fee Agreement Check ---
-        const cardContent = document.getElementById('card-content');
+
+    const fileInput = document.getElementById('fileInput');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (fileInput.files.length === 0) { 
+        alert("Please select a photo of your receipt."); 
+        return; 
+    }
+
+    // --- FEE AGREEMENT CHECK LOGIC ---
+    const cardContent = document.getElementById('card-content');
+    const sevenElevenContent = document.getElementById('seven-eleven-content');
+
+    // 1. Check kung Credit/Debit Card ang gamit
+    if (cardContent && cardContent.style.display === 'block') {
         const feeAgree = document.getElementById('feeAgree');
-        if (cardContent && cardContent.style.display === 'block') {
-            if (feeAgree && !feeAgree.checked) {
-                alert("Please agree to the 3.20% processing fee before submitting.");
-                return;
-            }
+        if (feeAgree && !feeAgree.checked) {
+            alert("Please agree to the 3.20% processing fee before submitting.");
+            return;
         }
+    }
+
+    // 2. Check kung 7-Eleven ang gamit
+    if (sevenElevenContent && sevenElevenContent.style.display === 'block') {
+        const feeAgree711 = document.getElementById('feeAgree711');
+        if (feeAgree711 && !feeAgree711.checked) {
+            alert("Please agree to the ₱15.00 convenience fee before submitting.");
+            return;
+        }
+    }
         // --------------------------------------
         submitBtn.disabled = true;
         submitBtn.innerText = "Uploading... Please wait";
