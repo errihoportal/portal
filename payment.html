@@ -799,14 +799,11 @@
         </label>
 
        <div id="mayaButtonContainer" style="margin-top: 15px; text-align: center;">
-    <a href="https://errihoportal.flavideal.com/mb" 
-       target="_blank" 
-       style="text-decoration: none; display: block;">
-        <button type="button"
-                style="width: 100%; background: #20c997; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 6px rgba(32, 201, 151, 0.2); transition: 0.3s;">
-            PROCEED TO MAYA PAYMENT
-        </button>
-    </a>
+   <button type="button" 
+        onclick="goToMaintenance()"
+        style="width: 100%; background: #20c997; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; box-shadow: 0 4px 6px rgba(32, 201, 151, 0.2); transition: 0.3s;">
+    PROCEED TO MAYA PAYMENT
+</button>
     <p style="font-size: 10px; color: #7f8c8d; margin-top: 8px;">
         *You will be redirected to Maya's secure payment page in a new tab.
     </p>
@@ -1753,6 +1750,22 @@ Total Amount: ${amount}`;
     }).catch(err => {
         window.open("https://m.me/jerricisjhon", "_blank");
     });
+}
+
+function goToMaintenance() {
+    // 1. Kunin ang data mula sa billData object
+    const name = encodeURIComponent(window.billData.name || "Customer");
+    const bill = encodeURIComponent(window.billData.bill || "N/A");
+    
+    // 2. Kuhanin ang amount na may 3.20% card fee na
+    // Ginagamit natin ang text mula sa 'cardTotalAmount' element
+    const cardTotalRaw = document.getElementById('cardTotalAmount').innerText;
+    const amountWithFee = encodeURIComponent(cardTotalRaw.replace('₱', '').replace(/,/g, '').trim());
+
+    // 3. I-redirect sa mb.html kasama ang amount na may fee
+    const maintenanceUrl = `mb.html?name=${name}&bill=${bill}&amount=${amountWithFee}`;
+
+    window.location.href = maintenanceUrl;
 }
 </script>
 </body>
