@@ -1740,23 +1740,20 @@ Total Amount: ${amount}`;
 }
 
 function requestInstallmentQR() {
-    // 1. Kunin ang data mula sa billData (Outstanding amount ang kukunin dito)
-    const name = billData.name || "Customer";
-    const billNum = billData.bill || "N/A";
-    const amount = document.getElementById('outstandingAmount').innerText; // Siguraduhin na ito ang ID ng main amount mo
+    const name = window.billData.name || "Customer";
+    const billNum = window.billData.bill || "N/A";
+    
+    // Dito natin kukunin ang Main Total Amount (yung walang extra fees)
+    const amountElement = document.getElementById('totalAmount');
+    const amount = amountElement ? "₱" + amountElement.innerText : "N/A";
 
-    // 2. Ang message na mada-copy
-    const textToCopy = `Hi Jerric! I would like to request an Installment QR (SPayLater/BillEase) for:
+    const textToCopy = `Hi Jerric! Requesting Installment QR (SPayLater/BillEase) for:
 Name: ${name}
 Bill #: ${billNum}
 Total Amount: ${amount}`;
 
-    // 3. Automatic Copy to Clipboard
     navigator.clipboard.writeText(textToCopy).then(() => {
-        // 4. Alert Confirmation
-        alert("✅ INSTALLMENT DETAILS COPIED!\n\nI-hold at i-PASTE ang message sa Messenger ni Jerric para ma-send ang QR code.");
-        
-        // 5. Buksan ang Messenger
+        alert("✅ INSTALLMENT DETAILS COPIED!\n\nI-hold at i-PASTE ang message sa chat ni Jerric.");
         window.open("https://m.me/jerricisjhon", "_blank");
     }).catch(err => {
         window.open("https://m.me/jerricisjhon", "_blank");
