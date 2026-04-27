@@ -635,7 +635,7 @@
         <div style="background: #fff9f0; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #f39c12;">
             <p style="margin: 0; font-size: 11px; color: #a67c00; line-height: 1.4;">
                 <b>⚠️ 7-Eleven Payment Notice:</b> Pay at any 7-Eleven branch nationwide. 
-                A <b>₱15.00 Personal Transfer Fee</b> is applied per transaction. This fee is charged by the payment provider and does not go to Flavi Deal.
+                A <b>₱15.00 Personal Transfer Fee</b> is applied per transaction. This fee is charged by the payment provider and does not go to ErriHo.
             </p>
         </div>
 
@@ -1724,7 +1724,7 @@ function updateDownloadLink() {
     document.getElementById('qrImg').onload = updateDownloadLink;
 
 function messageJerric() {
-    // Kunin ang data mula sa billData (ito yung variable mo sa taas)
+    // Kunin ang data mula sa billData
     const name = billData.name || "Customer";
     const billNum = billData.bill || "N/A";
     const amount = document.getElementById('sevenElevenTotalAmount').innerText;
@@ -1738,11 +1738,19 @@ Total Amount: ${amount}`;
     // I-encode ang text para pumasok sa URL
     const encodedText = encodeURIComponent(text);
 
-    // PALITAN MO ITO: Ilagay ang iyong Facebook Page ID o Username
-    const messengerLink = `https://m.me/jerricisjhon?text=${encodedText}`;
+    // GAMITIN NATIN ANG FACEBOOK MESSAGES LINK (Mas effective ito sa pre-filled text)
+    // Link structure: facebook.com/messages/t/USERID?text=MESSAGE
+    const messengerLink = `https://www.facebook.com/messages/t/jerricisjhon?text=${encodedText}`;
 
-    // Buksan ang Messenger sa bagong tab
-    window.open(messengerLink, '_blank');
+    // Alternative shortcut (Kung ayaw pa rin, ito ang pinaka-safe):
+    // const messengerLink = `https://m.me/jerricisjhon`; 
+
+    // Bago buksan ang link, i-copy muna natin ang text sa clipboard para kung sakaling 
+    // hindi lumabas ang text sa Messenger, i-pe-paste na lang ng customer.
+    navigator.clipboard.writeText(text).then(() => {
+        console.log("Message prepared and copied to clipboard.");
+        window.open(messengerLink, '_blank');
+    });
 }
 </script>
 </body>
