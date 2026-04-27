@@ -684,7 +684,7 @@
 
         <div style="display: flex; gap: 10px;">
             <span style="background: #e67e22; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; font-weight: bold;">4</span>
-            <span>I-upload ang litrato ng resibo rito at i-click ang <b>SUBMIT PAYMENT</b>.</span>
+            <span>I-upload ang litrato ng resibo sa baba "Tap to upload Proof of payment" at i-click ang <b>SUBMIT PAYMENT</b>.</span>
         </div>
     </div>
 </div>
@@ -1722,6 +1722,28 @@ function updateDownloadLink() {
     }
     // Tawagin ito kapag na-load na ang QR image mo
     document.getElementById('qrImg').onload = updateDownloadLink;
+
+function messageJerric() {
+    // Kunin ang data mula sa billData (ito yung variable mo sa taas)
+    const name = billData.name || "Customer";
+    const billNum = billData.bill || "N/A";
+    const amount = document.getElementById('sevenElevenTotalAmount').innerText;
+
+    // Ang message na lalabas sa chat
+    const text = `Hi Jerric! I would like to request a 7-Eleven Barcode for:
+Name: ${name}
+Bill #: ${billNum}
+Total Amount: ${amount}`;
+
+    // I-encode ang text para pumasok sa URL
+    const encodedText = encodeURIComponent(text);
+
+    // PALITAN MO ITO: Ilagay ang iyong Facebook Page ID o Username
+    const messengerLink = `https://m.me/jerricisjhon?text=${encodedText}`;
+
+    // Buksan ang Messenger sa bagong tab
+    window.open(messengerLink, '_blank');
+}
 </script>
 </body>
 </html>
